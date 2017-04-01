@@ -6,3 +6,4 @@ service lava-server stop
 service lava-server-gunicorn stop
 service apache2 stop
 service postgresql stop
+service tftpd-hpa stop

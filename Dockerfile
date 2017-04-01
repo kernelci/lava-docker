@@ -58,5 +58,5 @@ RUN /start.sh \
  && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
  && /stop.sh
 
-EXPOSE 22 80 5555 5556
+EXPOSE 69 80 5555 5556
 CMD /start.sh && bash
