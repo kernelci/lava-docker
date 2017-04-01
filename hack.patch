@@ -1,0 +1,26 @@
+From ae6dce30647ef602c750a3159ceac7bb801b001d Mon Sep 17 00:00:00 2001
+From: Tyler Baker <tyler.baker@linaro.org>
+Date: Fri, 31 Mar 2017 16:50:52 -0700
+Subject: [PATCH] HACK: switch to using unbroken pkg repo
+
+Signed-off-by: Tyler Baker <tyler.baker@linaro.org>
+---
+ share/debian-dev-build.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/share/debian-dev-build.sh b/share/debian-dev-build.sh
+index fca723a..24ae14c 100755
+--- a/share/debian-dev-build.sh
++++ b/share/debian-dev-build.sh
+@@ -65,7 +65,7 @@ else
+   mv -v ./dist/${NAME}*.tar.gz ${DIR}/${NAME}_${VERSION}.orig.tar.gz
+ fi
+ cd ${DIR}
+-git clone https://github.com/Linaro/pkg-${NAME}.git
++git clone https://github.com/EmbeddedAndroid/pkg-${NAME}.git
+ tar -xzf ${NAME}_${VERSION}.orig.tar.gz
+ if [ ! -d ${DIR}/${NAME}-${VERSION} ]; then
+   mv -v ${DIR}/${NAME}-* ${DIR}/${NAME}-${VERSION}
+-- 
+2.9.3
+
