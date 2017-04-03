@@ -53,6 +53,7 @@ RUN /start.sh \
  && cd /root/lava-server \
  && git checkout 2017.2 \
  && git am /root/hack.patch \
+ && git fetch https://review.linaro.org/lava/lava-server refs/changes/28/18328/1 && git cherry-pick FETCH_HEAD \
  && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
  && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
  && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
