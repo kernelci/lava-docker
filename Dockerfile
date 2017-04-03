@@ -1,7 +1,7 @@
 FROM kernelci/lava-docker:2017.02
 
 # Add device configuration
-COPY jinja/qemu.jinja2 /etc/dispatcher-config/devices/qemu.jinja2
+COPY jinja/* /etc/dispatcher-config/devices/
 
 COPY scripts/setup.sh .
 
