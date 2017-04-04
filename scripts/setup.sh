@@ -16,4 +16,4 @@ lava-server manage pipeline-worker --hostname $(hostname)
 # Add a single QEMU device
 lava-server manage device-types add qemu
 lava-server manage add-device --device-type qemu --worker $(hostname) qemu-01
-lava-server manage device-dictionary --hostname qemu-01 --import /etc/dispatcher-config/devices/qemu.jinja2
+lava-server manage device-dictionary --hostname qemu-01 --import /etc/dispatcher-config/devices/qemu-device-dictionary.jinja2
