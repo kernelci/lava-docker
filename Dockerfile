@@ -36,9 +36,6 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
  && /stop.sh \
  && rm -rf /var/lib/apt/lists/*
 
-# Add patches
-COPY hack.patch /root/
-
 # Create a admin user (Insecure note, this creates a default user, username: admin/admin)
 RUN /start.sh \
  && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost.com', 'admin')" | lava-server manage shell \
@@ -52,7 +49,6 @@ RUN /start.sh \
  && git clone -b master https://git.linaro.org/lava/lava-server.git /root/lava-server \
  && cd /root/lava-server \
  && git checkout 2017.2 \
- && git am /root/hack.patch \
  && git fetch https://review.linaro.org/lava/lava-server refs/changes/28/18328/1 && git cherry-pick FETCH_HEAD \
  && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
  && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
