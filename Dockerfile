@@ -1,7 +1,7 @@
 FROM kernelci/lava-docker:2017.02
 
 # Add device configuration
-COPY jinja/* /etc/dispatcher-config/devices/
+COPY devices/* /etc/dispatcher-config/devices/
 
 COPY scripts/setup.sh .
 
