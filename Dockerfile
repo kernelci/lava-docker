@@ -1,4 +1,4 @@
-FROM kernelci/lava-docker:2017.02
+FROM kernelci/lava-docker:2017.04
 
 # Add device configuration
 COPY devices/* /etc/dispatcher-config/devices/
