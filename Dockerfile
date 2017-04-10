@@ -1,4 +1,4 @@
-FROM debian:jessie-backports
+FROM bitnami/minideb:unstable
 
 # Add services helper utilities to start and stop LAVA
 COPY stop.sh .
@@ -10,20 +10,20 @@ COPY start.sh .
 RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' | debconf-set-selections \
  && echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections \
  && echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections \
- && apt-get clean && apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y -t jessie-backports \
+ && DEBIAN_FRONTEND=noninteractive install_packages \
  locales \
  postgresql \
  screen \
  sudo \
  wget \
+ gnupg \
  vim \
  && service postgresql start \
  && wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
  && apt-key add production-repo.key.asc \
  && echo 'deb http://images.validation.linaro.org/production-repo/ sid main' > /etc/apt/sources.list.d/lava.list \
  && apt-get clean && apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y -t jessie-backports \
+ && DEBIAN_FRONTEND=noninteractive install_packages \
  lava \
  qemu-system \
  qemu-system-arm \
@@ -33,8 +33,7 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
  && a2enmod proxy_http \
  && a2dissite 000-default \
  && a2ensite lava-server \
- && /stop.sh \
- && rm -rf /var/lib/apt/lists/*
+ && /stop.sh
 
 # Create a admin user (Insecure note, this creates a default user, username: admin/admin)
 RUN /start.sh \
@@ -45,11 +44,12 @@ RUN /start.sh \
 RUN /start.sh \
  && git clone -b master https://git.linaro.org/lava/lava-dispatcher.git /root/lava-dispatcher \
  && cd /root/lava-dispatcher \
- && git checkout 2017.2 \
+ && git checkout 2017.4 \
  && git clone -b master https://git.linaro.org/lava/lava-server.git /root/lava-server \
  && cd /root/lava-server \
- && git checkout 2017.2 \
- && git fetch https://review.linaro.org/lava/lava-server refs/changes/28/18328/1 && git cherry-pick FETCH_HEAD \
+ && git checkout 2017.4 \
+ && git config --global user.name "Docker Build" \
+ && git config --global user.email "info@kernelci.org" \
  && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
  && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
  && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
