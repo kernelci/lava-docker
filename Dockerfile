@@ -1,8 +1,8 @@
 FROM bitnami/minideb:unstable
 
 # Add services helper utilities to start and stop LAVA
-COPY stop.sh .
-COPY start.sh .
+COPY scripts/stop.sh .
+COPY scripts/start.sh .
 
 # Install debian packages used by the container
 # Configure apache to run the lava server
@@ -55,5 +55,8 @@ RUN /start.sh \
  && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
  && /stop.sh
 
+COPY configs/tftpd-hpa /etc/default/tftpd-hpa
+
 EXPOSE 69 80 5555 5556
+
 CMD /start.sh && bash
