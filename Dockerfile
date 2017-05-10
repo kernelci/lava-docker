@@ -5,6 +5,6 @@ COPY devices/* /etc/dispatcher-config/devices/
 
 COPY scripts/setup.sh .
 
-EXPOSE 69 80 5555 5556
+EXPOSE 69/udp 80 5555 5556
 
 CMD /start.sh && /setup.sh && bash
