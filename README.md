@@ -12,6 +12,6 @@ sudo docker build -t lava .
 To run the image from a host terminal / command line execute the following:
 
 ```
-sudo docker run -it -v /dev:/dev -p 69:69 -p 80:80 -p 5555:5555 -p 5556:5556 -h <HOSTNAME> --privileged kernelci/lava-docker:latest
+sudo docker run -it -v /dev:/dev -p 69:69/udp -p 80:80 -p 5555:5555 -p 5556:5556 -h <HOSTNAME> --privileged kernelci/lava-docker:latest
 ```
 Where HOSTNAME is the hostname used during the container build process (check the docker build log), as that is the name used for the worker configuration. You can use `lava-docker` as the pre-built container hostname.

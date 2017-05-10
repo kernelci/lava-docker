@@ -57,6 +57,6 @@ RUN /start.sh \
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
-EXPOSE 69 80 5555 5556
+EXPOSE 69/udp 80 5555 5556
 
 CMD /start.sh && bash
