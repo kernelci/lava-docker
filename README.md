@@ -29,3 +29,9 @@ sudo docker run -it -v /dev:/dev -p 69:69 -p 80:80 -p 5555:5555 -p 5556:5556 -e 
 ```
 
 Where LAVA_SERVER_IP is the IP of your Docker host. This allows the TFTP service to properly address the TFTP transfers.
+
+## Additional Setup
+In order for TFTP requests to find their way back to the running container, you will need to describe the host IP address to the LAVA master node. You can to create a yaml file on the LAVA master node as described below.
+
+```
+echo "dispatcher_ip: <master host ip" > /etc/lava-server/dispatcher.d/<lava-master-hostname>.yaml
