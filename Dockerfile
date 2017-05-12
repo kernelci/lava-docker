@@ -42,14 +42,15 @@ RUN /start.sh \
 
 # Install latest
 RUN /start.sh \
- && git clone -b master https://git.linaro.org/lava/lava-dispatcher.git /root/lava-dispatcher \
+ && git clone https://github.com/kernelci/lava-dispatcher.git -b master  /root/lava-dispatcher \
  && cd /root/lava-dispatcher \
- && git checkout 2017.4 \
- && git clone -b master https://git.linaro.org/lava/lava-server.git /root/lava-server \
+ && git checkout release \
+ && git clone -b master https://github.com/kernelci/lava-server.git /root/lava-server \
  && cd /root/lava-server \
- && git checkout 2017.4 \
+ && git checkout release \
  && git config --global user.name "Docker Build" \
  && git config --global user.email "info@kernelci.org" \
+ && git fetch https://review.linaro.org/lava/lava-server refs/changes/03/19403/2 && git cherry-pick FETCH_HEAD \
  && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
  && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
  && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
