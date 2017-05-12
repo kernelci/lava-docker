@@ -21,3 +21,4 @@ In order for TFTP requests to find their way back to the running container, you 
 
 ```
 echo "dispatcher_ip: <master host ip" > /etc/lava-server/dispatcher.d/<lava-master-hostname>.yaml
+```
