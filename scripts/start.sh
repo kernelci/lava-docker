@@ -28,6 +28,7 @@ start postgresql
 start apache2
 start lava-server
 start lava-master
+start lava-coordinator
 start lava-slave
 start lava-server-gunicorn
 start tftpd-hpa
