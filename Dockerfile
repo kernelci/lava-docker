@@ -31,6 +31,7 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
  qemu-kvm \
  ser2net \
  u-boot-tools \
+ python-setproctitle \
  && a2enmod proxy \
  && a2enmod proxy_http \
  && a2dissite 000-default \
