@@ -53,7 +53,6 @@ RUN /start.sh \
  && git checkout release \
  && git config --global user.name "Docker Build" \
  && git config --global user.email "info@kernelci.org" \
- && git fetch https://review.linaro.org/lava/lava-server refs/changes/03/19403/2 && git cherry-pick FETCH_HEAD \
  && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
  && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
  && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
