@@ -22,3 +22,16 @@ In order for TFTP requests to find their way back to the running container, you 
 ```
 echo "dispatcher_ip: <master host ip" > /etc/lava-server/dispatcher.d/<lava-master-hostname>.yaml
 ```
+
+## Security
+Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
+
+  * Changing the default admin password
+  * Using HTTPS
+  
+Secure CSRF tokens are disabled as the container uses HTTP by default. To use SSL with this container you will need to remove the following lines from your ```/etc/lava-server/settings.conf```
+
+```
+   "CSRF_COOKIE_SECURE": false,
+   "SESSION_COOKIE_SECURE": false,
+```
