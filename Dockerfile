@@ -1,4 +1,6 @@
-FROM bitnami/minideb:unstable
+FROM bitnami/minideb:stretch
+
+RUN apt-get update
 
 # Add services helper utilities to start and stop LAVA
 COPY scripts/stop.sh .
@@ -10,7 +12,7 @@ COPY scripts/start.sh .
 RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' | debconf-set-selections \
  && echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections \
  && echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections \
- && DEBIAN_FRONTEND=noninteractive install_packages \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
  postgresql \
  screen \
@@ -21,9 +23,9 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
  && service postgresql start \
  && wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
  && apt-key add production-repo.key.asc \
- && echo 'deb http://images.validation.linaro.org/production-repo/ sid main' > /etc/apt/sources.list.d/lava.list \
+ && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
  && apt-get clean && apt-get update \
- && DEBIAN_FRONTEND=noninteractive install_packages \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install \
  lava \
  qemu-system \
  qemu-system-arm \
