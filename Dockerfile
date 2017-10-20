@@ -45,7 +45,7 @@ RUN service postgresql start \
 
 # Create a admin user (Insecure note, this creates a default user, username: admin/admin)
 RUN /start.sh \
- && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost.com', 'admin')" | lava-server manage shell \
+ && lava-server manage users add --passwd admin --staff --superuser --email admin@example.com admin \
  && /stop.sh
 
 # Install latest
