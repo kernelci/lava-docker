@@ -1,4 +1,6 @@
-FROM bitnami/minideb:unstable
+FROM bitnami/minideb:stretch
+
+RUN apt-get update
 
 # Add services helper utilities to start and stop LAVA
 COPY scripts/stop.sh .
@@ -9,21 +11,24 @@ COPY scripts/start.sh .
 # Log the hostname used during install for the slave name
 RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' | debconf-set-selections \
  && echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections \
- && echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections \
- && DEBIAN_FRONTEND=noninteractive install_packages \
+ && echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
  postgresql \
  screen \
  sudo \
  wget \
  gnupg \
- vim \
- && service postgresql start \
- && wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
+ vim
+
+RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
  && apt-key add production-repo.key.asc \
- && echo 'deb http://images.validation.linaro.org/production-repo/ sid main' > /etc/apt/sources.list.d/lava.list \
- && apt-get clean && apt-get update \
- && DEBIAN_FRONTEND=noninteractive install_packages \
+ && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
+ && apt-get clean && apt-get update
+
+RUN service postgresql start \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install \
  lava \
  qemu-system \
  qemu-system-arm \
@@ -40,7 +45,7 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
 
 # Create a admin user (Insecure note, this creates a default user, username: admin/admin)
 RUN /start.sh \
- && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost.com', 'admin')" | lava-server manage shell \
+ && lava-server manage users add --passwd admin --staff --superuser --email admin@example.com admin \
  && /stop.sh
 
 # Install latest
