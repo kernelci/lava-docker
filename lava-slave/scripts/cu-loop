@@ -1,0 +1,11 @@
+#!/bin/sh
+DEV=$1
+BAUD=${2:-115200}
+
+while true; do
+  # NOTE: needs cu >= 1.07-24
+  # c.f. https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=336996
+  test -e $DEV && cu -l $DEV -s $BAUD --parity=none --nostop --nortscts dir
+  sleep 0.2
+done
+

@@ -17,6 +17,8 @@ RUN \
  git \
  vim \
  sudo \
+ cu \
+ conmux \
  python-setproctitle \
  tftpd-hpa \
  u-boot-tools \
@@ -49,6 +51,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
+
+COPY scripts/cu-loop /usr/local/bin/
+COPY conmux/* /etc/conmux/
 
 #TODO made this customizable, 1000 ports by default is too much
 RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=55950,' /usr/lib/python2.7/dist-packages/lava_dispatcher/pipeline/utils/constants.py
