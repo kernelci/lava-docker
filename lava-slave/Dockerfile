@@ -55,6 +55,11 @@ COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 COPY scripts/cu-loop /usr/local/bin/
 COPY conmux/* /etc/conmux/
 
+#install pdudaemon
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install postgresql
+RUN service postgresql start && DEBIAN_FRONTEND=noninteractive apt-get -y install lavapdu-daemon lavapdu-client && service postgresql stop
+COPY lavapdu.conf /etc/lavapdu/
+
 #TODO made this customizable, 1000 ports by default is too much
 RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=55950,' /usr/lib/python2.7/dist-packages/lava_dispatcher/pipeline/utils/constants.py
 
