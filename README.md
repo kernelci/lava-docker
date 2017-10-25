@@ -1,27 +1,92 @@
 # Linaro's Automated Validation Architecture (LAVA) Docker Container
 Preinstalls and preconfigures the latest LAVA server release.
 
+## Prerequisite
+The package docker-compose is necessary
+
+## Name Conventions
+Each board must be named by their device-type as "device-type-XX" where XX is a number
+Each tty will have a name /dev/boardname (via the udev rules)
+Each conmux config file will be named boardname.cf
+Each slave must be named lab-slave-XX
+
+## Know limitation
+The current lava-docker provide support for only one slave
+
+## Architecture
+The host must have a dedicated LAN. (192.168.66.0/24)
+The host must have IP set to 192.168.66.1 on this LAN.
+A sample dhcpd config file is available in the dhcpd directory
+
+## Generating files
+### boards.yaml
+This file describe how are setuped your boards, and how they are connected and powered.
+```
+lab-slave-name:
+	devicename:
+		type: the devicetype of this device
+		pdu:
+			daemon: The hostname running the PDU daemon (always localhost)
+			host: The host name of the PDU as named in lavapdu.conf
+			port: portnumber (The port number of the PDU where the device is connected)
+		uart:
+			type:
+			serial: The serial number in case of FTDI uart
+```
+Notes:
+uart FTDI only need serial
+
+Examples: see boards.yaml
+
+### tokens.yaml
+The tokens format have two section, one for user generation, the other for callback tokens
+```
+lava_server_users:
+	- name: LAVA username
+	  token: The token of this use
+	  password: Password the this user (generated if not provided)
+callback_tokens:
+  - filename: The filename for storing the informations below, the name should be unique along other callback tokens
+    username: The LAVA user owning the token below. (This user should be created via lava_server_users:)
+    token: The token for this callback
+    description: The description of this token. This string could be used with LAVA-CI.
+```
+Example: see tokens.yaml
+
+### Generate
+```
+lavalab-gen.py
+```
+
+this scripts will generate all necessary files in the following location:
+```
+conmux/		All files needed by conmux
+tokens/		This is where the callback tokens will be generated
+users/		This is where the users will be generated
+devices/	All LAVA devices files (note that an extran qemu device is also created for the master)
+udev-rules for host
+docker-compose.yml	Generated from docker-compose.template
+```
+
+All thoses files (except for udev-rules) will be handled by docker.
+The udev-rules is for generating the right /dev/xxx TTY names.
+
+You can still hack after generated files.
+
 ## Building
 To build an image locally, execute the following from the directory you cloned the repo:
 
 ```
-sudo docker build -t lava .
+docker-compose build
 ```
 
 ## Running
-To run the image from a host terminal / command line execute the following:
+```
+docker-compose up
+```
 
-```
-sudo docker run -it -v /dev:/dev -p 69:69/udp -p 80:80 -p 3079:3079 -p 5555:5555 -p 5556:5556 -h <HOSTNAME> --privileged kernelci/lava-docker:latest
-```
-Where HOSTNAME is the hostname used during the container build process (check the docker build log), as that is the name used for the worker configuration. You can use `lava-docker` as the pre-built container hostname.
-
-## Additional Setup
-In order for TFTP requests to find their way back to the running container, you will need to describe the host IP address to the LAVA master node. You can to create a yaml file on the LAVA master node as described below.
-
-```
-echo "dispatcher_ip: <master host ip" > /etc/lava-server/dispatcher.d/<lava-master-hostname>.yaml
-```
+## Process wrapper
+You can use the lavalab-gen.sh wrapper which will do all the above actions
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
@@ -29,9 +94,3 @@ Note that this container provides defaults which are unsecure. If you plan on de
   * Changing the default admin password
   * Using HTTPS
   
-Secure CSRF tokens are disabled as the container uses HTTP by default. To use SSL with this container you will need to remove the following lines from your ```/etc/lava-server/settings.conf```
-
-```
-   "CSRF_COOKIE_SECURE": false,
-   "SESSION_COOKIE_SECURE": false,
-```

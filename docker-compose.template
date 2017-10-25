@@ -1,0 +1,34 @@
+version: '2.0'
+services:
+  lava-master:
+    hostname: lava-master
+    restart: always
+    stdin_open: true
+    tty: true
+    build:
+      context: lava-master
+    devices:
+      - "/dev/kvm:/dev/kvm"
+    ports:
+      - "10080:80"
+      - "1022:22"
+      - "5555:5555"
+      - "5556:5556"
+    volumes:
+# boot and /lib/modules are for libguestfs
+      - "/boot:/boot"
+      - "/lib/modules:/lib/modules"
+  lava-slave:
+    hostname: lab-slave-0
+    restart: always
+    build:
+      context: lava-slave
+    devices:
+    environment:
+      LAVA_MASTER: "lava-master"
+    ports:
+      - "69:69/udp"
+      - "80:80"
+      - "55980-56000:55980-56000"
+    links:
+      - "lava-master"

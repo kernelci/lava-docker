@@ -65,6 +65,13 @@ RUN /start.sh \
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
+COPY devices/ /root/devices/
+COPY device-types/ /root/device-types/
+COPY users/ /root/lava-users/
+COPY tokens/ /root/lava-callback-tokens/
+COPY scripts/setup.sh /
+RUN /start.sh && /setup.sh && /stop.sh
+
 EXPOSE 69/udp 80 3079 5555 5556
 
 CMD /start.sh && bash
