@@ -1,0 +1,10 @@
+lava_server_users:
+  - name: example
+    token: longrandomtoken
+    password: examplepassword
+
+callback_tokens:
+  - filename: example
+    username: example
+    token: longrandomtokencallback
+    description: example-callback

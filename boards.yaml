@@ -1,0 +1,55 @@
+lab-slave-0:
+        bcm2837-rpi-3-b-01:
+                type: bcm2837-rpi-3-b
+                pdu:
+                        daemon: localhost
+                        host: acme-0
+                        port: 1
+                uart:
+                        type: FTDI
+                        serial: FT9QQZTA
+        am335x-boneblack-01:
+                type: beaglebone-black
+                pdu:
+                        daemon: localhost
+                        host: acme-0
+                        port: 2
+                uart:
+                        type: FTDI
+                        serial: FT9QR1A9
+        meson-gxl-s905x-libretech-cc-01:
+                type: meson-gxl-s905x-libretech-cc
+                pdu:
+                        daemon: localhost
+                        host: acme-0
+                        port: 3
+                uart:
+                        type: FTDI
+                        serial: FT9QQYCN
+        dragonboard-410c-01:
+                type: dragonboard-410c
+                pdu:
+                        daemon: localhost
+                        host: acme-0
+                        port: 4
+                uart:
+                        type: FTDI
+                        serial: FT9R7VDB
+        r8a7796-m3ulcb-01:
+                type: r8a7796-m3ulcb
+                pdu:
+                        daemon: localhost
+                        host: acme-0
+                        port: 5
+                uart:
+                        type: FTDI
+                        serial: AK04WW0Q
+        imx6q-sabrelite-01:
+                type: imx6q-sabrelite
+                pdu:
+                        daemon: localhost
+                        host: acme-0
+                        port: 6
+                uart:
+                        type: FTDI
+                        serial: FTAJMM4V
