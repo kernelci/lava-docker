@@ -63,7 +63,8 @@ this scripts will generate all necessary files in the following location:
 conmux/		All files needed by conmux
 tokens/		This is where the callback tokens will be generated
 users/		This is where the users will be generated
-devices/	All LAVA devices files (note that an extran qemu device is also created for the master)
+devices/	All LAVA devices files (note that an extra qemu device is also created for the master)
+slaves/		Contain the dispatcher_ip to give to slave node
 udev-rules for host
 docker-compose.yml	Generated from docker-compose.template
 ```
