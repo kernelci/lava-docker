@@ -65,6 +65,8 @@ RUN /start.sh \
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
+COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
+
 COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
