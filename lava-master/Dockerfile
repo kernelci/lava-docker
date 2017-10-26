@@ -69,6 +69,7 @@ COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY tokens/ /root/lava-callback-tokens/
+COPY slaves/* /etc/lava-server/dispatcher.d/
 COPY scripts/setup.sh /
 RUN /start.sh && /setup.sh && /stop.sh
 
