@@ -32,3 +32,14 @@ services:
       - "55980-56000:55980-56000"
     links:
       - "lava-master"
+  squid:
+    hostname: squid
+    restart: always
+    build:
+      context: squid
+    volumes:
+      - squid-cache:/var/spool/squid
+    ports:
+      - "3128:3128"
+volumes:
+  squid-cache:

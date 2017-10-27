@@ -75,6 +75,9 @@ COPY slaves/* /etc/lava-server/dispatcher.d/
 COPY scripts/setup.sh /
 RUN /start.sh && /setup.sh && /stop.sh
 
+#uncomment if you want to use squid
+#RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
+
 EXPOSE 69/udp 80 3079 5555 5556
 
 CMD /start.sh && bash

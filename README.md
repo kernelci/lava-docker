@@ -89,6 +89,10 @@ docker-compose up
 ## Process wrapper
 You can use the lavalab-gen.sh wrapper which will do all the above actions
 
+## Proxy cache
+A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)
+You have to uncomment a line in lava-master/Dockerfile to enable it
+
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
 
