@@ -49,28 +49,34 @@ RUN /start.sh \
  && /stop.sh
 
 # Install latest
-RUN /start.sh \
- && git clone https://github.com/kernelci/lava-dispatcher.git -b master  /root/lava-dispatcher \
- && cd /root/lava-dispatcher \
- && git checkout release \
- && git clone -b master https://github.com/kernelci/lava-server.git /root/lava-server \
- && cd /root/lava-server \
- && git checkout release \
- && git config --global user.name "Docker Build" \
- && git config --global user.email "info@kernelci.org" \
- && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
- && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
- && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
- && /stop.sh
+#RUN /start.sh \
+# && git clone https://github.com/kernelci/lava-dispatcher.git -b master  /root/lava-dispatcher \
+# && cd /root/lava-dispatcher \
+# && git checkout release \
+# && git clone -b master https://github.com/kernelci/lava-server.git /root/lava-server \
+# && cd /root/lava-server \
+# && git checkout release \
+# && git config --global user.name "Docker Build" \
+# && git config --global user.email "info@kernelci.org" \
+# && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
+# && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
+# && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
+# && /stop.sh
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
+
+COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 
 COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY tokens/ /root/lava-callback-tokens/
+COPY slaves/* /etc/lava-server/dispatcher.d/
 COPY scripts/setup.sh /
 RUN /start.sh && /setup.sh && /stop.sh
+
+#uncomment if you want to use squid
+#RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
 
 EXPOSE 69/udp 80 3079 5555 5556
 

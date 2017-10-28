@@ -63,7 +63,8 @@ this scripts will generate all necessary files in the following location:
 conmux/		All files needed by conmux
 tokens/		This is where the callback tokens will be generated
 users/		This is where the users will be generated
-devices/	All LAVA devices files (note that an extran qemu device is also created for the master)
+devices/	All LAVA devices files (note that an extra qemu device is also created for the master)
+slaves/		Contain the dispatcher_ip to give to slave node
 udev-rules for host
 docker-compose.yml	Generated from docker-compose.template
 ```
@@ -87,6 +88,10 @@ docker-compose up
 
 ## Process wrapper
 You can use the lavalab-gen.sh wrapper which will do all the above actions
+
+## Proxy cache
+A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)
+You have to uncomment a line in lava-master/Dockerfile to enable it
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
