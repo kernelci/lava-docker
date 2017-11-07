@@ -72,9 +72,13 @@ docker-compose.yml	Generated from docker-compose.template
 ```
 
 All thoses files (except for udev-rules) will be handled by docker.
-The udev-rules is for generating the right /dev/xxx TTY names.
 
 You can still hack after generated files.
+
+#### udev rules
+Note that some udev-rules are generated for the host, they must be placed in /etc/udev/rules.d/
+They are used for giving a proper /dev/xxx name to tty devices.
+(lavalab-gen.sh will do it for you)
 
 ## Building
 To build an image locally, execute the following from the directory you cloned the repo:

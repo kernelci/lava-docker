@@ -93,7 +93,7 @@ def main(args):
             fp = open(board_device_file, "w")
             fp.write(device_line)
             fp.close()
-        fp = open("lavalab-udev-%s.rules" % lab_name, "w")
+        fp = open("99-lavalab-udev-%s.rules" % lab_name, "w")
         fp.write(udev_line)
         fp.close()
         if lab.has_key("dispatcher_ip"):
