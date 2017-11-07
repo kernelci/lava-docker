@@ -53,6 +53,16 @@ def main(args):
         dockcomp["services"]["lava-slave"]["devices"] = []
         dc_devices = dockcomp["services"]["lava-slave"]["devices"]
 
+    # The slaves directory must exists
+    if not os.path.isdir("lava-master/slaves/"):
+        os.mkdir("lava-master/slaves/")
+        fp = open("lava-master/slaves/.empty", "w")
+        fp.close()
+    if not os.path.isdir("lava-slave/conmux/"):
+        os.mkdir("lava-slave/conmux/")
+        fp = open("lava-slave/conmux/.empty", "w")
+        fp.close()
+
     for lab_name in labs:
         lab = labs[lab_name]
         for board_name in lab["boardlist"]:
@@ -69,8 +79,6 @@ def main(args):
                 delay_opt = ""
                 device_line += template_device_pdu.substitute(port=port, pdudaemon=daemon, pduhost=host)
             if b.has_key("uart"):
-                if not os.path.isdir("lava-slave/conmux/"):
-                    os.mkdir("lava-slave/conmux/")
                 baud = b["uart"].get("baud", baud_default)
                 line = template_conmux.substitute(board=board_name, baud=baud, daemon=daemon, host=host, port=port, delay=delay_opt)
                 serial = b["uart"]["serial"]
@@ -97,8 +105,6 @@ def main(args):
         fp.write(udev_line)
         fp.close()
         if lab.has_key("dispatcher_ip"):
-            if not os.path.isdir("lava-master/slaves/"):
-                os.mkdir("lava-master/slaves/")
             fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
             fp.write("dispatcher_ip: %s" % lab["dispatcher_ip"])
             fp.close()
