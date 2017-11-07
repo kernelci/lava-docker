@@ -23,15 +23,16 @@ A sample dhcpd config file is available in the dhcpd directory
 This file describe how are setuped your boards, and how they are connected and powered.
 ```
 lab-slave-name:
-	devicename:
-		type: the devicetype of this device
-		pdu:
-			daemon: The hostname running the PDU daemon (always localhost)
-			host: The host name of the PDU as named in lavapdu.conf
-			port: portnumber (The port number of the PDU where the device is connected)
-		uart:
-			type:
-			serial: The serial number in case of FTDI uart
+	boardlist:
+		devicename:
+			type: the devicetype of this device
+			pdu:
+				daemon: The hostname running the PDU daemon (always localhost)
+				host: The host name of the PDU as named in lavapdu.conf
+				port: portnumber (The port number of the PDU where the device is connected)
+			uart:
+				type:
+				serial: The serial number in case of FTDI uart
 ```
 Notes:
 uart FTDI only need serial
