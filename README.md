@@ -23,6 +23,7 @@ A sample dhcpd config file is available in the dhcpd directory
 This file describe how are setuped your boards, and how they are connected and powered.
 ```
 lab-slave-name:
+	dispatcher_ip: the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
 	boardlist:
 		devicename:
 			type: the devicetype of this device
