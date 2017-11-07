@@ -96,11 +96,12 @@ def main(args):
         fp = open("lavalab-udev-%s.rules" % lab_name, "w")
         fp.write(udev_line)
         fp.close()
-        if not os.path.isdir("lava-master/slaves/"):
-            os.mkdir("lava-master/slaves/")
-        fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
-        fp.write("dispatcher_ip: 192.168.66.1")
-        fp.close()
+        if lab.has_key("dispatcher_ip"):
+            if not os.path.isdir("lava-master/slaves/"):
+                os.mkdir("lava-master/slaves/")
+            fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
+            fp.write("dispatcher_ip: %s" % lab["dispatcher_ip"])
+            fp.close()
 
     #now proceed with tokens
     fp = open(tokens_yaml, "r")
