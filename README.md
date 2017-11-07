@@ -23,6 +23,7 @@ A sample dhcpd config file is available in the dhcpd directory
 This file describe how are setuped your boards, and how they are connected and powered.
 ```
 lab-slave-name:
+	dispatcher_ip: the IP of the host on the boards's LAN
 	boardlist:
 		devicename:
 			type: the devicetype of this device
