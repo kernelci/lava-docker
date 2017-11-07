@@ -104,4 +104,17 @@ Note that this container provides defaults which are unsecure. If you plan on de
 
   * Changing the default admin password
   * Using HTTPS
-  
+
+## Quickstart
+Example to use lava-docker with only qemu:
+
+* Create the following boards.yaml
+```
+lava-master:
+   boardlist:
+     qemu-01:
+       type: qemu
+```
+* Generate files via ./lavalab-gen.py
+* Build docker images via docker-compose build
+* Start all images via docker-compose up
