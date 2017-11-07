@@ -100,4 +100,4 @@ Note that this container provides defaults which are unsecure. If you plan on de
 
   * Changing the default admin password
   * Using HTTPS
-  
+  * Re-enable CSRF cookie (disabled in lava-master/Dockerfile)
