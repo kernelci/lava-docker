@@ -31,9 +31,9 @@ template_device_conmux = string.Template("""
 {% set connection_command = 'conmux-console ${board}' %}
 """)
 template_device_pdu = string.Template("""
-{% set hard_reset_command = 'pduclient --daemon localhost --hostname acme-0 --port ${port} --command=reboot' %}
-{% set power_off_command = 'pduclient --daemon localhost --hostname acme-0 --port ${port} --command=off' %}
-{% set power_on_command = 'pduclient --daemon localhost --hostname acme-0 --port ${port} --command=on' %}
+{% set hard_reset_command = 'pduclient --daemon ${pdudaemon} --hostname ${pduhost} --port ${port} --command=reboot' %}
+{% set power_off_command = 'pduclient --daemon ${pdudaemon} --hostname ${pduhost} --port ${port} --command=off' %}
+{% set power_on_command = 'pduclient --daemon ${pdudaemon} --hostname ${pduhost} --port ${port} --command=on' %}
 """)
 
 template_udev = string.Template("""#
@@ -67,7 +67,7 @@ def main(args):
                 host = b["pdu"]["host"]
                 port = b["pdu"]["port"]
                 delay_opt = ""
-                device_line += template_device_pdu.substitute(port=port)
+                device_line += template_device_pdu.substitute(port=port, pdudaemon=daemon, pduhost=host)
             if b.has_key("uart"):
                 if not os.path.isdir("lava-slave/conmux/"):
                     os.mkdir("lava-slave/conmux/")
