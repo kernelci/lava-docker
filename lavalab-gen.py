@@ -52,8 +52,8 @@ def main(args):
 
     for lab_name in labs:
         lab = labs[lab_name]
-        for board_name in lab:
-            b = lab[board_name]
+        for board_name in lab["boardlist"]:
+            b = lab["boardlist"][board_name]
             if b.get("disabled", None):
                 continue
 
