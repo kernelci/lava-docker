@@ -60,13 +60,13 @@ def main(args):
             if b.get("disabled", None):
                 continue
 
+            devicetype = b["type"]
+            device_line = template_device.substitute(devicetype=devicetype)
             if b.has_key("pdu"):
                 daemon = b["pdu"]["daemon"]
                 host = b["pdu"]["host"]
                 port = b["pdu"]["port"]
-                devicetype = b["type"]
                 delay_opt = ""
-                device_line = template_device.substitute(board=board_name, port=port, devicetype=devicetype)
                 device_line += template_device_pdu.substitute(port=port)
             if b.has_key("uart"):
                 if not os.path.isdir("lava-slave/conmux/"):
