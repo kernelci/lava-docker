@@ -55,9 +55,22 @@ COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 COPY scripts/cu-loop /usr/local/bin/
 COPY conmux/* /etc/conmux/
 
-#install pdudaemon
+#install recent pdudaemon
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install postgresql
-RUN service postgresql start && DEBIAN_FRONTEND=noninteractive apt-get -y install lavapdu-daemon lavapdu-client && service postgresql stop
+#RUN service postgresql start && DEBIAN_FRONTEND=noninteractive apt-get -y install lavapdu-daemon lavapdu-client && service postgresql stop
+
+# pdudaemon dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-paramiko python-psycopg2
+# clone pdudaemon sources and debian directory
+RUN git clone https://github.com/Linaro/pdudaemon lavapdu
+RUN git clone https://github.com/Linaro/pkg-lavapdu
+RUN tar cvzf lavapdu_0.0.5.orig.tar.gz lavapdu
+RUN mv pkg-lavapdu/debian lavapdu/
+# build the .deb
+RUN cd lavapdu && debuild -sa -uc -us
+# The package need postgresql when installed (create database)
+RUN service postgresql start && dpkg -i lavapdu-daemon_0.0.5-2_all.deb && service postgresql stop
+RUN dpkg -i lavapdu-client_0.0.5-2_all.deb
 COPY lavapdu.conf /etc/lavapdu/
 
 #TODO made this customizable, 1000 ports by default is too much
