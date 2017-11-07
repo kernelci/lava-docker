@@ -1,3 +1,7 @@
+lava-master:
+  boardlist:
+    qemu-01:
+      type: qemu
 lab-slave-0:
   dispatcher_ip: 192.168.66.1
   boardlist:
