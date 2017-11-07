@@ -22,16 +22,18 @@ A sample dhcpd config file is available in the dhcpd directory
 ### boards.yaml
 This file describe how are setuped your boards, and how they are connected and powered.
 ```
-lab-slave-name:
-	devicename:
-		type: the devicetype of this device
-		pdu:
-			daemon: The hostname running the PDU daemon (always localhost)
-			host: The host name of the PDU as named in lavapdu.conf
-			port: portnumber (The port number of the PDU where the device is connected)
-		uart:
-			type:
-			serial: The serial number in case of FTDI uart
+lab-slave-XX:
+	dispatcher_ip: the IP of the host on the boards's LAN
+	boardlist:
+		devicename:
+			type: the devicetype of this device
+			pdu:
+				daemon: The hostname running the PDU daemon (always localhost)
+				host: The host name of the PDU as named in lavapdu.conf
+				port: portnumber (The port number of the PDU where the device is connected)
+			uart:
+				type:
+				serial: The serial number in case of FTDI uart
 ```
 Notes:
 uart FTDI only need serial
@@ -70,9 +72,13 @@ docker-compose.yml	Generated from docker-compose.template
 ```
 
 All thoses files (except for udev-rules) will be handled by docker.
-The udev-rules is for generating the right /dev/xxx TTY names.
 
 You can still hack after generated files.
+
+#### udev rules
+Note that some udev-rules are generated for the host, they must be placed in /etc/udev/rules.d/
+They are used for giving a proper /dev/xxx name to tty devices.
+(lavalab-gen.sh will do it for you)
 
 ## Building
 To build an image locally, execute the following from the directory you cloned the repo:
@@ -98,4 +104,17 @@ Note that this container provides defaults which are unsecure. If you plan on de
 
   * Changing the default admin password
   * Using HTTPS
-  
+
+## Quickstart
+Example to use lava-docker with only qemu:
+
+* Create the following boards.yaml
+```
+lava-master:
+   boardlist:
+     qemu-01:
+       type: qemu
+```
+* Generate files via ./lavalab-gen.py
+* Build docker images via docker-compose build
+* Start all images via docker-compose up
