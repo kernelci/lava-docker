@@ -38,7 +38,7 @@ lab-slave-XX:
 Notes:
 uart FTDI only need serial
 
-Examples: see boards.yaml
+Examples: see boards.yaml.example
 
 ### tokens.yaml
 The tokens format have two section, one for user generation, the other for callback tokens
