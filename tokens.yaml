@@ -1,4 +1,9 @@
 lava_server_users:
+  - name: admin
+    token: longrandomtokenadmin
+    password: admin
+    superuser: yes
+    staff: yes
   - name: example
     token: longrandomtoken
     password: examplepassword

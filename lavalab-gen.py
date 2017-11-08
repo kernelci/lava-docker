@@ -127,7 +127,16 @@ def main(args):
                 ftok.write("TOKEN=" + token + "\n")
                 if user.has_key("password"):
                     password = user["password"]
-                    ftok.write("PASSWORD=" + password)
+                    ftok.write("PASSWORD=" + password + "\n")
+                # libyaml convert yes/no to true/false...
+                if user.has_key("staff"):
+                    value = user["staff"]
+                    if value is True:
+                        ftok.write("STAFF=1\n")
+                if user.has_key("superuser"):
+                    value = user["superuser"]
+                    if value is True:
+                        ftok.write("SUPERUSER=1\n")
                 ftok.close()
         if section_name == "callback_tokens":
             for token in section:

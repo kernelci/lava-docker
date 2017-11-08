@@ -43,11 +43,6 @@ RUN service postgresql start \
  && a2ensite lava-server \
  && /stop.sh
 
-# Create a admin user (Insecure note, this creates a default user, username: admin/admin)
-RUN /start.sh \
- && lava-server manage users add --passwd admin --staff --superuser --email admin@example.com admin \
- && /stop.sh
-
 # Install latest
 #RUN /start.sh \
 # && git clone https://github.com/kernelci/lava-dispatcher.git -b master  /root/lava-dispatcher \

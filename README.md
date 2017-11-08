@@ -47,6 +47,8 @@ lava_server_users:
 	- name: LAVA username
 	  token: The token of this use
 	  password: Password the this user (generated if not provided)
+	  superuser: yes/no (default no)
+	  staff: yes/no (default no)
 callback_tokens:
   - filename: The filename for storing the informations below, the name should be unique along other callback tokens
     username: The LAVA user owning the token below. (This user should be created via lava_server_users:)
