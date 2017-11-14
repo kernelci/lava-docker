@@ -13,10 +13,15 @@ fi
 
 ./lavalab-gen.py || exit 1
 
-rm /etc/udev/rules.d/*lavalab*rules
-cp *lavalab*rules /etc/udev/rules.d/
-udevadm control --reload-rules || exit $?
-udevadm trigger || exit $?
+#check for root
+BEROOT=""
+if [ $(id -u) -ne 0 ];then
+	BEROOT="sudo "
+fi
+$BEROOT rm /etc/udev/rules.d/*lavalab*rules
+$BEROOT cp *lavalab*rules /etc/udev/rules.d/
+$BEROOT udevadm control --reload-rules || exit $?
+$BEROOT udevadm trigger || exit $?
 
 docker-compose build || exit 1
 docker-compose up || exit 1
