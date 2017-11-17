@@ -64,6 +64,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-paramiko python-psy
 # clone pdudaemon sources and debian directory
 RUN git clone https://github.com/Linaro/pdudaemon lavapdu
 RUN git clone https://github.com/Linaro/pkg-lavapdu
+# workaround for new pdudaemon repository, use a know commit id
+RUN cd lavapdu && git checkout 8b4cc86c10b145e8437dba25f0b3b2c93c78e7e0
 RUN tar cvzf lavapdu_0.0.5.orig.tar.gz lavapdu
 RUN mv pkg-lavapdu/debian lavapdu/
 # build the .deb
