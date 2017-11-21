@@ -98,6 +98,9 @@ def main(args):
                 fp.write(line)
                 fp.close()
                 device_line += template_device_conmux.substitute(board=board_name)
+            if b.has_key("macaddr"):
+                device_line += '{% set uboot_set_mac = true %}'
+                device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
             if b.has_key("fastboot_serial_number"):
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
