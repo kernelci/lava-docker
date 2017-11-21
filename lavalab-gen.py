@@ -47,7 +47,6 @@ def main(args):
     fp = open(boards_yaml, "r")
     labs = yaml.load(fp)
     fp.close()
-    udev_line =""
     tdc = open("docker-compose.template", "r")
     dockcomp = yaml.load(tdc)
     tdc.close()
@@ -67,6 +66,7 @@ def main(args):
         fp.close()
 
     for lab_name in labs:
+        udev_line =""
         lab = labs[lab_name]
         for board_name in lab["boardlist"]:
             b = lab["boardlist"][board_name]
