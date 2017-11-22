@@ -84,6 +84,10 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
 
+RUN git clone https://github.com/baylibre-acme/acme-cli.git /root/acme-cli
+RUN cp /root/acme-cli/acme-cli /usr/local/bin
+RUN chmod 755 /usr/local/bin/acme-cli
+
 EXPOSE 69/udp 80
 
 CMD /start.sh
