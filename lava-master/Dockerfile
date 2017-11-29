@@ -13,12 +13,14 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
  && echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections \
  && echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections
 
+# e2fsprogs is for libguestfs
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
  postgresql \
  screen \
  sudo \
  wget \
+ e2fsprogs \
  gnupg \
  vim
 
