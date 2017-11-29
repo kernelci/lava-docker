@@ -18,7 +18,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
  postgresql \
  screen \
- sudo \
  wget \
  e2fsprogs \
  gnupg \
@@ -36,7 +35,6 @@ RUN service postgresql start \
  qemu-system-arm \
  qemu-system-i386 \
  qemu-kvm \
- ser2net \
  u-boot-tools \
  python-setproctitle \
  && a2enmod proxy \
