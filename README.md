@@ -1,18 +1,29 @@
 # Linaro's Automated Validation Architecture (LAVA) Docker Container
 
 ## Introduction
-The purpose of lava-docker is to integrate in an easy way, all compoments necessary to make a LAVA test lab.
-The goal is to do automatic test of Device Under Test (DUT).
 
-All that you need is to fill two files which describes your lab (DUT, users etc...) then a script will generate all necessary compoments.
+The goal of lava-docker is to simplify the install and maintenance of
+a LAVA lab in order to participate in distributed test efforts such as
+kernelCI.org.
+
+With lava-docker, you describe the devices under test (DUT) in a
+simple YAML file, and then a custom script will generate the necessary
+LAVA configuration files automatically.
+
+Similarly, LAVA users and authentication tokens are described in
+a(nother) YAML file, and the LAVA configurations are automatically generated.
+
+This enables the setup of a LAVA lab with minimal knowledge of the
+underlying LAVA configuration steps necessary.
 
 ## Prerequisites
-The following packages are necessary:
+lava-docker has currently been tested primarily on Debian stable (stretch).
+The following packages are necessary on the host machine:
 * docker
 * docker-compose
 
 ## Quickstart
-Example to use lava-docker with only one qemu device:
+Example to use lava-docker with only one QEMU device:
 
 * Checkout the lava-docker repository
 * You will obtain the following boards.yaml
@@ -22,7 +33,7 @@ lab-slave-0:
     qemu-01:
       type: qemu
 ```
-* Generate files via
+* Generate configuration files for LAVA, udev, serial ports, etc. via
 ```
 ./lavalab-gen.py
 ```
@@ -35,15 +46,15 @@ docker-compose build
 docker-compose up -d
 ```
 
-* Once launched, you can access the web interface via http://127.0.0.1:10080/.
-If you do not have changed anything, you can login with admin:admin.
+* Once launched, you can access the LAVA web interface via http://localhost:10080/.
+With the default users, you can login with admin:admin.
 
-* By default, a healthcheck will be run on the qemu.
-You will see it in http://127.0.0.1:10080/scheduler/healthcheck
+* By default, a LAVA healthcheck job will be run on the qemu device.
+You will see it in the "All Jobs" list: http://localhost:10080/scheduler/alljobs
 
-* You could now see full job output by clicking the blue eye icon ("View job details") (or via http://127.0.0.1:10080/scheduler/job/1 since it is the first job ran)
+* You can also see full job output by clicking the blue eye icon ("View job details") (or via http://localhost:10080/scheduler/job/1 since it is the first job ran)
 
-* For more details, see https://staging.validation.linaro.org/static/docs/v2/first-job.html
+* For more details, see https://validation.linaro.org/static/docs/v2/first-job.html
 
 ## Known limitations
 The current lava-docker provides support for generating only one LAVA slave.
@@ -52,8 +63,8 @@ But many slaves could be managed by simply add their name in boards.yaml
 ## Architecture
 The setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
 * lava-master: run lava-server along with the web interface
-* lava-slave: run lava-dispatcher, the compoment which send job to DUT
-* squid: a proxy for caching downloaded contents (kernel/dtb/rootfs)
+* lava-slave: run lava-dispatcher, the compoment which sends jobs to DUTs
+* squid: an HTTP proxy for caching downloaded contents (kernel/dtb/rootfs)
 
 The host and DUTs must share a common LAN.<br/>
 The host IP on this LAN must be set as dispatcher_ip in boards.yaml.<br/>
@@ -182,8 +193,8 @@ For running all images, simply run:
 docker-compose up -d
 ```
 
-## Process wrapper
-You can use the lavalab-gen.sh wrapper which will do all the above actions for you.
+## Helper script
+You can use the lavalab-gen.sh helper script which will do all the above actions for you.
 
 ## Proxy cache
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
