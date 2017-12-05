@@ -105,6 +105,9 @@ def main(args):
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
 
+            # board specific hacks
+            if devicetype == "qemu":
+                device_line += "{% set no_kvm = True %}\n"
             if not os.path.isdir("lava-master/devices/"):
                 os.mkdir("lava-master/devices/")
             device_path = "lava-master/devices/%s" % lab_name
