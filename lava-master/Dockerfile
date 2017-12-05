@@ -28,19 +28,17 @@ RUN wget http://images.validation.linaro.org/production-repo/production-repo.key
  && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
  && apt-get clean && apt-get update
 
-RUN service postgresql start \
- && DEBIAN_FRONTEND=noninteractive apt-get -y install \
- lava \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  qemu-system \
  qemu-system-arm \
  qemu-system-i386 \
  qemu-kvm \
  u-boot-tools \
- python-setproctitle \
- && a2enmod proxy \
- && a2enmod proxy_http \
- && a2dissite 000-default \
- && a2ensite lava-server \
+ python-setproctitle
+
+RUN service postgresql start \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+ lava \
  && /stop.sh
 
 # Install latest
@@ -57,6 +55,11 @@ RUN service postgresql start \
 # && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
 # && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
 # && /stop.sh
+
+RUN a2enmod proxy \
+ && a2enmod proxy_http \
+ && a2dissite 000-default \
+ && a2ensite lava-server
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
