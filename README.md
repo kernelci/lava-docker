@@ -33,7 +33,7 @@ lab-slave-0:
     qemu-01:
       type: qemu
 ```
-* Generate configuration files for LAVA, udev, serial ports, etc. via
+* Generate configuration files for LAVA, udev, serial ports, etc. from boards.yaml via
 ```
 ./lavalab-gen.py
 ```
@@ -56,9 +56,55 @@ You will see it in the "All Jobs" list: http://localhost:10080/scheduler/alljobs
 
 * For more details, see https://validation.linaro.org/static/docs/v2/first-job.html
 
+### Adding your first board:
+#### device-type
+For adding a board you need to find its device-type, standard naming is to use the same as the official kernel DT name.
+(But a very few DUT differ from that)
+
+You could check in https://github.com/Linaro/lava-server/tree/release/lava_scheduler_app/tests/device-types if you find yours.
+
+Example:
+For a beagleboneblack, the device-type is am335x-boneblack
+
+#### UART
+Next step is to gather information on UART wired on DUT.<br>
+If you have a FTDI, simply get its serial (visible in lsusb -v or for major distribution in dmesg)<br>
+For other UART type (or for old FTDI without serial number) you need to get the devpath attribute via:
+```
+udevadm info -a -n /dev/ttyUSBx |grep devpath | head -n1
+```
+Example with a FTDI UART:
+```
+[    6.616707] usb 4-1.4.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[    6.704305] usb 4-1.4.2: SerialNumber: AK04TU1X
+The serial is AK04TU1X
+```
+
+Example with a FTDI without serial:
+```
+[2428401.256860] ftdi_sio 1-1.4:1.0: FTDI USB Serial Device converter detected
+[2428401.256916] usb 1-1.4: Detected FT232BM
+[2428401.257752] usb 1-1.4: FTDI USB Serial Device converter now attached to ttyUSB1
+udevadm info -a -n /dev/ttyUSB1 |grep devpath | head -n1
+    ATTRS{devpath}=="1.5"
+```
+
+#### PDU
+Final step is to manage the powering of the board.<br>
+Many PDU switch could be handled by a command line tool which control the PDU.<br>
+You need to fill boards.yaml with the command line to be ran.<br>
+
+Example with an ACME board:
+If the beagleboneblack is wired to port 3 and the ACME board have IP 192.168.66.2:
+```
+      pdu_generic:
+        hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 3
+        power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_off 3
+        power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_on 3
+```
+
 ## Known limitations
 The current lava-docker provides support for generating only one LAVA slave.
-But many slaves could be managed by simply add their name in boards.yaml
 
 ## Architecture
 The setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
@@ -76,9 +122,12 @@ So, on the LAN shared with DUTs, a running DHCPD is necessary. (See DHCPD below)
 
 ### Power supply
 You need to have a PDU for powering your DUT.
-Managing PDUs is done by lavapdu-daemon.
+Managing PDUs could be done via:
+- lavapdu-daemon (See https://github.com/pdudaemon for more information)
+- A generic command line for managing PDU
 
-See https://github.com/pdudaemon for more information
+This choice is done in boards.yaml.
+You can see example of both in board.yaml.example
 
 ### Network ports
 The following ports are used by lava-docker and are proxyfied on the host:
@@ -118,23 +167,33 @@ lab-slave-XX:		The name of the slave (where XX is a number)
     devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
       type: the LAVA device-type of this device
       macaddr: (Optional) the MAC address to set in uboot
-      pdu:
-        daemon: The hostname running the PDU daemon (always localhost)
-        host: The host name of the PDU as named in lavapdu.conf
-        port: portnumber (The port number of the PDU where the device is connected)
       uart:
-        type: (unused)
 	idvendor: The VID of the UART
 	idproduct: the PID of the UART
         serial: The serial number in case of FTDI uart
         devpath: the UDEV devpath to this uart for UART without serial number
+# One of pdu or pdu_generic must be choosen
+      pdu:
+        daemon: The hostname running the PDU daemon (always localhost)
+        host: The host name of the PDU as named in lavapdu.conf
+        port: portnumber (The port number of the PDU where the device is connected)
+      pdu_generic:
+        hard_reset_command: commandline to reset the board
+	power_off_command: commandline to power off the board
+	power_on_command: commandline to power on the board
 ```
 Notes on UART:
 * Only one of devpath/serial is necessary.
 * For finding the right devpath, you could use
 ```
-udevadm info -a -n /dev/ttyUSBx |grep devpath
+udevadm info -a -n /dev/ttyUSBx |grep devpath | head -n1
 ```
+* VID and PID could be found in lsusb. If a leading zero is present, the value must be given between double-quotes (and leading zero must be kept)
+Example:
+```
+Bus 001 Device 054: ID 0403:6001 Future Technology Devices International, Ltd FT232 Serial (UART) IC
+```
+This device must use "0403" for idvendor and 6001 for idproduct.
 
 Examples: see [boards.yaml.example](boards.yaml.example)
 

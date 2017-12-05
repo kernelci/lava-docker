@@ -25,10 +25,10 @@ lab-slave-0:
         serial: FT9QR1A9
     meson-gxl-s905x-libretech-cc-01:
       type: meson-gxl-s905x-libretech-cc
-      pdu:
-        daemon: localhost
-        host: acme-0
-        port: 3
+      pdu_generic:
+        hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 3
+        power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 3
+        power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 3
       uart:
         idvendor: 067b
         idproduct: 2303
