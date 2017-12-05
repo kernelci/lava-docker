@@ -1,10 +1,8 @@
-lava-master:
-  boardlist:
-    qemu-01:
-      type: qemu
 lab-slave-0:
   dispatcher_ip: 192.168.66.1
   boardlist:
+    qemu-01:
+      type: qemu
     bcm2837-rpi-3-b-01:
       type: bcm2837-rpi-3-b
       pdu:
@@ -12,7 +10,6 @@ lab-slave-0:
         host: acme-0
         port: 1
       uart:
-        type: FTDI
         idvendor: "0403"
         idproduct: 6001
         serial: FT9QQZTA
@@ -23,7 +20,6 @@ lab-slave-0:
         host: acme-0
         port: 2
       uart:
-        type: FTDI
         idvendor: "0403"
         idproduct: 6001
         serial: FT9QR1A9
@@ -34,7 +30,6 @@ lab-slave-0:
         host: acme-0
         port: 3
       uart:
-        type: PL2303
         idvendor: 067b
         idproduct: 2303
         devpath: 1.1.4
@@ -46,7 +41,6 @@ lab-slave-0:
         host: acme-0
         port: 4
       uart:
-        type: FTDI
         idvendor: "0403"
         idproduct: 6001
         serial: FT9R7VDB
@@ -57,7 +51,6 @@ lab-slave-0:
         host: acme-0
         port: 5
       uart:
-        type: FTDI
         idvendor: "0403"
         idproduct: 6001
         serial: AK04WW0Q
@@ -68,7 +61,6 @@ lab-slave-0:
         host: acme-0
         port: 6
       uart:
-        type: FTDI
         idvendor: "0403"
         idproduct: 6015
         serial: DAZ0KEUH
