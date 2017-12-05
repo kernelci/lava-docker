@@ -36,25 +36,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  u-boot-tools \
  python-setproctitle
 
-RUN service postgresql start \
- && DEBIAN_FRONTEND=noninteractive apt-get -y install \
- lava \
- && /stop.sh
+#RUN service postgresql start \
+# && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+# lava \
+# && /stop.sh
 
 # Install latest
-#RUN /start.sh \
-# && git clone https://github.com/kernelci/lava-dispatcher.git -b master  /root/lava-dispatcher \
-# && cd /root/lava-dispatcher \
-# && git checkout release \
-# && git clone -b master https://github.com/kernelci/lava-server.git /root/lava-server \
-# && cd /root/lava-server \
-# && git checkout release \
-# && git config --global user.name "Docker Build" \
-# && git config --global user.email "info@kernelci.org" \
-# && echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh \
-# && cd /root/lava-dispatcher && /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher \
-# && cd /root/lava-server && /root/lava-server/share/debian-dev-build.sh -p lava-server \
-# && /stop.sh
+COPY scripts/build-lava /
+RUN bash /build-lava lava-dispatcher 2017.11 2017.11.post1-1
+RUN service postgresql start && \
+ bash /build-lava lava-server 2017.11 2017.11.post1-1 && \
+ /stop.sh
 
 RUN a2enmod proxy \
  && a2enmod proxy_http \

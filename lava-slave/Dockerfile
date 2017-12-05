@@ -12,11 +12,7 @@ RUN \
  echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections && \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
- lava-dispatcher \
- lava-dev \
- git \
  vim \
- sudo \
  cu \
  conmux \
  python-setproctitle \
@@ -30,23 +26,16 @@ RUN \
  xnbd-server \
  e2fsprogs
 
-RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
- && apt-key add production-repo.key.asc \
- && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
- && apt-get clean && apt-get update
+# Uncomment the following for having the latest package (you need to comment all build-lava below)
+#RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget gnupg \
+# && wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
+# && apt-key add production-repo.key.asc \
+# && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
+# && apt-get clean && apt-get update
+#RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
-
-#RUN \
-# git clone https://github.com/kernelci/lava-server.git -b release /root/lava-server && \
-# git clone https://github.com/kernelci/lava-dispatcher.git -b master /root/lava-dispatcher && \
-# cd /root/lava-dispatcher && \
-# git checkout release && \
-# git config --global user.name "Docker Build" && \
-# git config --global user.email "info@kernelci.org" && \
-# echo "cd \${DIR} && dpkg -i *.deb" >> /root/lava-server/share/debian-dev-build.sh && \
-# sleep 2 && \
-# /root/lava-server/share/debian-dev-build.sh -p lava-dispatcher
+COPY scripts/build-lava /
+RUN sh /build-lava lava-dispatcher 2017.11 2017.11.post1-1
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
