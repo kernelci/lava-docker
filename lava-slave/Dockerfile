@@ -60,7 +60,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install postgresql
 #RUN service postgresql start && DEBIAN_FRONTEND=noninteractive apt-get -y install lavapdu-daemon lavapdu-client && service postgresql stop
 
 # pdudaemon dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-paramiko python-psycopg2
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-paramiko python-psycopg2 docbook-xsl xsltproc
 # clone pdudaemon sources and debian directory
 RUN git clone https://github.com/Linaro/pdudaemon lavapdu
 RUN git clone https://github.com/Linaro/pkg-lavapdu
