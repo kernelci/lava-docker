@@ -35,6 +35,11 @@ template_device_pdu = string.Template("""
 {% set power_off_command = 'pduclient --daemon ${pdudaemon} --hostname ${pduhost} --port ${port} --command=off' %}
 {% set power_on_command = 'pduclient --daemon ${pdudaemon} --hostname ${pduhost} --port ${port} --command=on' %}
 """)
+template_device_pdu_generic = string.Template("""
+{% set hard_reset_command = '${hard_reset_command}' %}
+{% set power_off_command = '${power_off_command}' %}
+{% set power_on_command = '${power_on_command}' %}
+""")
 
 template_udev_serial = string.Template("""#
 SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
@@ -81,6 +86,11 @@ def main(args):
                 port = b["pdu"]["port"]
                 delay_opt = ""
                 device_line += template_device_pdu.substitute(port=port, pdudaemon=daemon, pduhost=host)
+            elif b.has_key("pdu_generic"):
+                hard_reset_command = b["pdu_generic"]["hard_reset_command"]
+                power_off_command = b["pdu_generic"]["power_off_command"]
+                power_on_command = b["pdu_generic"]["power_on_command"]
+                device_line += template_device_pdu_generic.substitute(hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
             if b.has_key("uart"):
                 uart = b["uart"]
                 baud = b["uart"].get("baud", baud_default)
