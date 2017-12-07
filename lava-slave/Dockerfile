@@ -77,6 +77,9 @@ RUN git clone https://github.com/baylibre-acme/acme-cli.git /root/acme-cli
 RUN cp /root/acme-cli/acme-cli /usr/local/bin
 RUN chmod 755 /usr/local/bin/acme-cli
 
+COPY hack/nbd.patch /
+RUN patch -p0 < nbd.patch
+
 EXPOSE 69/udp 80
 
 CMD /start.sh
