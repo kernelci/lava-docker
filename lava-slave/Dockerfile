@@ -24,6 +24,7 @@ RUN \
  qemu-system-i386 \
  qemu-kvm \
  xnbd-server \
+ nfs-kernel-server \
  e2fsprogs
 
 # Uncomment the following for having the latest package (you need to comment all build-lava below)
