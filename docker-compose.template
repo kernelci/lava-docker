@@ -11,6 +11,7 @@ services:
       - "10080:80"
       - "5555:5555"
       - "5556:5556"
+      - "5500:5500"
     volumes:
 # boot and /lib/modules are for libguestfs (TODO set them read_only with docker-compose 3.0)
       - "/boot:/boot"

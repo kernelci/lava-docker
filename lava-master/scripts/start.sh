@@ -32,6 +32,7 @@ start lava-coordinator
 start lava-slave
 start lava-server-gunicorn
 start tftpd-hpa
+start lava-publisher
 
 postgres-ready
 service apache2 reload #added after the website not running a few times on boot
