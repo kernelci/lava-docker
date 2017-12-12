@@ -144,9 +144,24 @@ A DHCPD service is necessary for giving network access to DUT.
 The DHCPD server could be anywhere with the condition that it is accessible of DUTs. (Could be on host, in a docker in the host, or is the ISP box on the same LAN.<br/>
 
 ### Examples
-Examples are provided with a dedicated LAN. (192.168.66.0/24)
-The host (192.168.66.1) run lava-docker.
-A DHCPD give address in range of 192.168.66.3-192.168.66.200
+#### Example 1: Basic LAB with home router
+Router: 192.168.1.1 which handle DHCP for 192.168.1.10-192.168.1.254<br>
+Lab: 192.168.1.2<br>
+
+So the dispatcher_ip is set to 192.168.1.2
+
+#### Example 2: Basic LAB without home router
+Lab: 192.168.1.2 which handle DHCP for 192.168.1.10-192.168.1.254<br>
+
+So the dispatcher_ip is set to 192.168.1.2
+
+#### Example 3: LAB with dedicated LAN for DUTs
+A dedicated LAN is used for DUTs. (192.168.66.0/24)
+The host have two NIC:
+- eth0: (192.168.1.0/24) on home LAN. (The address could be static or via DHCP)
+- eth1: (192.168.66.0/24) with address set to 192.168.66.1
+
+On the host, a DHCPD give address in range of 192.168.66.3-192.168.66.200
 
 So the dispatcher_ip is set to 192.168.66.1
 
