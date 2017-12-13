@@ -74,6 +74,10 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
 
+# Permit to upload result via TFTP
+RUN chown tftp /var/lib/lava/dispatcher/tmp/
+RUN sed -i 's,TFTP_OPTIONS=.*,TFTP_OPTIONS="--secure --create",' /etc/default/tftpd-hpa
+
 RUN git clone https://github.com/baylibre-acme/acme-cli.git /root/acme-cli
 RUN cp /root/acme-cli/acme-cli /usr/local/bin
 RUN chmod 755 /usr/local/bin/acme-cli
