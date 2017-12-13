@@ -30,6 +30,10 @@ services:
       - "69:69/udp"
       - "80:80"
       - "55950-56000:55950-56000"
+    volumes:
+# boot and /lib/modules are for libguestfs (TODO set them read_only with docker-compose 3.0)
+      - "/boot:/boot"
+      - "/lib/modules:/lib/modules"
     links:
       - "lava-master"
   squid:
