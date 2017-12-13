@@ -18,10 +18,20 @@ template_conmux = string.Template("""#
 #
 listener ${board}
 application console '${board} console' 'exec sg dialout "cu-loop /dev/${board} ${baud}"'
+""")
+
+template_conmux_add_pdu = string.Template("""#
 command 'hardreset' 'Reboot ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command reboot ${delay} '
 command 'b' 'Reboot ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command reboot '
 command 'off' 'Power off ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command off '
 command 'on' 'Power on ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command on '
+""")
+
+template_conmux_add_pdu_generic = string.Template("""#
+command 'hardreset' 'Reboot ${board}' '${hard_reset_command}'
+command 'b' 'Reboot ${board}' '${hard_reset_command}'
+command 'off' 'Power off ${board}' '${power_off_command}'
+command 'on' 'Power on ${board}' '${power_on_command}'
 """)
 
 #no comment it is volontary
@@ -96,7 +106,11 @@ def main(args):
                 baud = b["uart"].get("baud", baud_default)
                 idvendor = b["uart"]["idvendor"]
                 idproduct = b["uart"]["idproduct"]
-                line = template_conmux.substitute(board=board_name, baud=baud, daemon=daemon, host=host, port=port, delay=delay_opt)
+                line = template_conmux.substitute(board=board_name, baud=baud)
+                if b.has_key("pdu"):
+                    line += template_conmux_add_pdu.substitute(board=board_name, daemon=daemon, host=host, port=port, delay=delay_opt)
+                elif b.has_key("pdu_generic"):
+                    line += template_conmux_add_pdu_generic.substitute(board=board_name, hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
                 if uart.has_key("serial"):
                     serial = b["uart"]["serial"]
                     udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor=idvendor, idproduct=idproduct)
