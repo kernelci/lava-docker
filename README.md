@@ -103,6 +103,20 @@ If the beagleboneblack is wired to port 3 and the ACME board have IP 192.168.66.
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_on 3
 ```
 
+#### Example:
+beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
+    beagleboneblack-01:
+      type: am335x-boneblack
+      pdu_generic:
+        hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 5
+        power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_off 5
+        power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_on 5
+      uart:
+        idvendor: "0403"
+	idproduct: 6001
+	serial: 1234567
+
+
 ## Known limitations
 The current lava-docker provides support for generating only one LAVA slave.
 
