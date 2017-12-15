@@ -147,6 +147,7 @@ You can see example of both in board.yaml.example
 The following ports are used by lava-docker and are proxyfied on the host:
 - 69/UDP	proxyfied to the slave for TFTP
 - 80		proxyfied to the slave for TODO (transfer overlay)
+- 5500		proxyfied to the slave for Notification
 - 5555		proxyfied to the master (LAVA logger)
 - 5556		proxyfied to the master (LAVA master)
 - 10080		proxyfied to the master (Web interface)
