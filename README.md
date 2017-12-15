@@ -196,11 +196,13 @@ lab-slave-XX:		The name of the slave (where XX is a number)
     devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
       type: the LAVA device-type of this device
       macaddr: (Optional) the MAC address to set in uboot
+# One of uart or connection_command must be choosen
       uart:
 	idvendor: The VID of the UART
 	idproduct: the PID of the UART
         serial: The serial number in case of FTDI uart
         devpath: the UDEV devpath to this uart for UART without serial number
+      connection_command: A command to be ran for getting a serial console
 # One of pdu or pdu_generic must be choosen
       pdu:
         daemon: The hostname running the PDU daemon (always localhost)
@@ -223,6 +225,8 @@ Example:
 Bus 001 Device 054: ID 0403:6001 Future Technology Devices International, Ltd FT232 Serial (UART) IC
 ```
 This device must use "0403" for idvendor and 6001 for idproduct.
+
+Note on connection_command: connection_command is for people which want to use other way than conmux to handle the console. (ser2net).
 
 Examples: see [boards.yaml.example](boards.yaml.example)
 
