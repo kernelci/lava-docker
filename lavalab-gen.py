@@ -8,6 +8,8 @@ import yaml
 import string
 import socket
 
+import warnings
+
 # Defaults
 boards_yaml = "boards.yaml"
 tokens_yaml = "tokens.yaml"
@@ -39,6 +41,9 @@ template_device = string.Template("""{% extends '${devicetype}.jinja2' %}
 """)
 template_device_conmux = string.Template("""
 {% set connection_command = 'conmux-console ${board}' %}
+""")
+template_device_connection_command = string.Template("""#
+{% set connection_command = '${connection_command}' %}
 """)
 template_device_pdu = string.Template("""
 {% set hard_reset_command = 'pduclient --daemon ${pdudaemon} --hostname ${pduhost} --port ${port} --command=reboot' %}
@@ -122,6 +127,9 @@ def main(args):
                 fp.write(line)
                 fp.close()
                 device_line += template_device_conmux.substitute(board=board_name)
+            elif b.has_key("connection_command"):
+                connection_command = b["connection_command"]
+                device_line += template_device_connection_command.substitute(connection_command=connection_command)
             if b.has_key("macaddr"):
                 device_line += '{% set uboot_set_mac = true %}'
                 device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
