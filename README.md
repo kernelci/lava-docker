@@ -58,26 +58,41 @@ You will see it in the "All Jobs" list: http://localhost:10080/scheduler/alljobs
 
 ### Adding your first board:
 #### device-type
-For adding a board you need to find its device-type, standard naming is to use the same as the official kernel DT name.
+To add a board you need to find its device-type, standard naming is to use the same as the official kernel DT name.
 (But a very few DUT differ from that)
 
 You could check in https://github.com/Linaro/lava-server/tree/release/lava_scheduler_app/tests/device-types if you find yours.
 
 Example:
-For a beagleboneblack, the device-type is am335x-boneblack
+For a beagleboneblack, the device-type is beaglebone-black (Even if official DT name is am335x-boneblack)
+So you have now:
+```
+    beagleboneblack-01:
+      type: beaglebone-black
+```
 
 #### UART
 Next step is to gather information on UART wired on DUT.<br>
 If you have a FTDI, simply get its serial (visible in lsusb -v or for major distribution in dmesg)<br>
+<br>
 For other UART type (or for old FTDI without serial number) you need to get the devpath attribute via:
 ```
-udevadm info -a -n /dev/ttyUSBx |grep devpath | head -n1
+udevadm info -a -n /dev/ttyUSBx |grep ATTR|grep devpath | head -n1
 ```
 Example with a FTDI UART:
 ```
 [    6.616707] usb 4-1.4.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
 [    6.704305] usb 4-1.4.2: SerialNumber: AK04TU1X
 The serial is AK04TU1X
+```
+So you have now:
+```
+    beagleboneblack-01:
+      type: beaglebone-black
+      uart:
+        idvendor: "0403"
+	idproduct: 6001
+	serial: AK04TU1X
 ```
 
 Example with a FTDI without serial:
@@ -88,10 +103,19 @@ Example with a FTDI without serial:
 udevadm info -a -n /dev/ttyUSB1 |grep devpath | head -n1
     ATTRS{devpath}=="1.5"
 ```
+So you have now:
+```
+    beagleboneblack-01:
+      type: beaglebone-black
+      uart:
+        idvendor: "0403"
+	idproduct: 6001
+	devpath: "1.5"
+```
 
-#### PDU
+#### PDU (Power Distribution Unit)
 Final step is to manage the powering of the board.<br>
-Many PDU switch could be handled by a command line tool which control the PDU.<br>
+Many PDU switchs could be handled by a command line tool which control the PDU.<br>
 You need to fill boards.yaml with the command line to be ran.<br>
 
 Example with an ACME board:
@@ -105,8 +129,9 @@ If the beagleboneblack is wired to port 3 and the ACME board have IP 192.168.66.
 
 #### Example:
 beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
+```
     beagleboneblack-01:
-      type: am335x-boneblack
+      type: beaglebone-black
       pdu_generic:
         hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 5
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_off 5
@@ -115,7 +140,7 @@ beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
         idvendor: "0403"
 	idproduct: 6001
 	serial: 1234567
-
+```
 
 ## Known limitations
 The current lava-docker provides support for generating only one LAVA slave.
@@ -187,6 +212,9 @@ A sample isc-dhcpd-server DHCPD config file is available in the dhcpd directory.
 Simply set interface=interfacename where interfacename is your shared LAN interface
 
 ## Generating files
+
+### Helper script
+You can use the lavalab-gen.sh helper script which will do all the above actions for you.
 
 ### boards.yaml
 This file describe how the DUTs are connected and powered.
@@ -273,21 +301,18 @@ Note that the udev-rules are generated for the host, they must be placed in /etc
 They are used for giving a proper /dev/xxx name to tty devices. (where xxx is the board name)
 (lavalab-gen.sh will do it for you)
 
-## Building
+### Building
 To build all docker images, execute the following from the directory you cloned the repo:
 
 ```
 docker-compose build
 ```
 
-## Running
+### Running
 For running all images, simply run:
 ```
 docker-compose up -d
 ```
-
-## Helper script
-You can use the lavalab-gen.sh helper script which will do all the above actions for you.
 
 ## Proxy cache
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
