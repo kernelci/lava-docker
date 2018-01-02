@@ -1,0 +1,66 @@
+lab-slave-0:
+  dispatcher_ip: 192.168.66.1
+  boardlist:
+    qemu-01:
+      type: qemu
+    bcm2837-rpi-3-b-01:
+      type: bcm2837-rpi-3-b
+      pdu:
+        daemon: localhost
+        host: acme-0
+        port: 1
+      uart:
+        idvendor: "0403"
+        idproduct: 6001
+        serial: FT9QQZTA
+    am335x-boneblack-01:
+      type: beaglebone-black
+      pdu:
+        daemon: localhost
+        host: acme-0
+        port: 2
+      uart:
+        idvendor: "0403"
+        idproduct: 6001
+        serial: FT9QR1A9
+    meson-gxl-s905x-libretech-cc-01:
+      type: meson-gxl-s905x-libretech-cc
+      pdu_generic:
+        hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 3
+        power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 3
+        power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 3
+      uart:
+        idvendor: 067b
+        idproduct: 2303
+        devpath: 1.1.4
+      macaddr: "00:FA:E0:DE:AD:78"
+    dragonboard-410c-01:
+      type: dragonboard-410c
+      pdu:
+        daemon: localhost
+        host: acme-0
+        port: 4
+      uart:
+        idvendor: "0403"
+        idproduct: 6001
+        serial: FT9R7VDB
+    r8a7796-m3ulcb-01:
+      type: r8a7796-m3ulcb
+      pdu:
+        daemon: localhost
+        host: acme-0
+        port: 5
+      uart:
+        idvendor: "0403"
+        idproduct: 6001
+        serial: AK04WW0Q
+    imx6q-sabrelite-01:
+      type: imx6q-sabrelite
+      pdu:
+        daemon: localhost
+        host: acme-0
+        port: 6
+      uart:
+        idvendor: "0403"
+        idproduct: 6015
+        serial: DAZ0KEUH

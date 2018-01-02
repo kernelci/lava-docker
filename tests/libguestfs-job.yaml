@@ -1,0 +1,108 @@
+metadata:
+  git.branch: agl-branch
+  image.type: AGL
+  job.arch: x86_64
+  job.name: AGL-gerrit
+  kernel.tree: AGL-kernel-tree
+  kernel.version: AGL-gerrit-12169-1
+  kernel.defconfig_base: defconfig
+  kernel.defconfig: defconfig+CONFIG_AGL=y
+  platform.mach: x86
+  platform.name: qemu
+  vcs.url: https://download.automotivelinux.org/AGL/upload/ci/12169/1/qemux86-64/
+
+device_type: qemu
+job_name: AGL-gerrit
+
+timeouts:
+  job:
+    minutes: 30
+  action:
+    minutes: 15
+  connection:
+    minutes: 5
+priority: medium
+visibility: public
+
+context:
+    no_kvm: false
+    arch: x86_64
+    extra_options: ["-cpu qemu64,+ssse3,+sse4.1,+sse4.2,+popcnt -m 1048 -soundhw hda"]
+
+actions:
+- deploy:
+    timeout:
+      minutes: 15
+    to: tmpfs
+    os: oe
+    failure_retry: 2
+    images:
+        kernel:
+           image_arg: '-kernel {kernel} -append "console=ttyS0,115200 root=/dev/hda debug verbose"'
+           url: https://download.automotivelinux.org/AGL/upload/ci/12169/1/qemux86-64/bzImage
+        ramdisk:
+           image_arg: '-drive format=raw,file={ramdisk}'
+           url: https://download.automotivelinux.org/AGL/upload/ci/12169/1/qemux86-64/agl-demo-platform-qemux86-64.ext4.xz
+           compression: xz
+
+- boot:
+    timeout:
+      minutes: 10
+    method: qemu
+    prompts:
+      - "root@qemux86-64:~"
+      - '/ #'
+
+    auto_login:
+      login_prompt: "login:"
+      username: root
+    media: tmpfs
+    transfer_overlay:
+      download_command: wget
+      unpack_command: tar -C / -xvpf
+- test:
+    definitions:
+    - repository: https://git.automotivelinux.org/src/qa-testdefinitions
+      from: git
+      path: test-suites/yocto-ptest.yaml
+      name: yocto-ptest
+- test:
+    timeout:
+      minutes: 2
+    definitions:
+    - repository:
+        metadata:
+          format: Lava-Test Test Definition 1.0
+          name: inline-test
+          description: "Inline test to validate test framewrok health"
+          os:
+          - debian
+          scope:
+          - functional
+        run:
+          steps:
+          - lava-test-set start set-pass
+          - lava-test-case always-pass --shell true
+          - lava-test-set stop set-pass
+          - lava-test-set start set-fail
+          - lava-test-case always-fail --shell false
+          - lava-test-set stop set-fail
+      from: inline
+      name: health-test
+      path: inline/health-test.yaml
+
+- test:
+    definitions:
+    - repository: https://git.automotivelinux.org/src/qa-testdefinitions
+      from: git
+      path: test-suites/short-smoke/busybox.yaml
+      name: busybox
+    - repository: https://git.automotivelinux.org/src/qa-testdefinitions
+      from: git
+      path: test-suites/short-smoke/smoke-tests-basic.yaml
+      name: smoke-tests-basic
+    - repository: https://git.automotivelinux.org/src/qa-testdefinitions
+      from: git
+      path: test-suites/short-smoke/service-check.yaml
+      name: service-check
+

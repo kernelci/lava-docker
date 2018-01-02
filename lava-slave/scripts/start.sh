@@ -13,10 +13,13 @@ service lava-slave start || exit 5
 if [ -e /etc/lavapdu ];then
 	/etc/init.d/postgresql start || exit 6
 
+	# lavapdu-listen does not run if old PID is present
+	rm -f /var/run/lavapdu-listen.pid
 	echo "== Start lavapdu listen =="
 	/etc/init.d/lavapdu-listen start || exit 7
 	# lava listen create the database, let it some time
 	sleep 5
+	rm -f /var/run/lavapdu-runner.pid
 	echo "== Start lavapdu runner =="
 	/etc/init.d/lavapdu-runner start || exit 8
 fi
