@@ -6,6 +6,7 @@ RUN apt-get update
 COPY scripts/stop.sh .
 COPY scripts/start.sh .
 
+# e2fsprogs is for libguestfs
 RUN \
  echo 'lava-server   lava-server/instance-name string lava-slave-instance' | debconf-set-selections && \
  echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections && \
