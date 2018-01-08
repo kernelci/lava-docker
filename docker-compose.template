@@ -20,6 +20,8 @@ services:
       - "/lib/modules:/lib/modules"
   lava-slave:
     hostname: lab-slave-0
+#conmux does not support dns_search
+    dns_search: ""
     restart: always
     build:
       context: lava-slave
