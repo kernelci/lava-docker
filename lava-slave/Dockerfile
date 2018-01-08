@@ -60,8 +60,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install postgresql
 RUN service postgresql start && DEBIAN_FRONTEND=noninteractive apt-get -y install lavapdu-daemon lavapdu-client && service postgresql stop
 COPY lavapdu.conf /etc/lavapdu/
 
-#TODO made this customizable, 1000 ports by default is too much
-RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=55950,' /usr/lib/python2.7/dist-packages/lava_dispatcher/pipeline/utils/constants.py
+# Caution to not use any port between the Linux dynamic port range: 32768-60999
+RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python2.7/dist-packages/lava_dispatcher/utils/constants.py
+RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python2.7/dist-packages/lava_dispatcher/utils/constants.py
 
 EXPOSE 69/udp 80
 
