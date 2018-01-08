@@ -64,6 +64,12 @@ COPY lavapdu.conf /etc/lavapdu/
 RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python2.7/dist-packages/lava_dispatcher/utils/constants.py
 RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python2.7/dist-packages/lava_dispatcher/utils/constants.py
 
+#conmux need cu >= 1.07-24 See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=336996
+RUN echo "deb http://debian.proxad.net/debian/ testing main" >> /etc/apt/sources.list.d/testing.list
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
+RUN rm /etc/apt/sources.list.d/testing.list
+
 EXPOSE 69/udp 80
 
 CMD /start.sh
