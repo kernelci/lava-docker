@@ -50,6 +50,16 @@ def main(args):
         dockcomp["services"]["lava-slave"]["devices"] = []
         dc_devices = dockcomp["services"]["lava-slave"]["devices"]
 
+    # The slaves directory must exists
+    if not os.path.isdir("lava-master/slaves/"):
+        os.mkdir("lava-master/slaves/")
+        fp = open("lava-master/slaves/.empty", "w")
+        fp.close()
+    if not os.path.isdir("lava-slave/conmux/"):
+        os.mkdir("lava-slave/conmux/")
+        fp = open("lava-slave/conmux/.empty", "w")
+        fp.close()
+
     for lab_name in labs:
         lab = labs[lab_name]
         for board_name in lab["boardlist"]:
@@ -77,8 +87,6 @@ def main(args):
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
 
-            if not os.path.isdir("lava-slave/conmux/"):
-                os.mkdir("lava-slave/conmux/")
             # board specific hacks
             if devicetype == "qemu":
                 device_line += "{% set no_kvm = True %}\n"
@@ -98,8 +106,6 @@ def main(args):
         fp.write(udev_line)
         fp.close()
         if lab.has_key("dispatcher_ip"):
-            if not os.path.isdir("lava-master/slaves/"):
-                os.mkdir("lava-master/slaves/")
             fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
             fp.write("dispatcher_ip: %s" % lab["dispatcher_ip"])
             fp.close()
