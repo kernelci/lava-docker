@@ -28,6 +28,9 @@ template_device = string.Template("""{% extends '${devicetype}.jinja2' %}
 template_device_conmux = string.Template("""
 {% set connection_command = 'conmux-console ${board}' %}
 """)
+template_device_connection_command = string.Template("""#
+{% set connection_command = '${connection_command}' %}
+""")
 template_device_pdu_generic = string.Template("""
 {% set hard_reset_command = '${hard_reset_command}' %}
 {% set power_off_command = '${power_off_command}' %}
@@ -95,6 +98,9 @@ def main(args):
                 fp.write(line)
                 fp.close()
                 device_line += template_device_conmux.substitute(board=board_name)
+            elif b.has_key("connection_command"):
+                connection_command = b["connection_command"]
+                device_line += template_device_connection_command.substitute(connection_command=connection_command)
             if b.has_key("fastboot_serial_number"):
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
