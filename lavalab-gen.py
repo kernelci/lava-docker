@@ -34,8 +34,11 @@ template_device_pdu_generic = string.Template("""
 {% set power_on_command = '${power_on_command}' %}
 """)
 
-template_udev = string.Template("""#
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
+template_udev_serial = string.Template("""#
+SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
+""")
+template_udev_devpath = string.Template("""#
+SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{devpath}=="${devpath}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
 """)
 
 def main(args):
@@ -76,10 +79,17 @@ def main(args):
                 power_on_command = b["pdu_generic"]["power_on_command"]
                 device_line += template_device_pdu_generic.substitute(hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
             if b.has_key("uart"):
+                uart = b["uart"]
                 baud = b["uart"].get("baud", baud_default)
+                idvendor = b["uart"]["idvendor"]
+                idproduct = b["uart"]["idproduct"]
                 line = template_conmux.substitute(board=board_name, baud=baud)
-                serial = b["uart"]["serial"]
-                udev_line += template_udev.substitute(board=board_name, serial=serial)
+                if uart.has_key("serial"):
+                    serial = b["uart"]["serial"]
+                    udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor=idvendor, idproduct=idproduct)
+                else:
+                    devpath = b["uart"]["devpath"]
+                    udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor=idvendor, idproduct=idproduct)
                 dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
                 fp = open("lava-slave/conmux/%s.cf" % board_name, "w")
                 fp.write(line)
