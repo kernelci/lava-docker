@@ -101,6 +101,9 @@ def main(args):
             elif b.has_key("connection_command"):
                 connection_command = b["connection_command"]
                 device_line += template_device_connection_command.substitute(connection_command=connection_command)
+            if b.has_key("macaddr"):
+                device_line += '{% set uboot_set_mac = true %}'
+                device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
             if b.has_key("fastboot_serial_number"):
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
