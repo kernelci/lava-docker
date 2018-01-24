@@ -7,19 +7,21 @@ services:
     tty: true
     build:
       context: lava-master
-    devices:
-      - "/dev/kvm:/dev/kvm"
+# TODO handle kvm option
+#    devices:
+#      - "/dev/kvm:/dev/kvm"
     ports:
       - "10080:80"
-      - "1022:22"
       - "5555:5555"
       - "5556:5556"
     volumes:
-# boot and /lib/modules are for libguestfs
+# boot and /lib/modules are for libguestfs (TODO set them read_only with docker-compose 3.0)
       - "/boot:/boot"
       - "/lib/modules:/lib/modules"
   lava-slave:
     hostname: lab-slave-0
+#conmux does not support dns_search
+    dns_search: ""
     restart: always
     build:
       context: lava-slave
@@ -29,7 +31,11 @@ services:
     ports:
       - "69:69/udp"
       - "80:80"
-      - "55980-56000:55980-56000"
+      - "61950-62000:61950-62000"
+    volumes:
+# boot and /lib/modules are for libguestfs (TODO set them read_only with docker-compose 3.0)
+      - "/boot:/boot"
+      - "/lib/modules:/lib/modules"
     links:
       - "lava-master"
   squid:
