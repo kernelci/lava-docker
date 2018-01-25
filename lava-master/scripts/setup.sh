@@ -5,14 +5,23 @@ if [ -e /root/lava-users ];then
 	do
 		# User is the filename
 		USER=$ut
+		USER_OPTION=""
+		STAFF=0
+		SUPERUSER=0
 		. /root/lava-users/$ut
 		if [ -z "$PASSWORD" -o "$PASSWORD" = "$TOKEN" ];then
 			echo "Generating password..."
 			#Could be very long, should be avoided
 			PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 		fi
-		echo "Adding username $USER DEBUG(with $TOKEN / $PASSWORD)"
-		lava-server manage users add --passwd $PASSWORD $USER || exit 1
+		if [ $STAFF -eq 1 ];then
+			USER_OPTION="$USER_OPTION --staff"
+		fi
+		if [ $SUPERUSER -eq 1 ];then
+			USER_OPTION="$USER_OPTION --superuser"
+		fi
+		echo "Adding username $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
+		lava-server manage users add --passwd $PASSWORD $USER_OPTION $USER || exit 1
 		if [ ! -z "$TOKEN" ];then
 			lava-server manage tokens add --user $USER --secret $TOKEN || exit 1
 		fi
