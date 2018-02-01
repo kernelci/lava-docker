@@ -216,6 +216,7 @@ This file describe how the DUTs are connected and powered.
 ```
 lab-slave-XX:		The name of the slave (where XX is a number)
   dispatcher_ip: the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
+  host_has_cpuflag_kvm: Does the host running lab-slave-XX have KVM
   boardlist:
     devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
       type: the LAVA device-type of this device
