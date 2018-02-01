@@ -18,7 +18,7 @@ services:
 # boot and /lib/modules are for libguestfs (TODO set them read_only with docker-compose 3.0)
       - "/boot:/boot"
       - "/lib/modules:/lib/modules"
-  lava-slave:
+  lab-slave-0:
     hostname: lab-slave-0
 #conmux does not support dns_search
     dns_search: ""
