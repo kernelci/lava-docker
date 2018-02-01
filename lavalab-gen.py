@@ -51,10 +51,6 @@ def main(args):
     tdc = open("docker-compose.template", "r")
     dockcomp = yaml.load(tdc)
     tdc.close()
-    dc_devices = dockcomp["services"]["lava-slave"]["devices"]
-    if dc_devices is None:
-        dockcomp["services"]["lava-slave"]["devices"] = []
-        dc_devices = dockcomp["services"]["lava-slave"]["devices"]
 
     # The slaves directory must exists
     if not os.path.isdir("lava-master/slaves/"):
@@ -93,6 +89,11 @@ def main(args):
                 else:
                     devpath = b["uart"]["devpath"]
                     udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor=idvendor, idproduct=idproduct)
+                if dockcomp["services"][lab_name].has_key("devices"):
+                    dc_devices = dockcomp["services"][lab_name]["devices"]
+                else:
+                    dockcomp["services"][lab_name]["devices"] = []
+                    dc_devices = dockcomp["services"][lab_name]["devices"]
                 dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
                 fp = open("lava-slave/conmux/%s.cf" % board_name, "w")
                 fp.write(line)
