@@ -7,9 +7,6 @@ services:
     tty: true
     build:
       context: lava-master
-# TODO handle kvm option
-#    devices:
-#      - "/dev/kvm:/dev/kvm"
     ports:
       - "10080:80"
       - "5555:5555"
@@ -25,7 +22,6 @@ services:
     restart: always
     build:
       context: lava-slave
-    devices:
     environment:
       LAVA_MASTER: "lava-master"
     ports:
