@@ -65,6 +65,16 @@ def main(args):
     for lab_name in labs:
         udev_line =""
         lab = labs[lab_name]
+        use_kvm = False
+        if lab.has_key("host_has_cpuflag_kvm"):
+            use_kvm = lab["host_has_cpuflag_kvm"]
+        if use_kvm:
+            if dockcomp["services"][lab_name].has_key("devices"):
+                dc_devices = dockcomp["services"][lab_name]["devices"]
+            else:
+                dockcomp["services"][lab_name]["devices"] = []
+                dc_devices = dockcomp["services"][lab_name]["devices"]
+            dc_devices.append("/dev/kvm:/dev/kvm")
         for board_name in lab["boardlist"]:
             b = lab["boardlist"][board_name]
             if b.get("disabled", None):
@@ -110,7 +120,7 @@ def main(args):
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
 
             # board specific hacks
-            if devicetype == "qemu":
+            if devicetype == "qemu" and not use_kvm:
                 device_line += "{% set no_kvm = True %}\n"
             if not os.path.isdir("lava-master/devices/"):
                 os.mkdir("lava-master/devices/")
