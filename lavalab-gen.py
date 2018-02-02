@@ -7,6 +7,7 @@ import argparse
 import yaml
 import string
 import socket
+import shutil
 
 # Defaults
 boards_yaml = "boards.yaml"
@@ -146,6 +147,8 @@ def main(args):
         yaml.dump(dockcomp, f)
 
 if __name__ == "__main__":
+    shutil.copy("common/build-lava", "lava-slave/scripts/build-lava")
+    shutil.copy("common/build-lava", "lava-master/scripts/build-lava")
     parser = argparse.ArgumentParser()
     parser.add_argument("--header", help="use this file as header for output file")
     args = parser.parse_args()
