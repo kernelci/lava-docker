@@ -10,17 +10,6 @@ service tftpd-hpa start || exit 4
 rm -f /var/run/lava-slave.pid
 service lava-slave start || exit 5
 
-if [ -e /etc/lavapdu ];then
-	/etc/init.d/postgresql start || exit 6
-
-	echo "== Start lavapdu listen =="
-	/etc/init.d/lavapdu-listen start || exit 7
-	# lava listen create the database, let it some time
-	sleep 5
-	echo "== Start lavapdu runner =="
-	/etc/init.d/lavapdu-runner start || exit 8
-fi
-
 touch /var/run/conmux-registry
 /usr/sbin/conmux-registry 63000 /var/run/conmux-registry&
 sleep 2

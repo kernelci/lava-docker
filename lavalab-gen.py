@@ -19,10 +19,6 @@ template_conmux = string.Template("""#
 #
 listener ${board}
 application console '${board} console' 'exec sg dialout "cu-loop /dev/${board} ${baud}"'
-command 'hardreset' 'Reboot ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command reboot ${delay} '
-command 'b' 'Reboot ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command reboot '
-command 'off' 'Power off ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command off '
-command 'on' 'Power on ${board}' 'pduclient --daemon ${daemon} --host ${host} --port ${port} --command on '
 """)
 
 #no comment it is volontary
@@ -32,10 +28,10 @@ template_device = string.Template("""{% extends '${devicetype}.jinja2' %}
 template_device_conmux = string.Template("""
 {% set connection_command = 'conmux-console ${board}' %}
 """)
-template_device_pdu = string.Template("""
-{% set hard_reset_command = 'pduclient --daemon localhost --hostname acme-0 --port ${port} --command=reboot' %}
-{% set power_off_command = 'pduclient --daemon localhost --hostname acme-0 --port ${port} --command=off' %}
-{% set power_on_command = 'pduclient --daemon localhost --hostname acme-0 --port ${port} --command=on' %}
+template_device_pdu_generic = string.Template("""
+{% set hard_reset_command = '${hard_reset_command}' %}
+{% set power_off_command = '${power_off_command}' %}
+{% set power_on_command = '${power_on_command}' %}
 """)
 
 template_udev = string.Template("""#
@@ -72,17 +68,16 @@ def main(args):
             if b.get("disabled", None):
                 continue
 
-            if b.has_key("pdu"):
-                daemon = b["pdu"]["daemon"]
-                host = b["pdu"]["host"]
-                port = b["pdu"]["port"]
-                devicetype = b["type"]
-                delay_opt = ""
-                device_line = template_device.substitute(board=board_name, port=port, devicetype=devicetype)
-                device_line += template_device_pdu.substitute(port=port)
+            devicetype = b["type"]
+            device_line = template_device.substitute(devicetype=devicetype)
+            if b.has_key("pdu_generic"):
+                hard_reset_command = b["pdu_generic"]["hard_reset_command"]
+                power_off_command = b["pdu_generic"]["power_off_command"]
+                power_on_command = b["pdu_generic"]["power_on_command"]
+                device_line += template_device_pdu_generic.substitute(hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
             if b.has_key("uart"):
                 baud = b["uart"].get("baud", baud_default)
-                line = template_conmux.substitute(board=board_name, baud=baud, daemon=daemon, host=host, port=port, delay=delay_opt)
+                line = template_conmux.substitute(board=board_name, baud=baud)
                 serial = b["uart"]["serial"]
                 udev_line += template_udev.substitute(board=board_name, serial=serial)
                 dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
