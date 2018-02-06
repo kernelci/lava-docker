@@ -42,7 +42,6 @@ def main(args):
     fp = open(boards_yaml, "r")
     labs = yaml.load(fp)
     fp.close()
-    udev_line =""
     tdc = open("docker-compose.template", "r")
     dockcomp = yaml.load(tdc)
     tdc.close()
@@ -62,6 +61,7 @@ def main(args):
         fp.close()
 
     for lab_name in labs:
+        udev_line =""
         lab = labs[lab_name]
         for board_name in lab["boardlist"]:
             b = lab["boardlist"][board_name]
@@ -101,7 +101,9 @@ def main(args):
             fp = open(board_device_file, "w")
             fp.write(device_line)
             fp.close()
-        fp = open("lavalab-udev-%s.rules" % lab_name, "w")
+        if not os.path.isdir("udev"):
+            os.mkdir("udev")
+        fp = open("udev/99-lavalab-udev-%s.rules" % lab_name, "w")
         fp.write(udev_line)
         fp.close()
         if lab.has_key("dispatcher_ip"):
