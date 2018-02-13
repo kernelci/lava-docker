@@ -3,7 +3,6 @@
 from __future__ import print_function
 import os, sys, time
 import subprocess
-import argparse
 import yaml
 import string
 import socket
@@ -44,7 +43,7 @@ template_udev_devpath = string.Template("""#
 SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{devpath}=="${devpath}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
 """)
 
-def main(args):
+def main():
     fp = open(boards_yaml, "r")
     labs = yaml.load(fp)
     fp.close()
@@ -193,8 +192,5 @@ def main(args):
 if __name__ == "__main__":
     shutil.copy("common/build-lava", "lava-slave/scripts/build-lava")
     shutil.copy("common/build-lava", "lava-master/scripts/build-lava")
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--header", help="use this file as header for output file")
-    args = parser.parse_args()
-    main(args)
+    main()
 
