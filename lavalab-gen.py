@@ -66,10 +66,10 @@ def main(args):
         udev_line =""
         lab = labs[lab_name]
         use_kvm = False
-        if lab.has_key("host_has_cpuflag_kvm"):
+        if "host_has_cpuflag_kvm" in lab:
             use_kvm = lab["host_has_cpuflag_kvm"]
         if use_kvm:
-            if dockcomp["services"][lab_name].has_key("devices"):
+            if "devices" in dockcomp["services"][lab_name]:
                 dc_devices = dockcomp["services"][lab_name]["devices"]
             else:
                 dockcomp["services"][lab_name]["devices"] = []
@@ -82,24 +82,24 @@ def main(args):
 
             devicetype = b["type"]
             device_line = template_device.substitute(devicetype=devicetype)
-            if b.has_key("pdu_generic"):
+            if "pdu_generic" in b:
                 hard_reset_command = b["pdu_generic"]["hard_reset_command"]
                 power_off_command = b["pdu_generic"]["power_off_command"]
                 power_on_command = b["pdu_generic"]["power_on_command"]
                 device_line += template_device_pdu_generic.substitute(hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
-            if b.has_key("uart"):
+            if "uart" in b:
                 uart = b["uart"]
                 baud = b["uart"].get("baud", baud_default)
                 idvendor = b["uart"]["idvendor"]
                 idproduct = b["uart"]["idproduct"]
                 line = template_conmux.substitute(board=board_name, baud=baud)
-                if uart.has_key("serial"):
+                if "serial" in uart:
                     serial = b["uart"]["serial"]
                     udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor=idvendor, idproduct=idproduct)
                 else:
                     devpath = b["uart"]["devpath"]
                     udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor=idvendor, idproduct=idproduct)
-                if dockcomp["services"][lab_name].has_key("devices"):
+                if "devices" in dockcomp["services"][lab_name]:
                     dc_devices = dockcomp["services"][lab_name]["devices"]
                 else:
                     dockcomp["services"][lab_name]["devices"] = []
@@ -109,13 +109,13 @@ def main(args):
                 fp.write(line)
                 fp.close()
                 device_line += template_device_conmux.substitute(board=board_name)
-            elif b.has_key("connection_command"):
+            elif "connection_command" in b:
                 connection_command = b["connection_command"]
                 device_line += template_device_connection_command.substitute(connection_command=connection_command)
-            if b.has_key("macaddr"):
+            if "macaddr" in b:
                 device_line += '{% set uboot_set_mac = true %}'
                 device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
-            if b.has_key("fastboot_serial_number"):
+            if "fastboot_serial_number" in b:
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
 
@@ -136,7 +136,7 @@ def main(args):
         fp = open("udev/99-lavalab-udev-%s.rules" % lab_name, "w")
         fp.write(udev_line)
         fp.close()
-        if lab.has_key("dispatcher_ip"):
+        if "dispatcher_ip" in lab:
             fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
             fp.write("dispatcher_ip: %s" % lab["dispatcher_ip"])
             fp.close()
@@ -157,15 +157,15 @@ def main(args):
                 ftok = open("lava-master/users/%s" % username, "w")
                 token = user["token"]
                 ftok.write("TOKEN=" + token + "\n")
-                if user.has_key("password"):
+                if "password" in user:
                     password = user["password"]
                     ftok.write("PASSWORD=" + password + "\n")
                 # libyaml convert yes/no to true/false...
-                if user.has_key("staff"):
+                if "staff" in user:
                     value = user["staff"]
                     if value is True:
                         ftok.write("STAFF=1\n")
-                if user.has_key("superuser"):
+                if "superuser" in user:
                     value = user["superuser"]
                     if value is True:
                         ftok.write("SUPERUSER=1\n")
@@ -181,7 +181,7 @@ def main(args):
                 description = token["description"]
                 ftok.write("DESCRIPTION=" + description)
                 ftok.close()
-    with file('docker-compose.yml', 'w') as f:
+    with open('docker-compose.yml', 'w') as f:
         yaml.dump(dockcomp, f)
 
 if __name__ == "__main__":
