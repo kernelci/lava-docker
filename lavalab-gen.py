@@ -92,13 +92,19 @@ def main(args):
                 baud = b["uart"].get("baud", baud_default)
                 idvendor = b["uart"]["idvendor"]
                 idproduct = b["uart"]["idproduct"]
+                if type(idproduct) == str:
+                    print("Please put hexadecimal IDs for product %s (like 0x%s)" % (board_name,idproduct))
+                    sys.exit(1)
+                if type(idvendor) == str:
+                    print("Please put hexadecimal IDs for vendor %s (like 0x%s)" % (board_name,idvendor))
+                    sys.exit(1)
                 line = template_conmux.substitute(board=board_name, baud=baud)
                 if "serial" in uart:
                     serial = b["uart"]["serial"]
-                    udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor=idvendor, idproduct=idproduct)
+                    udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
                 else:
                     devpath = b["uart"]["devpath"]
-                    udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor=idvendor, idproduct=idproduct)
+                    udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
                 if "devices" in dockcomp["services"][lab_name]:
                     dc_devices = dockcomp["services"][lab_name]["devices"]
                 else:

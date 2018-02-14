@@ -223,8 +223,8 @@ lab-slave-XX:		The name of the slave (where XX is a number)
       macaddr: (Optional) the MAC address to set in uboot
 # One of uart or connection_command must be choosen
       uart:
-	idvendor: The VID of the UART
-	idproduct: the PID of the UART
+	idvendor: The VID of the UART (Formated as 0xXXXX)
+	idproduct: the PID of the UART (Formated as 0xXXXX)
         serial: The serial number in case of FTDI uart
         devpath: the UDEV devpath to this uart for UART without serial number
       connection_command: A command to be ran for getting a serial console

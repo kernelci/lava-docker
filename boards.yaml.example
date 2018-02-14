@@ -10,8 +10,8 @@ lab-slave-0:
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 1
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 1
       uart:
-        idvendor: "0403"
-        idproduct: 6001
+        idvendor: 0x0403
+        idproduct: 0x6001
         serial: FT9QQZTA
     am335x-boneblack-01:
       type: beaglebone-black
@@ -20,8 +20,8 @@ lab-slave-0:
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 2
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 2
       uart:
-        idvendor: "0403"
-        idproduct: 6001
+        idvendor: 0x0403
+        idproduct: 0x6001
         serial: FT9QR1A9
     meson-gxl-s905x-libretech-cc-01:
       type: meson-gxl-s905x-libretech-cc
@@ -30,8 +30,8 @@ lab-slave-0:
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 3
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 3
       uart:
-        idvendor: 067b
-        idproduct: 2303
+        idvendor: 0x067b
+        idproduct: 0x2303
         devpath: 1.1.4
       macaddr: "00:FA:E0:DE:AD:78"
     dragonboard-410c-01:
@@ -41,8 +41,8 @@ lab-slave-0:
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 4
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 4
       uart:
-        idvendor: "0403"
-        idproduct: 6001
+        idvendor: 0x403
+        idproduct: 0x6001
         serial: FT9R7VDB
     r8a7796-m3ulcb-01:
       type: r8a7796-m3ulcb
@@ -51,8 +51,8 @@ lab-slave-0:
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 5
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 5
       uart:
-        idvendor: "0403"
-        idproduct: 6001
+        idvendor: 0x0403
+        idproduct: 0x6001
         serial: AK04WW0Q
     imx6q-sabrelite-01:
       type: imx6q-sabrelite
@@ -61,6 +61,6 @@ lab-slave-0:
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_off 6
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 switch_on 6
       uart:
-        idvendor: "0403"
-        idproduct: 6015
+        idvendor: 0x0403
+        idproduct: 0x6015
         serial: DAZ0KEUH
