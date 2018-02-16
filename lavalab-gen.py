@@ -45,7 +45,7 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct
 
 def main():
     fp = open(boards_yaml, "r")
-    labs = yaml.load(fp)
+    workers = yaml.load(fp)
     fp.close()
     tdc = open("docker-compose.template", "r")
     dockcomp = yaml.load(tdc)
@@ -61,21 +61,21 @@ def main():
         fp = open("lava-slave/conmux/.empty", "w")
         fp.close()
 
-    for lab_name in labs:
+    for worker_name in workers:
         udev_line =""
-        lab = labs[lab_name]
+        worker = workers[worker_name]
         use_kvm = False
-        if "host_has_cpuflag_kvm" in lab:
-            use_kvm = lab["host_has_cpuflag_kvm"]
+        if "host_has_cpuflag_kvm" in worker:
+            use_kvm = worker["host_has_cpuflag_kvm"]
         if use_kvm:
-            if "devices" in dockcomp["services"][lab_name]:
-                dc_devices = dockcomp["services"][lab_name]["devices"]
+            if "devices" in dockcomp["services"][worker_name]:
+                dc_devices = dockcomp["services"][worker_name]["devices"]
             else:
-                dockcomp["services"][lab_name]["devices"] = []
-                dc_devices = dockcomp["services"][lab_name]["devices"]
+                dockcomp["services"][worker_name]["devices"] = []
+                dc_devices = dockcomp["services"][worker_name]["devices"]
             dc_devices.append("/dev/kvm:/dev/kvm")
-        for board_name in lab["boardlist"]:
-            b = lab["boardlist"][board_name]
+        for board_name in worker["boardlist"]:
+            b = worker["boardlist"][board_name]
             if b.get("disabled", None):
                 continue
 
@@ -104,11 +104,11 @@ def main():
                 else:
                     devpath = b["uart"]["devpath"]
                     udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
-                if "devices" in dockcomp["services"][lab_name]:
-                    dc_devices = dockcomp["services"][lab_name]["devices"]
+                if "devices" in dockcomp["services"][worker_name]:
+                    dc_devices = dockcomp["services"][worker_name]["devices"]
                 else:
-                    dockcomp["services"][lab_name]["devices"] = []
-                    dc_devices = dockcomp["services"][lab_name]["devices"]
+                    dockcomp["services"][worker_name]["devices"] = []
+                    dc_devices = dockcomp["services"][worker_name]["devices"]
                 dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
                 fp = open("lava-slave/conmux/%s.cf" % board_name, "w")
                 fp.write(line)
@@ -129,7 +129,7 @@ def main():
                 device_line += "{% set no_kvm = True %}\n"
             if not os.path.isdir("lava-master/devices/"):
                 os.mkdir("lava-master/devices/")
-            device_path = "lava-master/devices/%s" % lab_name
+            device_path = "lava-master/devices/%s" % worker_name
             if not os.path.isdir(device_path):
                 os.mkdir(device_path)
             board_device_file = "%s/%s.jinja2" % (device_path, board_name)
@@ -138,12 +138,12 @@ def main():
             fp.close()
         if not os.path.isdir("udev"):
             os.mkdir("udev")
-        fp = open("udev/99-lavalab-udev-%s.rules" % lab_name, "w")
+        fp = open("udev/99-lavaworker-udev-%s.rules" % worker_name, "w")
         fp.write(udev_line)
         fp.close()
-        if "dispatcher_ip" in lab:
-            fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
-            fp.write("dispatcher_ip: %s" % lab["dispatcher_ip"])
+        if "dispatcher_ip" in worker:
+            fp = open("lava-master/slaves/%s.yaml" % worker_name, "w")
+            fp.write("dispatcher_ip: %s" % worker["dispatcher_ip"])
             fp.close()
 
     #now proceed with tokens

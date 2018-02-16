@@ -18,8 +18,8 @@ BEROOT=""
 if [ $(id -u) -ne 0 ];then
 	BEROOT="sudo "
 fi
-$BEROOT rm /etc/udev/rules.d/*lavalab*rules
-$BEROOT cp udev/*lavalab*rules /etc/udev/rules.d/
+$BEROOT rm /etc/udev/rules.d/*lava*rules
+$BEROOT cp udev/*lava*rules /etc/udev/rules.d/
 $BEROOT udevadm control --reload-rules || exit $?
 $BEROOT udevadm trigger || exit $?
 
