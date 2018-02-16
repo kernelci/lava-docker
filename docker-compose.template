@@ -3,8 +3,6 @@ services:
   lava-master:
     hostname: lava-master
     restart: always
-    stdin_open: true
-    tty: true
     build:
       context: lava-master
     ports:

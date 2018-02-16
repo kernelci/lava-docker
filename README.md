@@ -90,8 +90,8 @@ So you have now:
     beagleboneblack-01:
       type: beaglebone-black
       uart:
-        idvendor: "0403"
-	idproduct: 6001
+        idvendor: 0x0403
+	idproduct: 0x6001
 	serial: AK04TU1X
 ```
 
@@ -108,8 +108,8 @@ So you have now:
     beagleboneblack-01:
       type: beaglebone-black
       uart:
-        idvendor: "0403"
-	idproduct: 6001
+        idvendor: 0x0403
+	idproduct: 0x6001
 	devpath: "1.5"
 ```
 
@@ -137,8 +137,8 @@ beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
         power_off_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_off 5
         power_on_command: /usr/local/bin/acme-cli -s 192.168.66.2 power_on 5
       uart:
-        idvendor: "0403"
-	idproduct: 6001
+        idvendor: 0x0403
+	idproduct: 0x6001
 	serial: 1234567
 ```
 
