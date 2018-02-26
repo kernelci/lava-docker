@@ -77,4 +77,4 @@ COPY settings.conf /etc/lava-server/
 
 EXPOSE 69/udp 80 3079 5555 5556
 
-CMD /start.sh && bash
+CMD /start.sh && while [ true ];do sleep 365d; done
