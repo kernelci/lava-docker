@@ -6,10 +6,6 @@ fi
 
 service tftpd-hpa start || exit 4
 
-# FIXME lava-slave does not run if old pid is present
-rm -f /var/run/lava-slave.pid
-service lava-slave start || exit 5
-
 touch /var/run/conmux-registry
 /usr/sbin/conmux-registry 63000 /var/run/conmux-registry&
 sleep 2
@@ -22,4 +18,10 @@ do
 done
 
 # start an http file server for boot/transfer_overlay support
-(cd /var/lib/lava/dispatcher; python -m SimpleHTTPServer 80)
+(cd /var/lib/lava/dispatcher; python -m SimpleHTTPServer 80) &
+
+# FIXME lava-slave does not run if old pid is present
+rm -f /var/run/lava-slave.pid
+service lava-slave start || exit 5
+
+sleep 3650d
