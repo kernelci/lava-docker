@@ -16,6 +16,8 @@ sleep 2
 for item in $(ls /etc/conmux/*cf)
 do
 	echo "Add $item"
+	# On some OS, the rights/user from host are not duplicated on guest
+	grep -o '/dev/[a-zA-Z0-9_-]*' $item | xargs chown uucp
 	/usr/sbin/conmux $item &
 done
 
