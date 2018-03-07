@@ -2,10 +2,6 @@ FROM bitnami/minideb:stretch
 
 RUN apt-get update
 
-# Add services helper utilities to start and stop LAVA
-COPY scripts/stop.sh .
-COPY scripts/start.sh .
-
 # e2fsprogs is for libguestfs
 RUN \
  echo 'lava-server   lava-server/instance-name string lava-slave-instance' | debconf-set-selections && \
@@ -56,6 +52,10 @@ RUN echo "deb http://debian.proxad.net/debian/ testing main" >> /etc/apt/sources
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
+
+# Add services helper utilities to start and stop LAVA
+COPY scripts/stop.sh .
+COPY scripts/start.sh .
 
 EXPOSE 69/udp 80
 
