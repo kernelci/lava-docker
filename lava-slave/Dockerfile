@@ -24,9 +24,10 @@ RUN \
  qemu-system \
  qemu-system-arm \
  qemu-system-i386 \
- qemu-kvm \
  xnbd-server \
  e2fsprogs
+
+RUN if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "x86" ] ;then apt-get -y install qemu-kvm ; fi
 
 # Uncomment the following for having the latest package (you need to comment all build-lava below)
 #RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget gnupg \
