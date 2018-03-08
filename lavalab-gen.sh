@@ -6,6 +6,9 @@ rm -rv lava-slave/conmux/
 rm -rv lava-master/tokens/
 rm -rv lava-master/users/
 rm udev/*lavalab*rules
+rm lava-master/scripts/build-lava
+rm lava-slave/scripts/build-lava
+rm docker-compose.yml
 
 if [ "$1" = "mrproper" ];then
 	exit 0
