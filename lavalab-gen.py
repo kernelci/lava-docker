@@ -44,6 +44,46 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct
 """)
 
 def main():
+    fp = open(tokens_yaml, "r")
+    tokens = yaml.load(fp)
+    fp.close()
+    if not os.path.isdir("lava-master/users/"):
+        os.mkdir("lava-master/users/")
+    if not os.path.isdir("lava-master/tokens/"):
+        os.mkdir("lava-master/tokens/")
+    for section_name in tokens:
+        section = tokens[section_name]
+        if section_name == "lava_server_users":
+            for user in section:
+                username = user["name"]
+                ftok = open("lava-master/users/%s" % username, "w")
+                token = user["token"]
+                ftok.write("TOKEN=" + token + "\n")
+                if "password" in user:
+                    password = user["password"]
+                    ftok.write("PASSWORD=" + password + "\n")
+                # libyaml convert yes/no to true/false...
+                if "staff" in user:
+                    value = user["staff"]
+                    if value is True:
+                        ftok.write("STAFF=1\n")
+                if "superuser" in user:
+                    value = user["superuser"]
+                    if value is True:
+                        ftok.write("SUPERUSER=1\n")
+                ftok.close()
+        if section_name == "callback_tokens":
+            for token in section:
+                filename = token["filename"]
+                ftok = open("lava-master/tokens/%s" % filename, "w")
+                username = token["username"]
+                ftok.write("USER=" + username + "\n")
+                vtoken = token["token"]
+                ftok.write("TOKEN=" + vtoken + "\n")
+                description = token["description"]
+                ftok.write("DESCRIPTION=" + description)
+                ftok.close()
+
     fp = open(boards_yaml, "r")
     workers = yaml.load(fp)
     fp.close()
@@ -151,46 +191,6 @@ def main():
             fp.write("dispatcher_ip: %s" % worker["dispatcher_ip"])
             fp.close()
 
-    #now proceed with tokens
-    fp = open(tokens_yaml, "r")
-    tokens = yaml.load(fp)
-    fp.close()
-    if not os.path.isdir("lava-master/users/"):
-        os.mkdir("lava-master/users/")
-    if not os.path.isdir("lava-master/tokens/"):
-        os.mkdir("lava-master/tokens/")
-    for section_name in tokens:
-        section = tokens[section_name]
-        if section_name == "lava_server_users":
-            for user in section:
-                username = user["name"]
-                ftok = open("lava-master/users/%s" % username, "w")
-                token = user["token"]
-                ftok.write("TOKEN=" + token + "\n")
-                if "password" in user:
-                    password = user["password"]
-                    ftok.write("PASSWORD=" + password + "\n")
-                # libyaml convert yes/no to true/false...
-                if "staff" in user:
-                    value = user["staff"]
-                    if value is True:
-                        ftok.write("STAFF=1\n")
-                if "superuser" in user:
-                    value = user["superuser"]
-                    if value is True:
-                        ftok.write("SUPERUSER=1\n")
-                ftok.close()
-        if section_name == "callback_tokens":
-            for token in section:
-                filename = token["filename"]
-                ftok = open("lava-master/tokens/%s" % filename, "w")
-                username = token["username"]
-                ftok.write("USER=" + username + "\n")
-                vtoken = token["token"]
-                ftok.write("TOKEN=" + vtoken + "\n")
-                description = token["description"]
-                ftok.write("DESCRIPTION=" + description)
-                ftok.close()
     with open('docker-compose.yml', 'w') as f:
         yaml.dump(dockcomp, f)
 
