@@ -66,11 +66,11 @@ COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY tokens/ /root/lava-callback-tokens/
-COPY slaves/* /etc/lava-server/dispatcher.d/
 COPY scripts/setup.sh /
 RUN /start.sh && /setup.sh && /stop.sh
 
 #uncomment if you want to use squid
+# warning the address used must be network accessible by all slave
 #RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
 
 #comment this if you do HTTPS (For reenabling CSRF cookie)

@@ -45,7 +45,7 @@ if [ -e /root/lava-callback-tokens ];then
 			exit 1
 		fi
 		echo "Adding $USER ($DESCRIPTION) DEBUG($TOKEN)"
-		lava-server manage tokens add --user $USER --secret $TOKEN --description $DESCRIPTION || exit 1
+		lava-server manage tokens add --user $USER --secret $TOKEN --description "$DESCRIPTION" || exit 1
 	done
 fi
 
