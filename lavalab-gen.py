@@ -119,9 +119,9 @@ def main():
                 device_line += template_device_connection_command.substitute(connection_command=connection_command)
             if "uboot_ipaddr" in b:
                 device_line += "{%% set uboot_ipaddr_cmd = 'setenv ipaddr %s' %%}\n" % b["uboot_ipaddr"]
-            if "macaddr" in b:
+            if "uboot_macaddr" in b:
                 device_line += '{% set uboot_set_mac = true %}'
-                device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
+                device_line += "{%% set uboot_mac_addr = '%s' %%}\n" % b["uboot_macaddr"]
             if "fastboot_serial_number" in b:
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial

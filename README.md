@@ -221,7 +221,7 @@ lab-slave-XX:		The name of the slave (where XX is a number)
     devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
       type: the LAVA device-type of this device
       uboot_ipaddr: (optional) a static IP to set in uboot
-      macaddr: (Optional) the MAC address to set in uboot
+      uboot_macaddr: (Optional) the MAC address to set in uboot
 # One of uart or connection_command must be choosen
       uart:
 	idvendor: The VID of the UART (Formated as 0xXXXX)
