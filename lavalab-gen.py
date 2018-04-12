@@ -117,6 +117,8 @@ def main():
             elif "connection_command" in b:
                 connection_command = b["connection_command"]
                 device_line += template_device_connection_command.substitute(connection_command=connection_command)
+            if "uboot_ipaddr" in b:
+                device_line += "{%% set uboot_ipaddr_cmd = 'setenv ipaddr %s' %%}\n" % b["uboot_ipaddr"]
             if "macaddr" in b:
                 device_line += '{% set uboot_set_mac = true %}'
                 device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
