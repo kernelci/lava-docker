@@ -95,10 +95,6 @@ def main():
         os.mkdir("lava-master/slaves/")
         fp = open("lava-master/slaves/.empty", "w")
         fp.close()
-    if not os.path.isdir("lava-slave/conmux/"):
-        os.mkdir("lava-slave/conmux/")
-        fp = open("lava-slave/conmux/.empty", "w")
-        fp.close()
 
     lava_master_path = None
     for phyhost in labs:
@@ -203,7 +199,7 @@ def main():
                         dockcomp["services"][worker_name]["devices"] = []
                         dc_devices = dockcomp["services"][worker_name]["devices"]
                     dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
-                    fp = open("lava-slave/conmux/%s.cf" % board_name, "w")
+                    fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
                     fp.write(line)
                     fp.close()
                     device_line += template_device_conmux.substitute(board=board_name)
