@@ -116,6 +116,7 @@ def main():
         curhost = labs[phyhost]
         if not os.path.isdir("output/%s/" % phyhost):
             os.mkdir("output/%s/" % phyhost)
+        udev_line =""
         dockcomposeymlpath = "output/%s/docker-compose.yml" % phyhost
         dockcomp = {}
         dockcomp["version"] = "2.0"
@@ -156,7 +157,6 @@ def main():
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = "http://lava-master/RPC2"
                 else:
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = worker["remote_uri"]
-            udev_line =""
             use_kvm = False
             if "host_has_cpuflag_kvm" in worker:
                 use_kvm = worker["host_has_cpuflag_kvm"]
@@ -234,9 +234,9 @@ def main():
                 fp = open(board_device_file, "w")
                 fp.write(device_line)
                 fp.close()
-            if not os.path.isdir("udev"):
-                os.mkdir("udev")
-            fp = open("udev/99-lavaworker-udev-%s.rules" % worker_name, "w")
+            if not os.path.isdir("output/%s/udev" % phyhost):
+                os.mkdir("output/%s/udev" % phyhost)
+            fp = open("output/%s/udev/99-lavaworker-udev-%s.rules" % (phyhost, worker_name), "w")
             fp.write(udev_line)
             fp.close()
             if "dispatcher_ip" in worker:
