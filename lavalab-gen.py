@@ -87,9 +87,6 @@ def main():
     fp = open(boards_yaml, "r")
     labs = yaml.load(fp)
     fp.close()
-    tdc = open("docker-compose.template", "r")
-    dockcomp = yaml.load(tdc)
-    tdc.close()
     if not os.path.isdir("output/"):
         os.mkdir("output/")
 
@@ -119,6 +116,10 @@ def main():
         curhost = labs[phyhost]
         if not os.path.isdir("output/%s/" % phyhost):
             os.mkdir("output/%s/" % phyhost)
+        dockcomposeymlpath = "output/%s/docker-compose.yml" % phyhost
+        dockcomp = {}
+        dockcomp["version"] = "2.0"
+        dockcomp["services"] = {}
         if not "lavalist" in curhost:
             print("ERROR: missing list for %s" % phyhost)
             sys.exit(1)
@@ -127,12 +128,34 @@ def main():
             worker = curhost["lavalist"][worker_name]
             workerdir = "output/%s/%s/" % (phyhost, worker_name)
             if worker_name == "lava-master":
+                dockcomp["services"][worker_name] = {}
+                dockcomp["services"][worker_name]["hostname"] = worker_name
+                dockcomp["services"][worker_name]["ports"] = [ "10080:80", "5555:5555", "5556:5556", "5500:5500" ]
+                dockcomp["services"][worker_name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
+                dockcomp["services"][worker_name]["build"] = {}
+                dockcomp["services"][worker_name]["build"]["context"] = "lava-master"
             else:
+                dockcomp["services"][worker_name] = {}
+                dockcomp["services"][worker_name]["hostname"] = worker_name
+                dockcomp["services"][worker_name]["dns_search"] = ""
+                dockcomp["services"][worker_name]["ports"] = [ "69:69/udp", "80:80", "61950-62000:61950-62000" ]
+                dockcomp["services"][worker_name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
+                dockcomp["services"][worker_name]["environment"] = {}
+                dockcomp["services"][worker_name]["build"] = {}
+                dockcomp["services"][worker_name]["build"]["context"] = worker_name
                 shutil.copytree("lava-slave", workerdir)
                 if not os.path.isdir("%s/conmux/" % workerdir):
                     os.mkdir("%s/conmux/" % workerdir)
                     fp = open("%s/conmux/.empty" % workerdir, "w")
                     fp.close()
+                if not "remote_master" in worker:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = "lava-master"
+                else:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = worker["remote_master"]
+                if not "remote_uri" in worker:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = "http://lava-master/RPC2"
+                else:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = worker["remote_uri"]
             udev_line =""
             use_kvm = False
             if "host_has_cpuflag_kvm" in worker:
