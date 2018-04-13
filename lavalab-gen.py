@@ -44,109 +44,6 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct
 """)
 
 def main():
-    fp = open(boards_yaml, "r")
-    labs = yaml.load(fp)
-    fp.close()
-    tdc = open("docker-compose.template", "r")
-    dockcomp = yaml.load(tdc)
-    tdc.close()
-
-    # The slaves directory must exists
-    if not os.path.isdir("lava-master/slaves/"):
-        os.mkdir("lava-master/slaves/")
-        fp = open("lava-master/slaves/.empty", "w")
-        fp.close()
-    if not os.path.isdir("lava-slave/conmux/"):
-        os.mkdir("lava-slave/conmux/")
-        fp = open("lava-slave/conmux/.empty", "w")
-        fp.close()
-
-    for lab_name in labs:
-        udev_line =""
-        lab = labs[lab_name]
-        use_kvm = False
-        if "host_has_cpuflag_kvm" in lab:
-            use_kvm = lab["host_has_cpuflag_kvm"]
-        if use_kvm:
-            if "devices" in dockcomp["services"][lab_name]:
-                dc_devices = dockcomp["services"][lab_name]["devices"]
-            else:
-                dockcomp["services"][lab_name]["devices"] = []
-                dc_devices = dockcomp["services"][lab_name]["devices"]
-            dc_devices.append("/dev/kvm:/dev/kvm")
-        for board_name in lab["boardlist"]:
-            b = lab["boardlist"][board_name]
-            if b.get("disabled", None):
-                continue
-
-            devicetype = b["type"]
-            device_line = template_device.substitute(devicetype=devicetype)
-            if "pdu_generic" in b:
-                hard_reset_command = b["pdu_generic"]["hard_reset_command"]
-                power_off_command = b["pdu_generic"]["power_off_command"]
-                power_on_command = b["pdu_generic"]["power_on_command"]
-                device_line += template_device_pdu_generic.substitute(hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
-            if "uart" in b:
-                uart = b["uart"]
-                baud = b["uart"].get("baud", baud_default)
-                idvendor = b["uart"]["idvendor"]
-                idproduct = b["uart"]["idproduct"]
-                if type(idproduct) == str:
-                    print("Please put hexadecimal IDs for product %s (like 0x%s)" % (board_name,idproduct))
-                    sys.exit(1)
-                if type(idvendor) == str:
-                    print("Please put hexadecimal IDs for vendor %s (like 0x%s)" % (board_name,idvendor))
-                    sys.exit(1)
-                line = template_conmux.substitute(board=board_name, baud=baud)
-                if "serial" in uart:
-                    serial = b["uart"]["serial"]
-                    udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
-                else:
-                    devpath = b["uart"]["devpath"]
-                    udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
-                if "devices" in dockcomp["services"][lab_name]:
-                    dc_devices = dockcomp["services"][lab_name]["devices"]
-                else:
-                    dockcomp["services"][lab_name]["devices"] = []
-                    dc_devices = dockcomp["services"][lab_name]["devices"]
-                dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
-                fp = open("lava-slave/conmux/%s.cf" % board_name, "w")
-                fp.write(line)
-                fp.close()
-                device_line += template_device_conmux.substitute(board=board_name)
-            elif "connection_command" in b:
-                connection_command = b["connection_command"]
-                device_line += template_device_connection_command.substitute(connection_command=connection_command)
-            if "macaddr" in b:
-                device_line += '{% set uboot_set_mac = true %}'
-                device_line += "{%% set uboot_mac_addr = '%s' %%}" % b["macaddr"]
-            if "fastboot_serial_number" in b:
-                fserial = b["fastboot_serial_number"]
-                device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
-
-            # board specific hacks
-            if devicetype == "qemu" and not use_kvm:
-                device_line += "{% set no_kvm = True %}\n"
-            if not os.path.isdir("lava-master/devices/"):
-                os.mkdir("lava-master/devices/")
-            device_path = "lava-master/devices/%s" % lab_name
-            if not os.path.isdir(device_path):
-                os.mkdir(device_path)
-            board_device_file = "%s/%s.jinja2" % (device_path, board_name)
-            fp = open(board_device_file, "w")
-            fp.write(device_line)
-            fp.close()
-        if not os.path.isdir("udev"):
-            os.mkdir("udev")
-        fp = open("udev/99-lavalab-udev-%s.rules" % lab_name, "w")
-        fp.write(udev_line)
-        fp.close()
-        if "dispatcher_ip" in lab:
-            fp = open("lava-master/slaves/%s.yaml" % lab_name, "w")
-            fp.write("dispatcher_ip: %s" % lab["dispatcher_ip"])
-            fp.close()
-
-    #now proceed with tokens
     fp = open(tokens_yaml, "r")
     tokens = yaml.load(fp)
     fp.close()
@@ -186,8 +83,192 @@ def main():
                 description = token["description"]
                 ftok.write("DESCRIPTION=" + description)
                 ftok.close()
-    with open('docker-compose.yml', 'w') as f:
-        yaml.dump(dockcomp, f)
+
+    fp = open(boards_yaml, "r")
+    labs = yaml.load(fp)
+    fp.close()
+    if not os.path.isdir("output/"):
+        os.mkdir("output/")
+
+    # The slaves directory must exists
+    if not os.path.isdir("lava-master/slaves/"):
+        os.mkdir("lava-master/slaves/")
+        fp = open("lava-master/slaves/.empty", "w")
+        fp.close()
+
+    lava_master_path = None
+    for phyhost in labs:
+        curhost = labs[phyhost]
+        for worker_name in curhost["lavalist"]:
+            if worker_name == "lava-master":
+                workerdir = "output/%s/%s/" % (phyhost, worker_name)
+                lava_master_path = workerdir
+                if not os.path.isdir("output/%s/" % phyhost):
+                    os.mkdir("output/%s/" % phyhost)
+                    shutil.copytree("lava-master", workerdir)
+
+    for phyhost in labs:
+        print("DEBUG: Handle %s" % phyhost)
+        curhost = labs[phyhost]
+        if not os.path.isdir("output/%s/" % phyhost):
+            os.mkdir("output/%s/" % phyhost)
+        shutil.copy("deploy.sh", "output/%s/" % phyhost)
+        udev_line =""
+        use_kvm = False
+        if "host_has_cpuflag_kvm" in curhost:
+            use_kvm = curhost["host_has_cpuflag_kvm"]
+        dockcomposeymlpath = "output/%s/docker-compose.yml" % phyhost
+        dockcomp = {}
+        dockcomp["version"] = "2.0"
+        dockcomp["services"] = {}
+        if not "lavalist" in curhost:
+            print("ERROR: missing list for %s" % phyhost)
+            sys.exit(1)
+        for worker_name in curhost["lavalist"]:
+            print("  Handle %s" % worker_name)
+            worker = curhost["lavalist"][worker_name]
+            workerdir = "output/%s/%s/" % (phyhost, worker_name)
+            if worker_name == "lava-master":
+                dockcomp["services"][worker_name] = {}
+                dockcomp["services"][worker_name]["hostname"] = worker_name
+                dockcomp["services"][worker_name]["ports"] = [ "10080:80", "5555:5555", "5556:5556", "5500:5500" ]
+                dockcomp["services"][worker_name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
+                dockcomp["services"][worker_name]["build"] = {}
+                dockcomp["services"][worker_name]["build"]["context"] = "lava-master"
+                device_path = "%s/devices/" % workerdir
+                devices_path = "%s/devices/%s" % (workerdir, worker_name)
+            else:
+                dockcomp["services"][worker_name] = {}
+                dockcomp["services"][worker_name]["hostname"] = worker_name
+                dockcomp["services"][worker_name]["dns_search"] = ""
+                dockcomp["services"][worker_name]["ports"] = [ "69:69/udp", "80:80", "61950-62000:61950-62000" ]
+                dockcomp["services"][worker_name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
+                dockcomp["services"][worker_name]["environment"] = {}
+                dockcomp["services"][worker_name]["build"] = {}
+                dockcomp["services"][worker_name]["build"]["context"] = worker_name
+                shutil.copytree("lava-slave", workerdir)
+                if not os.path.isdir("%s/conmux/" % workerdir):
+                    os.mkdir("%s/conmux/" % workerdir)
+                    fp = open("%s/conmux/.empty" % workerdir, "w")
+                    fp.close()
+                # if the slave is static, its stuff is handled by master
+                slave_is_static = True
+                if 'static_worker' in worker:
+                    slave_is_static = worker['static_worker']
+                if not "remote_master" in worker:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = "lava-master"
+                else:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = worker["remote_master"]
+                if not "remote_uri" in worker:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = "http://lava-master/RPC2"
+                else:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = worker["remote_uri"]
+                if slave_is_static:
+                    print("Slave is static")
+                    if lava_master_path is None:
+                        print("ERROR: master not found")
+                        sys.exit(1)
+                    device_path = "%s/devices/" % lava_master_path
+                    devices_path = "%s/devices/%s" % (lava_master_path, worker_name)
+                else:
+                    device_path = "%s/devices/" % workerdir
+                    devices_path = "%s/devices/%s" % (workerdir, worker_name)
+            #endif if not lava-master (eg slave)
+            if use_kvm:
+                if "devices" in dockcomp["services"][worker_name]:
+                    dc_devices = dockcomp["services"][worker_name]["devices"]
+                else:
+                    dockcomp["services"][worker_name]["devices"] = []
+                    dc_devices = dockcomp["services"][worker_name]["devices"]
+                dc_devices.append("/dev/kvm:/dev/kvm")
+            for board_name in worker["boardlist"]:
+                print("    Handle %s" % board_name)
+                b = worker["boardlist"][board_name]
+                if b.get("disabled", None):
+                    continue
+
+                devicetype = b["type"]
+                device_line = template_device.substitute(devicetype=devicetype)
+                if "pdu_generic" in b:
+                    hard_reset_command = b["pdu_generic"]["hard_reset_command"]
+                    power_off_command = b["pdu_generic"]["power_off_command"]
+                    power_on_command = b["pdu_generic"]["power_on_command"]
+                    device_line += template_device_pdu_generic.substitute(hard_reset_command=hard_reset_command, power_off_command=power_off_command, power_on_command=power_on_command)
+                if "uart" in b:
+                    uart = b["uart"]
+                    baud = b["uart"].get("baud", baud_default)
+                    idvendor = b["uart"]["idvendor"]
+                    idproduct = b["uart"]["idproduct"]
+                    if type(idproduct) == str:
+                        print("Please put hexadecimal IDs for product %s (like 0x%s)" % (board_name,idproduct))
+                        sys.exit(1)
+                    if type(idvendor) == str:
+                        print("Please put hexadecimal IDs for vendor %s (like 0x%s)" % (board_name,idvendor))
+                        sys.exit(1)
+                    line = template_conmux.substitute(board=board_name, baud=baud)
+                    if "serial" in uart:
+                        serial = b["uart"]["serial"]
+                        udev_line += template_udev_serial.substitute(board=board_name, serial=serial, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
+                    else:
+                        devpath = b["uart"]["devpath"]
+                        udev_line += template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
+                    if "devices" in dockcomp["services"][worker_name]:
+                        dc_devices = dockcomp["services"][worker_name]["devices"]
+                    else:
+                        dockcomp["services"][worker_name]["devices"] = []
+                        dc_devices = dockcomp["services"][worker_name]["devices"]
+                    dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
+                    fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
+                    fp.write(line)
+                    fp.close()
+                    device_line += template_device_conmux.substitute(board=board_name)
+                elif "connection_command" in b:
+                    connection_command = b["connection_command"]
+                    device_line += template_device_connection_command.substitute(connection_command=connection_command)
+                if "uboot_ipaddr" in b:
+                    device_line += "{%% set uboot_ipaddr_cmd = 'setenv ipaddr %s' %%}\n" % b["uboot_ipaddr"]
+                if "uboot_macaddr" in b:
+                    device_line += '{% set uboot_set_mac = true %}'
+                    device_line += "{%% set uboot_mac_addr = '%s' %%}\n" % b["uboot_macaddr"]
+                if "fastboot_serial_number" in b:
+                    fserial = b["fastboot_serial_number"]
+                    device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
+                if "custom_option" in b:
+                    for coption in b["custom_option"]:
+                        device_line += "{%% %s %%}" % coption
+
+                # board specific hacks
+                if devicetype == "qemu" and not use_kvm:
+                    device_line += "{% set no_kvm = True %}\n"
+                if not os.path.isdir(device_path):
+                    os.mkdir(device_path)
+                if not os.path.isdir(devices_path):
+                    os.mkdir(devices_path)
+                board_device_file = "%s/%s.jinja2" % (devices_path, board_name)
+                fp = open(board_device_file, "w")
+                fp.write(device_line)
+                fp.close()
+            if not os.path.isdir("output/%s/udev" % phyhost):
+                os.mkdir("output/%s/udev" % phyhost)
+            fp = open("output/%s/udev/99-lavaworker-udev-%s.rules" % (phyhost, worker_name), "w")
+            fp.write(udev_line)
+            fp.close()
+            if "dispatcher_ip" in worker:
+                if slave_is_static:
+                    if lava_master_path is None:
+                        print("ERROR: cannot do a static slave with dispatcher_ip without a master in boards.yaml")
+                        sys.exit(1)
+                    if not os.path.isdir("%s/slaves/" % lava_master_path):
+                        os.mkdir("%s/slaves/" % lava_master_path)
+                    fp = open("%s/slaves/%s.yaml" % (lava_master_path, worker_name), "w")
+                    fp.write("dispatcher_ip: %s" % worker["dispatcher_ip"])
+                    fp.close()
+                else:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_DISPATCHER_IP"] = worker["dispatcher_ip"]
+            print("Write %s" % dockcomposeymlpath)
+            with open(dockcomposeymlpath, 'w') as f:
+                yaml.dump(dockcomp, f)
+
 
 if __name__ == "__main__":
     shutil.copy("common/build-lava", "lava-slave/scripts/build-lava")

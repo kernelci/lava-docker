@@ -142,11 +142,8 @@ beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
 	serial: 1234567
 ```
 
-## Known limitations
-The current lava-docker provides support for generating only one LAVA slave.
-
 ## Architecture
-The setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
+The basic setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
 * lava-master: run lava-server along with the web interface
 * lava-slave: run lava-dispatcher, the compoment which sends jobs to DUTs
 * squid: an HTTP proxy for caching downloaded contents (kernel/dtb/rootfs)
@@ -158,6 +155,15 @@ Since most DUTs are booted using TFTP, they need DHCP for gaining network connec
 So, on the LAN shared with DUTs, a running DHCPD is necessary. (See DHCPD below)<br/>
 
 ![lava-docker diagram](doc/lava-docker.png)
+
+## Multi-host architectures
+Lava-docker support multi-host architecture, Master and slaves could be on different host.
+
+Lava-docker support multiples slaves, but with a maximum of one slave per physical host.
+
+Two type of slave are possible:
+* static slave is the default, all data(devices, device-types) for this slave is already on the master.
+* dynamic slave is a slave which will registers all its data when it starts.
 
 ### Power supply
 You need to have a PDU for powering your DUT.
@@ -200,6 +206,9 @@ On the host, a DHCPD give address in range of 192.168.66.3-192.168.66.200
 
 So the dispatcher_ip is set to 192.168.66.1
 
+#### Example 4: LAB with master on server1 and slave on server2
+See boards.example.multihost
+
 #### DHCPD examples:
 ##### isc-dhcpd-server
 A sample isc-dhcpd-server DHCPD config file is available in the dhcpd directory.<br/>
@@ -214,24 +223,29 @@ You can use the lavalab-gen.sh helper script which will do all the above actions
 ### boards.yaml
 This file describe how the DUTs are connected and powered.
 ```
-lab-slave-XX:		The name of the slave (where XX is a number)
-  dispatcher_ip: the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
-  host_has_cpuflag_kvm: Does the host running lab-slave-XX have KVM
-  boardlist:
-    devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
-      type: the LAVA device-type of this device
-      macaddr: (Optional) the MAC address to set in uboot
+nameofphysicalhost:
+  lab-slave-XX:		The name of the slave (where XX is a number)
+    dispatcher_ip: the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
+    host_has_cpuflag_kvm: Does the host running lab-slave-XX have KVM
+    static_worker: (default: true) Does the worker is static or not.
+    remote_master: the FQDN or IP address of the master (default: lava-master)
+    remote_master_uri: the authenticated URI for doing actions on master (only necessary for external dynamic slave)
+    boardlist:
+      devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
+        type: the LAVA device-type of this device
+        uboot_ipaddr: (optional) a static IP to set in uboot
+        uboot_macaddr: (Optional) the MAC address to set in uboot
 # One of uart or connection_command must be choosen
-      uart:
-	idvendor: The VID of the UART (Formated as 0xXXXX)
-	idproduct: the PID of the UART (Formated as 0xXXXX)
-        serial: The serial number in case of FTDI uart
-        devpath: the UDEV devpath to this uart for UART without serial number
-      connection_command: A command to be ran for getting a serial console
-      pdu_generic:
-        hard_reset_command: commandline to reset the board
-	power_off_command: commandline to power off the board
-	power_on_command: commandline to power on the board
+        uart:
+	  idvendor: The VID of the UART (Formated as 0xXXXX)
+	  idproduct: the PID of the UART (Formated as 0xXXXX)
+          serial: The serial number in case of FTDI uart
+          devpath: the UDEV devpath to this uart for UART without serial number
+        connection_command: A command to be ran for getting a serial console
+        pdu_generic:
+          hard_reset_command: commandline to reset the board
+	  power_off_command: commandline to power off the board
+	  power_on_command: commandline to power on the board
 ```
 Notes on UART:
 * Only one of devpath/serial is necessary.
@@ -274,13 +288,16 @@ lavalab-gen.py
 
 this script will generate all necessary files in the following locations:
 ```
-conmux/		All files needed by conmux
-tokens/		This is where the callback tokens will be generated
-users/		This is where the users will be generated
-devices/	All LAVA devices files
-slaves/		Contain the dispatcher_ip to give to slave node
-udev-rules for host
-docker-compose.yml	Generated from docker-compose.template
+output/host/
+output/host/lab-slave-X/
+output/host/lab-slave-X/conmux/		All files needed by conmux
+output/host/lab-slave-X/devices/	All devices present on a dynamic slave
+output/host/lava-master/tokens/		This is where the callback tokens will be generated
+output/host/lava-master/users/		This is where the users will be generated
+output/host/lava-master/devices/	All LAVA devices files for the master and all static slaves
+output/host/lava-master/slaves/		Contain the dispatcher_ip to give to static slave node
+output/host/udev-rules for host
+output/host/docker-compose.yml	Generated from docker-compose.template
 ```
 
 All thoses file (except for udev-rules) will be handled by docker.
