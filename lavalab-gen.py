@@ -90,6 +90,8 @@ def main():
     tdc = open("docker-compose.template", "r")
     dockcomp = yaml.load(tdc)
     tdc.close()
+    if not os.path.isdir("output/"):
+        os.mkdir("output/")
 
     # The slaves directory must exists
     if not os.path.isdir("lava-master/slaves/"):
@@ -104,12 +106,15 @@ def main():
     for phyhost in labs:
         print("DEBUG: Handle %s" % phyhost)
         curhost = labs[phyhost]
+        if not os.path.isdir("output/%s/" % phyhost):
+            os.mkdir("output/%s/" % phyhost)
         if not "lavalist" in curhost:
             print("ERROR: missing list for %s" % phyhost)
             sys.exit(1)
         for worker_name in curhost["lavalist"]:
             print("  Handle %s" % worker_name)
             worker = curhost["lavalist"][worker_name]
+            workerdir = "output/%s/%s/" % (phyhost, worker_name)
             udev_line =""
             use_kvm = False
             if "host_has_cpuflag_kvm" in worker:
