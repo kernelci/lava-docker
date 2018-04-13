@@ -112,6 +112,7 @@ def main():
         curhost = labs[phyhost]
         if not os.path.isdir("output/%s/" % phyhost):
             os.mkdir("output/%s/" % phyhost)
+        shutil.copy("deploy.sh", "output/%s/" % phyhost)
         udev_line =""
         use_kvm = False
         if "host_has_cpuflag_kvm" in curhost:

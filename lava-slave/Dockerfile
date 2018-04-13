@@ -57,6 +57,17 @@ RUN rm /etc/apt/sources.list.d/testing.list
 COPY scripts/stop.sh .
 COPY scripts/start.sh .
 
+# lava-cli dependencies
+RUN apt-get -y install python3-setuptools python3-dev python3-zmq
+RUN git clone https://git.linaro.org/lava/lavacli.git /root/lavacli && cd /root/lavacli && git checkout v0.6 && python3 setup.py install
+
+COPY scripts/setup.sh .
+
+COPY scripts/retire.sh /usr/local/bin/
+RUN chmod 755 /usr/local/bin/retire.sh
+
+COPY devices/ /root/devices/
+
 EXPOSE 69/udp 80
 
 CMD /start.sh
