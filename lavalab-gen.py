@@ -125,6 +125,9 @@ def main():
             if "fastboot_serial_number" in b:
                 fserial = b["fastboot_serial_number"]
                 device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
+            if "custom_option" in b:
+                for coption in b["custom_option"]:
+                    device_line += "{%% %s %%}" % coption
 
             # board specific hacks
             if devicetype == "qemu" and not use_kvm:
