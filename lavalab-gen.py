@@ -126,6 +126,13 @@ def main():
             print("  Handle %s" % worker_name)
             worker = curhost["lavalist"][worker_name]
             workerdir = "output/%s/%s/" % (phyhost, worker_name)
+            if worker_name == "lava-master":
+            else:
+                shutil.copytree("lava-slave", workerdir)
+                if not os.path.isdir("%s/conmux/" % workerdir):
+                    os.mkdir("%s/conmux/" % workerdir)
+                    fp = open("%s/conmux/.empty" % workerdir, "w")
+                    fp.close()
             udev_line =""
             use_kvm = False
             if "host_has_cpuflag_kvm" in worker:
