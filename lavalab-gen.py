@@ -117,6 +117,9 @@ def main():
         if not os.path.isdir("output/%s/" % phyhost):
             os.mkdir("output/%s/" % phyhost)
         udev_line =""
+        use_kvm = False
+        if "host_has_cpuflag_kvm" in curhost:
+            use_kvm = curhost["host_has_cpuflag_kvm"]
         dockcomposeymlpath = "output/%s/docker-compose.yml" % phyhost
         dockcomp = {}
         dockcomp["version"] = "2.0"
@@ -157,9 +160,6 @@ def main():
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = "http://lava-master/RPC2"
                 else:
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = worker["remote_uri"]
-            use_kvm = False
-            if "host_has_cpuflag_kvm" in worker:
-                use_kvm = worker["host_has_cpuflag_kvm"]
             if use_kvm:
                 if "devices" in dockcomp["services"][worker_name]:
                     dc_devices = dockcomp["services"][worker_name]["devices"]
