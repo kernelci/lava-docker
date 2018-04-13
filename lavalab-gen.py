@@ -103,6 +103,17 @@ def main():
         fp = open("lava-slave/conmux/.empty", "w")
         fp.close()
 
+    lava_master_path = None
+    for phyhost in labs:
+        curhost = labs[phyhost]
+        for worker_name in curhost["lavalist"]:
+            if worker_name == "lava-master":
+                workerdir = "output/%s/%s/" % (phyhost, worker_name)
+                lava_master_path = workerdir
+                if not os.path.isdir("output/%s/" % phyhost):
+                    os.mkdir("output/%s/" % phyhost)
+                    shutil.copytree("lava-master", workerdir)
+
     for phyhost in labs:
         print("DEBUG: Handle %s" % phyhost)
         curhost = labs[phyhost]
