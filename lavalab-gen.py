@@ -134,6 +134,8 @@ def main():
                 dockcomp["services"][worker_name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
                 dockcomp["services"][worker_name]["build"] = {}
                 dockcomp["services"][worker_name]["build"]["context"] = "lava-master"
+                device_path = "%s/devices/" % workerdir
+                devices_path = "%s/devices/%s" % (workerdir, worker_name)
             else:
                 dockcomp["services"][worker_name] = {}
                 dockcomp["services"][worker_name]["hostname"] = worker_name
@@ -148,6 +150,10 @@ def main():
                     os.mkdir("%s/conmux/" % workerdir)
                     fp = open("%s/conmux/.empty" % workerdir, "w")
                     fp.close()
+                # if the slave is static, its stuff is handled by master
+                slave_is_static = True
+                if 'static_worker' in worker:
+                    slave_is_static = worker['static_worker']
                 if not "remote_master" in worker:
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = "lava-master"
                 else:
@@ -156,6 +162,17 @@ def main():
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = "http://lava-master/RPC2"
                 else:
                     dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = worker["remote_uri"]
+                if slave_is_static:
+                    print("Slave is static")
+                    if lava_master_path is None:
+                        print("ERROR: master not found")
+                        sys.exit(1)
+                    device_path = "%s/devices/" % lava_master_path
+                    devices_path = "%s/devices/%s" % (lava_master_path, worker_name)
+                else:
+                    device_path = "%s/devices/" % workerdir
+                    devices_path = "%s/devices/%s" % (workerdir, worker_name)
+            #endif if not lava-master (eg slave)
             if use_kvm:
                 if "devices" in dockcomp["services"][worker_name]:
                     dc_devices = dockcomp["services"][worker_name]["devices"]
@@ -164,6 +181,7 @@ def main():
                     dc_devices = dockcomp["services"][worker_name]["devices"]
                 dc_devices.append("/dev/kvm:/dev/kvm")
             for board_name in worker["boardlist"]:
+                print("    Handle %s" % board_name)
                 b = worker["boardlist"][board_name]
                 if b.get("disabled", None):
                     continue
@@ -221,12 +239,11 @@ def main():
                 # board specific hacks
                 if devicetype == "qemu" and not use_kvm:
                     device_line += "{% set no_kvm = True %}\n"
-                if not os.path.isdir("lava-master/devices/"):
-                    os.mkdir("lava-master/devices/")
-                device_path = "lava-master/devices/%s" % worker_name
                 if not os.path.isdir(device_path):
                     os.mkdir(device_path)
-                board_device_file = "%s/%s.jinja2" % (device_path, board_name)
+                if not os.path.isdir(devices_path):
+                    os.mkdir(devices_path)
+                board_device_file = "%s/%s.jinja2" % (devices_path, board_name)
                 fp = open(board_device_file, "w")
                 fp.write(device_line)
                 fp.close()
@@ -236,12 +253,21 @@ def main():
             fp.write(udev_line)
             fp.close()
             if "dispatcher_ip" in worker:
-                fp = open("lava-master/slaves/%s.yaml" % worker_name, "w")
-                fp.write("dispatcher_ip: %s" % worker["dispatcher_ip"])
-                fp.close()
+                if slave_is_static:
+                    if lava_master_path is None:
+                        print("ERROR: cannot do a static slave with dispatcher_ip without a master in boards.yaml")
+                        sys.exit(1)
+                    if not os.path.isdir("%s/slaves/" % lava_master_path):
+                        os.mkdir("%s/slaves/" % lava_master_path)
+                    fp = open("%s/slaves/%s.yaml" % (lava_master_path, worker_name), "w")
+                    fp.write("dispatcher_ip: %s" % worker["dispatcher_ip"])
+                    fp.close()
+                else:
+                    dockcomp["services"][worker_name]["environment"]["LAVA_DISPATCHER_IP"] = worker["dispatcher_ip"]
+            print("Write %s" % dockcomposeymlpath)
+            with open(dockcomposeymlpath, 'w') as f:
+                yaml.dump(dockcomp, f)
 
-        with open('docker-compose.yml', 'w') as f:
-            yaml.dump(dockcomp, f)
 
 if __name__ == "__main__":
     shutil.copy("common/build-lava", "lava-slave/scripts/build-lava")
