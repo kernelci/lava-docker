@@ -24,7 +24,7 @@ lava-server)
 	build-essential \
 	docbook-xsl \
 	xsltproc \
-	gunicorn \
+	gunicorn3 \
 	ntp \
 	nodejs \
 	node-uglify \
@@ -33,37 +33,26 @@ lava-server)
 	libjs-jquery-watermark \
 	libjs-jquery-flot \
 	libjs-jquery-ui \
-	python-django \
-	python-json-schema-validator \
-	python-configglue \
-	python-twisted\
-	python-guestfs \
-	python-configobj \
-	python-lzma \
-	python-magic \
-	python-netifaces \
-	python-nose \
-	python-pexpect \
-	python-pyudev \
-	python-requests \
-	python-yaml \
-	python-zmq \
+	python3-django-restricted-resource \
+	python3-django-auth-ldap \
+	python3-django-tables2 \
+	python3-django \
+	python3-guestfs \
+	python3-netifaces \
+	python3-markdown \
+	python3-nose \
+	python3-pexpect \
+	python3-psycopg2 \
+	python3-requests \
+	python3-simplejson \
+	python3-yaml \
+	python3-zmq \
 	python3-sphinx-bootstrap-theme \
 	pep8 \
 	python-pep8 \
-	python-voluptuous \
-	python-dateutil \
-	python-django-auth-ldap \
-	python-django-restricted-resource \
-	python-django-tables2 \
-	python-docutils \
-	python-jinja2 \
-	python-markdown \
-	python-psycopg2 \
-	python-voluptuous \
-	python-sphinx \
-	python-sphinx-bootstrap-theme \
-	python-mocker \
+	python3-voluptuous \
+	python3-dateutil \
+	python3-voluptuous \
 	systemd-sysv \
 	tftpd-hpa \
 	lxc \
@@ -75,24 +64,23 @@ lava-server)
 ;;
 lava-dispatcher)
 	# build dependencies
-	DEBIAN_FRONTEND=noninteractive apt-get -y install python-setuptools || exit $?
+	DEBIAN_FRONTEND=noninteractive apt-get -y install python3-setuptools || exit $?
 	# package dependencies
-	DEBIAN_FRONTEND=noninteractive apt-get -y install python-serial \
-	python-daemon \
-	python-guestfs \
+	DEBIAN_FRONTEND=noninteractive apt-get -y install \
+	python3-serial \
+	python3-configobj \
+	python3-pyudev \
+	python3-setproctitle \
+	python3-guestfs \
 	sudo \
 	telnet \
-	python-configobj \
-	python-lzma \
-	python-magic \
-	python-netifaces \
-	python-nose \
-	python-pexpect \
-	python-pyudev \
-	python-requests \
-	python-tz \
-	python-yaml \
-	python-zmq || exit $?
+	systemd-sysv \
+	python3-netifaces \
+	python3-nose \
+	python3-pexpect \
+	python3-requests \
+	python3-yaml \
+	python3-zmq || exit $?
 ;;
 *)
 	echo "Unknow compoments $1"

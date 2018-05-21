@@ -34,7 +34,7 @@ RUN if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "x86" ] ;then apt-get -y in
 #RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
 
 COPY scripts/build-lava /
-RUN sh /build-lava lava-dispatcher 2017.11 2017.11.post1-1
+RUN sh /build-lava lava-dispatcher 2018.4 2018.4-1
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
@@ -44,8 +44,8 @@ COPY scripts/cu-loop /usr/local/bin/
 COPY conmux/ /etc/conmux/
 
 # Caution to not use any port between the Linux dynamic port range: 32768-60999
-RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python2.7/dist-packages/lava_dispatcher/utils/constants.py
-RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python2.7/dist-packages/lava_dispatcher/utils/constants.py
+RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python3/dist-packages/lava_dispatcher/utils/constants.py
+RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python3/dist-packages/lava_dispatcher/utils/constants.py
 
 #conmux need cu >= 1.07-24 See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=336996
 RUN echo "deb http://debian.proxad.net/debian/ testing main" >> /etc/apt/sources.list.d/testing.list
@@ -53,13 +53,16 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
 
+COPY scripts/lava-slave /etc/init.d/
+RUN chmod 755 /etc/init.d/lava-slave
+
 # Add services helper utilities to start and stop LAVA
 COPY scripts/stop.sh .
 COPY scripts/start.sh .
 
 # lava-cli dependencies
 RUN apt-get -y install python3-setuptools python3-dev python3-zmq
-RUN git clone https://git.linaro.org/lava/lavacli.git /root/lavacli && cd /root/lavacli && git checkout v0.6 && python3 setup.py install
+RUN git clone https://git.linaro.org/lava/lavacli.git /root/lavacli && cd /root/lavacli && git checkout v0.7 && python3 setup.py install
 
 COPY phyhostname /root/
 COPY scripts/setup.sh .
