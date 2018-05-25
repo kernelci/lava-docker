@@ -33,7 +33,7 @@ lab-slave-0:
         idvendor: 0x067b
         idproduct: 0x2303
         devpath: 1.1.4
-      macaddr: "00:FA:E0:DE:AD:78"
+      uboot_macaddr: "00:FA:E0:DE:AD:78"
     dragonboard-410c-01:
       type: dragonboard-410c
       pdu_generic:

@@ -2,10 +2,6 @@ FROM bitnami/minideb:stretch
 
 RUN apt-get update
 
-# Add services helper utilities to start and stop LAVA
-COPY scripts/stop.sh .
-COPY scripts/start.sh .
-
 # e2fsprogs is for libguestfs
 RUN \
  echo 'lava-server   lava-server/instance-name string lava-slave-instance' | debconf-set-selections && \
@@ -24,9 +20,10 @@ RUN \
  qemu-system \
  qemu-system-arm \
  qemu-system-i386 \
- qemu-kvm \
  xnbd-server \
  e2fsprogs
+
+RUN if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "x86" ] ;then apt-get -y install qemu-kvm ; fi
 
 # Uncomment the following for having the latest package (you need to comment all build-lava below)
 #RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget gnupg \
@@ -55,6 +52,10 @@ RUN echo "deb http://debian.proxad.net/debian/ testing main" >> /etc/apt/sources
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
+
+# Add services helper utilities to start and stop LAVA
+COPY scripts/stop.sh .
+COPY scripts/start.sh .
 
 EXPOSE 69/udp 80
 

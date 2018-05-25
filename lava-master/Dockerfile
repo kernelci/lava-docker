@@ -33,10 +33,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  qemu-system \
  qemu-system-arm \
  qemu-system-i386 \
- qemu-kvm \
  ser2net \
  u-boot-tools \
  python-setproctitle
+
+RUN if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "x86" ] ;then apt-get -y install qemu-kvm ; fi
 
 #RUN service postgresql start \
 # && DEBIAN_FRONTEND=noninteractive apt-get -y install \
