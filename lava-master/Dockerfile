@@ -90,6 +90,9 @@ RUN /start.sh && /setup.sh && /stop.sh
 #comment this if you do HTTPS (For reenabling CSRF cookie)
 COPY settings.conf /etc/lava-server/
 
+COPY device-types-patch/ /root/device-types-patch/
+RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && patch < $patch ; done
+
 EXPOSE 69/udp 80 3079 5555 5556
 
 CMD /start.sh && while [ true ];do sleep 365d; done
