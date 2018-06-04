@@ -214,6 +214,7 @@ This file describe how the DUTs are connected and powered.
 masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
+    webadmin_https:	Does the LAVA webadmin is accessed via https
     users:
     - name: LAVA username
       token: The token of this user

@@ -43,6 +43,25 @@ template_udev_devpath = string.Template("""#
 SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{devpath}=="${devpath}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
 """)
 
+template_settings_conf = string.Template("""
+{
+    "DEBUG": false,
+    "STATICFILES_DIRS": [
+        ["lava-server", "/usr/share/pyshared/lava_server/htdocs/"]
+    ],
+    "MEDIA_ROOT": "/var/lib/lava-server/default/media",
+    "ARCHIVE_ROOT": "/var/lib/lava-server/default/archive",
+    "STATIC_ROOT": "/usr/share/lava-server/static",
+    "STATIC_URL": "/static/",
+    "MOUNT_POINT": "/",
+    "HTTPS_XML_RPC": false,
+    "LOGIN_URL": "/accounts/login/",
+    "LOGIN_REDIRECT_URL": "/",
+    "CSRF_COOKIE_SECURE": $cookie_secure,
+    "SESSION_COOKIE_SECURE": $session_cookie_secure
+}
+""")
+
 def main():
     fp = open(boards_yaml, "r")
     workers = yaml.load(fp)
@@ -83,6 +102,18 @@ def main():
         userdir = "%s/users" % workerdir
         os.mkdir(userdir)
         worker = master
+        webadmin_https = False
+        if "webadmin_https" in worker:
+            webadmin_https = worker["webadmin_https"]
+        if webadmin_https:
+            cookie_secure = "true"
+            session_cookie_secure = "true"
+        else:
+            cookie_secure = "false"
+            session_cookie_secure = "false"
+        fsettings = open("%s/settings.conf" % workerdir, 'w')
+        fsettings.write(template_settings_conf.substitute(cookie_secure=cookie_secure, session_cookie_secure=session_cookie_secure))
+        fsettings.close()
         if "users" in worker:
             for user in worker["users"]:
                 username = user["name"]
