@@ -26,17 +26,11 @@ The following packages are necessary on the host machine:
 Example to use lava-docker with only one QEMU device:
 
 * Checkout the lava-docker repository
-* You will obtain the following boards.yaml
-```
-lab-slave-0:
-  boardlist:
-    qemu-01:
-      type: qemu
-```
 * Generate configuration files for LAVA, udev, serial ports, etc. from boards.yaml via
 ```
 ./lavalab-gen.py
 ```
+* Go to output/local directory
 * Build docker images via
 ```
 docker-compose build
@@ -65,9 +59,9 @@ You could check in https://github.com/Linaro/lava-server/tree/release/lava_sched
 
 Example:
 For a beagleboneblack, the device-type is beaglebone-black (Even if official DT name is am335x-boneblack)
-So you have now:
+So you need to add in the boards section:
 ```
-    beagleboneblack-01:
+    - name: beagleboneblack-01
       type: beaglebone-black
 ```
 
@@ -87,7 +81,7 @@ The serial is AK04TU1X
 ```
 So you have now:
 ```
-    beagleboneblack-01:
+    - name: beagleboneblack-01
       type: beaglebone-black
       uart:
         idvendor: 0x0403
@@ -105,7 +99,7 @@ udevadm info -a -n /dev/ttyUSB1 |grep devpath | head -n1
 ```
 So you have now:
 ```
-    beagleboneblack-01:
+    - name: beagleboneblack-01
       type: beaglebone-black
       uart:
         idvendor: 0x0403
@@ -130,7 +124,7 @@ If the beagleboneblack is wired to port 3 and the ACME board have IP 192.168.66.
 #### Example:
 beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
 ```
-    beagleboneblack-01:
+    - name: beagleboneblack-01
       type: beaglebone-black
       pdu_generic:
         hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 5
@@ -142,14 +136,11 @@ beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
 	serial: 1234567
 ```
 
-## Known limitations
-The current lava-docker provides support for generating only one LAVA slave.
-
 ## Architecture
-The setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
+The basic setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
 * lava-master: run lava-server along with the web interface
 * lava-slave: run lava-dispatcher, the compoment which sends jobs to DUTs
-* squid: an HTTP proxy for caching downloaded contents (kernel/dtb/rootfs)
+* squid: an HTTP proxy for caching downloaded contents (kernel/dtb/rootfs) (Work in progress)
 
 The host and DUTs must share a common LAN.<br/>
 The host IP on this LAN must be set as dispatcher_ip in boards.yaml.<br/>
@@ -158,6 +149,12 @@ Since most DUTs are booted using TFTP, they need DHCP for gaining network connec
 So, on the LAN shared with DUTs, a running DHCPD is necessary. (See DHCPD below)<br/>
 
 ![lava-docker diagram](doc/lava-docker.png)
+
+## Multi-host architectures
+Lava-docker support multi-host architecture, Master and slaves could be on different host.
+
+Lava-docker support multiples slaves, but with a maximum of one slave per host.
+This is due to that slave need TFTP port accessible from outside.
 
 ### Power supply
 You need to have a PDU for powering your DUT.
@@ -214,25 +211,51 @@ You can use the lavalab-gen.sh helper script which will do all the above actions
 ### boards.yaml
 This file describe how the DUTs are connected and powered.
 ```
-lab-slave-XX:		The name of the slave (where XX is a number)
-  dispatcher_ip: the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
-  host_has_cpuflag_kvm: Does the host running lab-slave-XX have KVM
-  boardlist:
-    devicename:	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
-      type: the LAVA device-type of this device
-      uboot_ipaddr: (optional) a static IP to set in uboot
-      uboot_macaddr: (Optional) the MAC address to set in uboot
+masters:
+ - name:  lava-master	name of the master
+    host: name		name of the host running lava-master (default to "local")
+    webadmin_https:	Does the LAVA webadmin is accessed via https
+    users:
+    - name: LAVA username
+      token: The token of this user
+      password: Password the this user (generated if not provided)
+      superuser: yes/no (default no)
+      staff: yes/no (default no)
+    tokens:
+    - username: The LAVA user owning the token below. (This user should be created via users:)
+      token: The token for this callback
+      description: The description of this token. This string could be used with LAVA-CI.
+slaves:
+  - name: lab-slave-XX		The name of the slave (where XX is a number)
+    host: name			name of the host running lava-slave-XX (default to "local")
+    dispatcher_ip: 		the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
+    remote_master: 		the name of the master to connect to
+    remote_address: 		the FQDN or IP address of the master (if different from remote_master)
+    remote_rpc_port: 		the port used by the LAVA RPC2 (default 80)
+    remote_user: 		the user used for connecting to the master
+    remote_proto:		http(default) or https
+    extra_actions:		An optional list of action to do at end of the docker build
+    - "apt-get install package"
+
+boards:
+  - name: devicename	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
+    type: the LAVA device-type of this device
+    kvm: (For qemu only) Does the qemu could use KVM (default: no)
+    uboot_ipaddr:	(optional) a static IP to set in uboot
+    uboot_macaddr:	(Optional) the MAC address to set in uboot
+    custom_option:	(optional) All following strings will be directly append to devicefile
+    - "set x=1"
 # One of uart or connection_command must be choosen
-      uart:
-	idvendor: The VID of the UART (Formated as 0xXXXX)
-	idproduct: the PID of the UART (Formated as 0xXXXX)
-        serial: The serial number in case of FTDI uart
-        devpath: the UDEV devpath to this uart for UART without serial number
-      connection_command: A command to be ran for getting a serial console
-      pdu_generic:
-        hard_reset_command: commandline to reset the board
-	power_off_command: commandline to power off the board
-	power_on_command: commandline to power on the board
+    uart:
+      idvendor: The VID of the UART (Formated as 0xXXXX)
+      idproduct: the PID of the UART (Formated as 0xXXXX)
+      serial: The serial number in case of FTDI uart
+      devpath: the UDEV devpath to this uart for UART without serial number
+    connection_command: A command to be ran for getting a serial console
+    pdu_generic:
+      hard_reset_command: commandline to reset the board
+      power_off_command: commandline to power off the board
+      power_on_command: commandline to power on the board
 ```
 Notes on UART:
 * Only one of devpath/serial is necessary.
@@ -251,23 +274,6 @@ Note on connection_command: connection_command is for people which want to use o
 
 Examples: see [boards.yaml.example](boards.yaml.example)
 
-### tokens.yaml
-The tokens format has two sections, one for LAVA users, the other for callback tokens
-```
-lava_server_users:
-  - name: LAVA username
-    token: The token of this user
-    password: Password the this user (generated if not provided)
-    superuser: yes/no (default no)
-    staff: yes/no (default no)
-callback_tokens:
-  - filename: The filename for storing the informations below, the name should be unique along other callback tokens
-    username: The LAVA user owning the token below. (This user should be created via lava_server_users:)
-    token: The token for this callback
-    description: The description of this token. This string could be used with LAVA-CI.
-```
-Example: see [tokens.yaml](tokens.yaml)
-
 ### Generate
 ```
 lavalab-gen.py
@@ -275,13 +281,12 @@ lavalab-gen.py
 
 this script will generate all necessary files in the following locations:
 ```
-conmux/		All files needed by conmux
-tokens/		This is where the callback tokens will be generated
-users/		This is where the users will be generated
-devices/	All LAVA devices files
-slaves/		Contain the dispatcher_ip to give to slave node
-udev-rules for host
-docker-compose.yml	Generated from docker-compose.template
+output/host/lava-master/tokens/			This is where the callback tokens will be generated
+output/host/lava-master/users/			This is where the users will be generated
+output/host/lab-slave-XX/conmux/		All files needed by conmux
+output/host/lab-slave-XX/devices/		All LAVA devices files
+output/host/udev/99-lavaworker-udev.rules 	udev rules for host
+output/host/docker-compose.yml			Generated from docker-compose.template
 ```
 
 All thoses file (except for udev-rules) will be handled by docker.
@@ -306,10 +311,10 @@ For running all images, simply run:
 docker-compose up -d
 ```
 
-## Proxy cache
+## Proxy cache (Work in progress)
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
 You have to uncomment a line in lava-master/Dockerfile to enable it.<br/>
-Note that the squid proxy is always built and run.
+For the moment, it is unsupported and unbuilded.
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:

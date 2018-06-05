@@ -1,4 +1,22 @@
-lab-slave-0:
-  boardlist:
-    qemu-01:
-      type: qemu
+masters:
+  - name: master1
+    host: local
+    users:
+    - name: admin
+      token: longrandomtokenadmin
+      password: admin
+      superuser: yes
+      staff: yes
+    tokens:
+    - username: admin
+      token: dfjdfkfkdjfkdsjfsl
+      description: no description
+slaves:
+  - name: lab-slave-0
+    host: local
+    remote_master: master1
+    remote_user: admin
+
+boards:
+  - name: qemu-01
+    type: qemu

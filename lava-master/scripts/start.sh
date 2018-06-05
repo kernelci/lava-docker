@@ -24,14 +24,14 @@ start () {
 #remove lava-pid files incase the image is stored without first stopping the services
 rm -f /var/run/lava-*.pid 2> /dev/null
 
-start postgresql
-start apache2
-start lava-server
-start lava-master
-start lava-coordinator
-start lava-slave
-start lava-server-gunicorn
-start tftpd-hpa
+/etc/init.d/postgresql start
+start apache2 || exit $?
+start lava-logs || exit $?
+start lava-master || exit $?
+start lava-coordinator || exit $?
+start lava-slave || exit $?
+start lava-server-gunicorn || exit $?
+start tftpd-hpa || exit $?
 
 postgres-ready
 service apache2 reload #added after the website not running a few times on boot

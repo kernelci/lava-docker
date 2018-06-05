@@ -1,5 +1,7 @@
 FROM bitnami/minideb:stretch
 
+RUN echo "deb http://ftp.fr.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list
+
 RUN apt-get update
 
 # Add services helper utilities to start and stop LAVA
@@ -46,10 +48,10 @@ RUN if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "x86" ] ;then apt-get -y in
 
 # Install latest
 COPY scripts/build-lava /
-RUN bash /build-lava lava-dispatcher 2017.11 2017.11.post1-1
-RUN service postgresql start && \
- bash /build-lava lava-server 2017.11 2017.11.post1-1 && \
- /stop.sh
+RUN bash /build-lava lava-dispatcher 2018.4 2018.4-1
+RUN /etc/init.d/postgresql start && \
+ bash /build-lava lava-server 2018.4 2018.4-1 && \
+ /etc/init.d/postgresql stop
 
 RUN a2enmod proxy \
  && a2enmod proxy_http \
@@ -62,19 +64,34 @@ RUN git clone https://github.com/BayLibre/lava-healthchecks.git
 RUN cp lava-healthchecks/health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 
+# Add services helper utilities to start and stop LAVA
+COPY scripts/stop.sh .
+COPY scripts/start.sh .
+COPY scripts/lava-logs /etc/init.d/
+RUN chmod 755 /etc/init.d/lava-logs
+COPY scripts/lava-master /etc/init.d/
+RUN chmod 755 /etc/init.d/lava-master
+COPY scripts/lava-slave /etc/init.d/
+RUN chmod 755 /etc/init.d/lava-slave
+COPY scripts/lava-server-gunicorn /etc/init.d/
+RUN chmod 755 /etc/init.d/lava-server-gunicorn
+
 COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY tokens/ /root/lava-callback-tokens/
-COPY slaves/* /etc/lava-server/dispatcher.d/
 COPY scripts/setup.sh /
 RUN /start.sh && /setup.sh && /stop.sh
 
 #uncomment if you want to use squid
+# warning the address used must be network accessible by all slave
 #RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
 
 #comment this if you do HTTPS (For reenabling CSRF cookie)
 COPY settings.conf /etc/lava-server/
+
+COPY device-types-patch/ /root/device-types-patch/
+RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && patch < $patch ; done
 
 EXPOSE 69/udp 80 3079 5555 5556
 
