@@ -345,7 +345,7 @@ def main():
             device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
         if "custom_option" in board:
             for coption in board["custom_option"]:
-                device_line += "{%% %s %%}" % coption
+                device_line += "{%% %s %%}\n" % coption
         if not os.path.isdir(device_path):
             os.mkdir(device_path)
         if not os.path.isdir(devices_path):
