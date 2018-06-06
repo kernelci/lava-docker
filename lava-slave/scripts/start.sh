@@ -8,6 +8,9 @@ if [[ -n "$LAVA_MASTER" ]]; then
 fi
 
 service tftpd-hpa start || exit 4
+if [ -s /etc/ser2net.conf ];then
+	service ser2net start || exit 7
+fi
 
 touch /var/run/conmux-registry
 /usr/sbin/conmux-registry 63000 /var/run/conmux-registry&

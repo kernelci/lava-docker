@@ -53,6 +53,9 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
 
+RUN apt-get -y install ser2net
+COPY ser2net.conf /etc
+
 COPY scripts/lava-slave /etc/init.d/
 RUN chmod 755 /etc/init.d/lava-slave
 

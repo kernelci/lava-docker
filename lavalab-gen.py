@@ -36,6 +36,13 @@ template_device_pdu_generic = string.Template("""
 {% set power_on_command = '${power_on_command}' %}
 """)
 
+template_ser2net = string.Template("""
+${port}:telnet:600:/dev/${board}:${baud} 8DATABITS NONE 1STOPBIT banner
+""")
+template_device_ser2net = string.Template("""
+{% set connection_command = 'telnet 127.0.0.1 ${port}' %}
+""")
+
 template_udev_serial = string.Template("""#
 SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
 """)
@@ -252,6 +259,7 @@ def main():
     if "boards" not in workers:
         print("Missing boards")
         sys.exit(1)
+    ser2net_port = 60000
     boards = workers["boards"]
     for board in boards:
         board_name = board["name"]
@@ -310,7 +318,6 @@ def main():
             if type(idvendor) == str:
                 print("Please put hexadecimal IDs for vendor %s (like 0x%s)" % (board_name, idvendor))
                 sys.exit(1)
-            line = template_conmux.substitute(board=board_name, baud=baud)
             if "serial" in uart:
                 serial = board["uart"]["serial"]
                 udev_line = template_udev_serial.substitute(board=board_name, serial=serial, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
@@ -328,10 +335,22 @@ def main():
                 dockcomp["services"][worker_name]["devices"] = []
                 dc_devices = dockcomp["services"][worker_name]["devices"]
             dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
-            fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
-            fp.write(line)
-            fp.close()
-            device_line += template_device_conmux.substitute(board=board_name)
+            use_conmux = True
+            if "use_ser2net" in uart:
+                use_conmux = False
+            if use_conmux:
+                conmuxline = template_conmux.substitute(board=board_name, baud=baud)
+                device_line += template_device_conmux.substitute(board=board_name)
+                fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
+                fp.write(conmuxline)
+                fp.close()
+            else:
+                ser2net_line = template_ser2net.substitute(port=ser2net_port,baud=baud,board=board_name)
+                device_line += template_device_ser2net.substitute(port=ser2net_port)
+                ser2net_port += 1
+                fp = open("%s/ser2net.conf" % workerdir, "a")
+                fp.write(ser2net_line)
+                fp.close()
         elif "connection_command" in board:
             connection_command = board["connection_command"]
             device_line += template_device_connection_command.substitute(connection_command=connection_command)
