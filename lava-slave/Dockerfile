@@ -81,6 +81,11 @@ COPY devices/ /root/devices/
 COPY scripts/extra_actions /root/
 RUN if [ -x /root/extra_actions ] ; then /root/extra_actions ; fi
 
+RUN apt-get -y install screen openssh-server
+RUN ssh-keygen -q -f /root/.ssh/id_rsa
+RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
+COPY lava-screen.conf /root/
+
 EXPOSE 69/udp 80
 
 CMD /start.sh

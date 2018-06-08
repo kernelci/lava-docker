@@ -43,6 +43,10 @@ template_device_ser2net = string.Template("""
 {% set connection_command = 'telnet 127.0.0.1 ${port}' %}
 """)
 
+template_device_screen = string.Template("""
+{% set connection_command = 'ssh -o StrictHostKeyChecking=no -t root@127.0.0.1 "TERM=xterm screen -x ${board}"' %}
+""")
+
 template_udev_serial = string.Template("""#
 SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
 """)
@@ -336,20 +340,31 @@ def main():
                 dc_devices = dockcomp["services"][worker_name]["devices"]
             dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = True
+            use_ser2net = False
+            use_screen = False
             if "use_ser2net" in uart:
                 use_conmux = False
+                use_ser2net = True
+            if "use_screen" in uart:
+                use_conmux = False
+                use_screen = True
             if use_conmux:
                 conmuxline = template_conmux.substitute(board=board_name, baud=baud)
                 device_line += template_device_conmux.substitute(board=board_name)
                 fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
                 fp.write(conmuxline)
                 fp.close()
-            else:
+            if use_ser2net:
                 ser2net_line = template_ser2net.substitute(port=ser2net_port,baud=baud,board=board_name)
                 device_line += template_device_ser2net.substitute(port=ser2net_port)
                 ser2net_port += 1
                 fp = open("%s/ser2net.conf" % workerdir, "a")
                 fp.write(ser2net_line)
+                fp.close()
+            if use_screen:
+                device_line += template_device_screen.substitute(board=board_name)
+                fp = open("%s/lava-screen.conf" % workerdir, "a")
+                fp.write("%s\n" % board_name)
                 fp.close()
         elif "connection_command" in board:
             connection_command = board["connection_command"]
