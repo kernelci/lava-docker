@@ -85,6 +85,10 @@ def main():
         sys.exit(1)
     masters = workers["masters"]
     for master in masters:
+        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https" ]
+        for keyword in master:
+            if not keyword in keywords_master:
+                print("WARNING: unknown keyword %s" % keyword)
         name = master["name"]
         print("Handle %s\n" % name)
         if not "host" in master:
@@ -127,6 +131,10 @@ def main():
         fsettings.close()
         if "users" in worker:
             for user in worker["users"]:
+                keywords_users = [ "name", "staff", "superuser", "password", "token" ]
+                for keyword in user:
+                    if not keyword in keywords_users:
+                        print("WARNING: unknown keyword %s" % keyword)
                 username = user["name"]
                 ftok = open("%s/%s" % (userdir, username), "w")
                 token = user["token"]
@@ -150,6 +158,10 @@ def main():
             filename_num = {}
             print("Found tokens")
             for token in worker["tokens"]:
+                keywords_tokens = [ "username", "token", "description" ]
+                for keyword in token:
+                    if not keyword in keywords_tokens:
+                        print("WARNING: unknown keyword %s" % keyword)
                 username = token["username"]
                 description = token["description"]
                 if username in filename_num:
@@ -173,6 +185,10 @@ def main():
         sys.exit(1)
     slaves = workers["slaves"]
     for slave in slaves:
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions" ]
+        for keyword in slave:
+            if not keyword in keywords_slaves:
+                print("WARNING: unknown keyword %s" % keyword)
         name = slave["name"]
         if len(slaves) == 1:
             default_slave = name
