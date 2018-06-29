@@ -4,10 +4,6 @@ RUN echo "deb http://ftp.fr.debian.org/debian/ stretch-backports main" >> /etc/a
 
 RUN apt-get update
 
-# Add services helper utilities to start and stop LAVA
-COPY scripts/stop.sh .
-COPY scripts/start.sh .
-
 # Install debian packages used by the container
 # Configure apache to run the lava server
 # Log the hostname used during install for the slave name
