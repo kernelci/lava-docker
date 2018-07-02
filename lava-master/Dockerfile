@@ -77,7 +77,6 @@ COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY tokens/ /root/lava-callback-tokens/
 COPY scripts/setup.sh /
-RUN /start.sh && /setup.sh && /stop.sh
 
 #uncomment if you want to use squid
 # warning the address used must be network accessible by all slave

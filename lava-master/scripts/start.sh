@@ -25,6 +25,9 @@ start () {
 rm -f /var/run/lava-*.pid 2> /dev/null
 
 /etc/init.d/postgresql start
+
+/setup.sh || exit $?
+
 start apache2 || exit $?
 start lava-logs || exit $?
 start lava-master || exit $?
