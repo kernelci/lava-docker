@@ -215,6 +215,9 @@ masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
     webadmin_https:	Does the LAVA webadmin is accessed via https
+    zmq_auth: True/False	Does the master requires ZMQ authentication.
+    zmq_auth_key:		optional path to a public ZMQ key
+    zmq_auth_key_secret:	optional path to a private ZMQ key
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     users:
     - name: LAVA username
@@ -229,6 +232,8 @@ masters:
 slaves:
   - name: lab-slave-XX		The name of the slave (where XX is a number)
     host: name			name of the host running lava-slave-XX (default to "local")
+    zmq_auth_key:		optional path to a public ZMQ key
+    zmq_auth_key_secret:	optional path to a private ZMQ key
     dispatcher_ip: 		the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
     remote_master: 		the name of the master to connect to
     remote_address: 		the FQDN or IP address of the master (if different from remote_master)

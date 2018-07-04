@@ -93,6 +93,8 @@ RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /ro
 COPY lava-patch/ /root/lava-patch
 RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
 
+COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
+
 EXPOSE 69/udp 80 3079 5555 5556
 
 CMD /start.sh && while [ true ];do sleep 365d; done
