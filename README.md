@@ -318,6 +318,9 @@ A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, e
 You have to uncomment a line in lava-master/Dockerfile to enable it.<br/>
 For the moment, it is unsupported and unbuilded.
 
+## Backporting LAVA patches
+All upstream LAVA patches could be backported by placing them in lava-master/lava-patch/
+
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
 

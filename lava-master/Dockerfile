@@ -89,6 +89,9 @@ COPY settings.conf /etc/lava-server/
 COPY device-types-patch/ /root/device-types-patch/
 RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && patch < $patch ; done
 
+COPY lava-patch/ /root/lava-patch
+RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
+
 EXPOSE 69/udp 80 3079 5555 5556
 
 CMD /start.sh && while [ true ];do sleep 365d; done
