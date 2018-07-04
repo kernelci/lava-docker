@@ -215,6 +215,7 @@ masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
     webadmin_https:	Does the LAVA webadmin is accessed via https
+    persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     users:
     - name: LAVA username
       token: The token of this user
