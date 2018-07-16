@@ -36,6 +36,17 @@ template_device_pdu_generic = string.Template("""
 {% set power_on_command = '${power_on_command}' %}
 """)
 
+template_ser2net = string.Template("""
+${port}:telnet:600:/dev/${board}:${baud} 8DATABITS NONE 1STOPBIT banner
+""")
+template_device_ser2net = string.Template("""
+{% set connection_command = 'telnet 127.0.0.1 ${port}' %}
+""")
+
+template_device_screen = string.Template("""
+{% set connection_command = 'ssh -o StrictHostKeyChecking=no -t root@127.0.0.1 "TERM=xterm screen -x ${board}"' %}
+""")
+
 template_udev_serial = string.Template("""#
 SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
 """)
@@ -74,6 +85,10 @@ def main():
         sys.exit(1)
     masters = workers["masters"]
     for master in masters:
+        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https" ]
+        for keyword in master:
+            if not keyword in keywords_master:
+                print("WARNING: unknown keyword %s" % keyword)
         name = master["name"]
         print("Handle %s\n" % name)
         if not "host" in master:
@@ -116,6 +131,10 @@ def main():
         fsettings.close()
         if "users" in worker:
             for user in worker["users"]:
+                keywords_users = [ "name", "staff", "superuser", "password", "token" ]
+                for keyword in user:
+                    if not keyword in keywords_users:
+                        print("WARNING: unknown keyword %s" % keyword)
                 username = user["name"]
                 ftok = open("%s/%s" % (userdir, username), "w")
                 token = user["token"]
@@ -139,6 +158,10 @@ def main():
             filename_num = {}
             print("Found tokens")
             for token in worker["tokens"]:
+                keywords_tokens = [ "username", "token", "description" ]
+                for keyword in token:
+                    if not keyword in keywords_tokens:
+                        print("WARNING: unknown keyword %s" % keyword)
                 username = token["username"]
                 description = token["description"]
                 if username in filename_num:
@@ -162,6 +185,10 @@ def main():
         sys.exit(1)
     slaves = workers["slaves"]
     for slave in slaves:
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions" ]
+        for keyword in slave:
+            if not keyword in keywords_slaves:
+                print("WARNING: unknown keyword %s" % keyword)
         name = slave["name"]
         if len(slaves) == 1:
             default_slave = name
@@ -252,6 +279,7 @@ def main():
     if "boards" not in workers:
         print("Missing boards")
         sys.exit(1)
+    ser2net_port = 60000
     boards = workers["boards"]
     for board in boards:
         board_name = board["name"]
@@ -310,7 +338,6 @@ def main():
             if type(idvendor) == str:
                 print("Please put hexadecimal IDs for vendor %s (like 0x%s)" % (board_name, idvendor))
                 sys.exit(1)
-            line = template_conmux.substitute(board=board_name, baud=baud)
             if "serial" in uart:
                 serial = board["uart"]["serial"]
                 udev_line = template_udev_serial.substitute(board=board_name, serial=serial, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
@@ -328,10 +355,33 @@ def main():
                 dockcomp["services"][worker_name]["devices"] = []
                 dc_devices = dockcomp["services"][worker_name]["devices"]
             dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
-            fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
-            fp.write(line)
-            fp.close()
-            device_line += template_device_conmux.substitute(board=board_name)
+            use_conmux = True
+            use_ser2net = False
+            use_screen = False
+            if "use_ser2net" in uart:
+                use_conmux = False
+                use_ser2net = True
+            if "use_screen" in uart:
+                use_conmux = False
+                use_screen = True
+            if use_conmux:
+                conmuxline = template_conmux.substitute(board=board_name, baud=baud)
+                device_line += template_device_conmux.substitute(board=board_name)
+                fp = open("%s/conmux/%s.cf" % (workerdir, board_name), "w")
+                fp.write(conmuxline)
+                fp.close()
+            if use_ser2net:
+                ser2net_line = template_ser2net.substitute(port=ser2net_port,baud=baud,board=board_name)
+                device_line += template_device_ser2net.substitute(port=ser2net_port)
+                ser2net_port += 1
+                fp = open("%s/ser2net.conf" % workerdir, "a")
+                fp.write(ser2net_line)
+                fp.close()
+            if use_screen:
+                device_line += template_device_screen.substitute(board=board_name)
+                fp = open("%s/lava-screen.conf" % workerdir, "a")
+                fp.write("%s\n" % board_name)
+                fp.close()
         elif "connection_command" in board:
             connection_command = board["connection_command"]
             device_line += template_device_connection_command.substitute(connection_command=connection_command)

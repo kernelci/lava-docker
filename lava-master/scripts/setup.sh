@@ -20,10 +20,15 @@ if [ -e /root/lava-users ];then
 		if [ $SUPERUSER -eq 1 ];then
 			USER_OPTION="$USER_OPTION --superuser"
 		fi
-		echo "Adding username $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
-		lava-server manage users add --passwd $PASSWORD $USER_OPTION $USER || exit 1
-		if [ ! -z "$TOKEN" ];then
-			lava-server manage tokens add --user $USER --secret $TOKEN || exit 1
+		lava-server manage users list | grep -q "[[:space:]]$USER$"
+		if [ $? -eq 0 ];then
+			echo "Skip already existing $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
+		else
+			echo "Adding username $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
+			lava-server manage users add --passwd $PASSWORD $USER_OPTION $USER || exit 1
+			if [ ! -z "$TOKEN" ];then
+				lava-server manage tokens add --user $USER --secret $TOKEN || exit 1
+			fi
 		fi
 	done
 fi
@@ -56,9 +61,14 @@ if [ -e /root/device-types ];then
 	do
 		cp $i /etc/lava-server/dispatcher-config/device-types/
 		devicetype=$(basename $i |sed 's,.jinja2,,')
-		echo "Adding custom $devicetype"
-		lava-server manage device-types add $devicetype || exit $?
-		touch /root/.lavadocker/devicetype-$devicetype
+		lava-server manage device-types list | grep -q "[[:space:]]$devicetype[[:space:]]"
+		if [ $? -eq 0 ];then
+			echo "Skip already known $devicetype"
+		else
+			echo "Adding custom $devicetype"
+			lava-server manage device-types add $devicetype || exit $?
+			touch /root/.lavadocker/devicetype-$devicetype
+		fi
 	done
 fi
 

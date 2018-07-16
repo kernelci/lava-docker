@@ -251,6 +251,8 @@ boards:
       idproduct: the PID of the UART (Formated as 0xXXXX)
       serial: The serial number in case of FTDI uart
       devpath: the UDEV devpath to this uart for UART without serial number
+      use_ser2net: True/false (Use ser2net instead of conmux-console)
+      use_screen: True/false (Use screen via ssh instead of conmux-console)
     connection_command: A command to be ran for getting a serial console
     pdu_generic:
       hard_reset_command: commandline to reset the board
@@ -315,6 +317,9 @@ docker-compose up -d
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
 You have to uncomment a line in lava-master/Dockerfile to enable it.<br/>
 For the moment, it is unsupported and unbuilded.
+
+## Backporting LAVA patches
+All upstream LAVA patches could be backported by placing them in lava-master/lava-patch/
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:

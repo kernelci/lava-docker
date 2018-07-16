@@ -53,6 +53,9 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
 RUN rm /etc/apt/sources.list.d/testing.list
 
+RUN apt-get -y install ser2net
+COPY ser2net.conf /etc
+
 COPY scripts/lava-slave /etc/init.d/
 RUN chmod 755 /etc/init.d/lava-slave
 
@@ -77,6 +80,11 @@ COPY devices/ /root/devices/
 
 COPY scripts/extra_actions /root/
 RUN if [ -x /root/extra_actions ] ; then /root/extra_actions ; fi
+
+RUN apt-get -y install screen openssh-server
+RUN ssh-keygen -q -f /root/.ssh/id_rsa
+RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
+COPY lava-screen.conf /root/
 
 EXPOSE 69/udp 80
 

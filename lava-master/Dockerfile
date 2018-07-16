@@ -4,10 +4,6 @@ RUN echo "deb http://ftp.fr.debian.org/debian/ stretch-backports main" >> /etc/a
 
 RUN apt-get update
 
-# Add services helper utilities to start and stop LAVA
-COPY scripts/stop.sh .
-COPY scripts/start.sh .
-
 # Install debian packages used by the container
 # Configure apache to run the lava server
 # Log the hostname used during install for the slave name
@@ -81,7 +77,6 @@ COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY tokens/ /root/lava-callback-tokens/
 COPY scripts/setup.sh /
-RUN /start.sh && /setup.sh && /stop.sh
 
 #uncomment if you want to use squid
 # warning the address used must be network accessible by all slave
@@ -91,7 +86,10 @@ RUN /start.sh && /setup.sh && /stop.sh
 COPY settings.conf /etc/lava-server/
 
 COPY device-types-patch/ /root/device-types-patch/
-RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && patch < $patch ; done
+RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && patch < $patch || exit $?; done
+
+COPY lava-patch/ /root/lava-patch
+RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
 
 EXPOSE 69/udp 80 3079 5555 5556
 
