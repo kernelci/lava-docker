@@ -447,7 +447,5 @@ def main():
 
 
 if __name__ == "__main__":
-    shutil.copy("common/build-lava", "lava-slave/scripts/build-lava")
-    shutil.copy("common/build-lava", "lava-master/scripts/build-lava")
     main()
 
