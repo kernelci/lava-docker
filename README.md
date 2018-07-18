@@ -247,6 +247,14 @@ masters:
     - username: The LAVA user owning the token below. (This user should be created via users:)
       token: The token for this callback
       description: The description of this token. This string could be used with LAVA-CI.
+    smtp:			WARNING: Usage of an SMTP server makes it mandatory for each user to have an email address
+      email_host:		The host to use for sending email
+      email_host_user:		Username to use for the SMTP server
+      email_host_password:	Password to use for the SMTP server
+      email_port:		Port to use for the SMTP server (default: 25)
+      email_use_tls:		Whether to use a TLS (secure) connection when talking to the SMTP server
+      email_use_ssl:		Whether to use an implicit TLS (secure) connection when talking to the SMTP server
+      email_backend:		The backend to use for sending emails (default: 'django.core.mail.backends.smtp.EmailBackend')
     slaveenv:			A list of environment to pass to slave
       - name: slavename		The name of slave (mandatory)
         env:

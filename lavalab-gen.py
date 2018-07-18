@@ -64,7 +64,15 @@ template_settings_conf = string.Template("""
     "ALLOWED_HOSTS": [ $allowed_hosts ],
     "CSRF_TRUSTED_ORIGINS": ["$lava_http_fqdn"],
     "CSRF_COOKIE_SECURE": $cookie_secure,
-    "SESSION_COOKIE_SECURE": $session_cookie_secure
+    "SESSION_COOKIE_SECURE": $session_cookie_secure,
+    "SERVER_EMAIL": "$server_email",
+    "EMAIL_HOST": "$email_host",
+    "EMAIL_HOST_USER": "$email_host_user",
+    "EMAIL_HOST_PASSWORD": "$email_host_password",
+    "EMAIL_PORT": $email_port,
+    "EMAIL_USE_TLS": $email_use_tls,
+    "EMAIL_USE_SSL": $email_use_ssl,
+    "EMAIL_BACKEND": "$email_backend"
 }
 """)
 
@@ -105,7 +113,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "smtp" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -185,8 +193,60 @@ def main():
         f_fqdn = open("%s/lava_http_fqdn" % workerdir, 'w')
         f_fqdn.write(lava_http_fqdn)
         f_fqdn.close()
+        # DJANGO defaults
+        email_host = "localhost"
+        email_host_user = ""
+        email_host_password = ""
+        email_port = 25
+        email_use_tls = 'false'
+        email_use_ssl = 'false'
+        email_backend = 'django.core.mail.backends.smtp.EmailBackend'
+        server_email = "root@localhost"
+        if "smtp" in worker:
+            if "server_email" in worker["smtp"]:
+                server_email = worker["smtp"]["server_email"]
+            if "email_host" in worker["smtp"]:
+                email_host = worker["smtp"]["email_host"]
+            if "email_host_user" in worker["smtp"]:
+                email_host_user = worker["smtp"]["email_host_user"]
+            if "email_host_password" in worker["smtp"]:
+                email_host_password = worker["smtp"]["email_host_password"]
+            if "email_port" in worker["smtp"]:
+                email_port = worker["smtp"]["email_port"]
+            # django does not like True or False but want true/false (no upper case)
+            if "email_use_tls" in worker["smtp"]:
+                email_use_tls = worker["smtp"]["email_use_tls"]
+                if isinstance(email_use_tls, bool):
+                    if email_use_tls:
+                        email_use_tls = 'true'
+                    else:
+                        email_use_tls = 'false'
+            if "email_use_ssl" in worker["smtp"]:
+                email_use_ssl = worker["smtp"]["email_use_ssl"]
+                if isinstance(email_use_ssl, bool):
+                    if email_use_ssl:
+                        email_use_ssl = 'true'
+                    else:
+                        email_use_ssl = 'false'
+            if "email_backend" in worker["smtp"]:
+                email_backend = worker["smtp"]["email_backend"]
         fsettings = open("%s/settings.conf" % workerdir, 'w')
-        fsettings.write(template_settings_conf.substitute(cookie_secure=cookie_secure, session_cookie_secure=session_cookie_secure, lava_http_fqdn=lava_http_fqdn, allowed_hosts=allowed_hosts))
+        fsettings.write(
+            template_settings_conf.substitute(
+                cookie_secure=cookie_secure,
+                session_cookie_secure=session_cookie_secure,
+                lava_http_fqdn=lava_http_fqdn,
+                allowed_hosts=allowed_hosts,
+                email_host = email_host,
+                email_host_user = email_host_user,
+                email_host_password = email_host_password,
+                email_port = email_port,
+                email_use_tls = email_use_tls,
+                email_use_ssl = email_use_ssl,
+                email_backend = email_backend,
+                server_email = server_email
+                )
+            )
         fsettings.close()
         master_use_zmq_auth = False
         if "zmq_auth" in worker:
