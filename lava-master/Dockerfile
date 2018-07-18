@@ -29,6 +29,8 @@ RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*pat
 
 COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
+COPY lava_http_fqdn /root/
+
 EXPOSE 69/udp 80 3079 5555 5556
 
 CMD /start.sh && while [ true ];do sleep 365d; done

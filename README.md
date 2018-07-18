@@ -219,6 +219,7 @@ masters:
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
+    http_fqdn:			The FQDN used to access the LAVA web interface
     users:
     - name: LAVA username
       token: The token of this user 	(optional)
