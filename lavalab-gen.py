@@ -85,7 +85,7 @@ def main():
         sys.exit(1)
     masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https" ]
+        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https", "persistent_db" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -108,6 +108,16 @@ def main():
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
+        persistent_db = False
+        if "persistent_db" in master:
+            persistent_db = master["persistent_db"]
+        if persistent_db:
+            pg_volume_name = "pgdata_" + name
+            dockcomp["services"][name]["volumes"].append(pg_volume_name + ":/var/lib/postgresql")
+            dockcomp["services"][name]["volumes"].append("lava_job_output:/var/lib/lava-server/default/media/job-output/")
+            dockcomp["volumes"] = {}
+            dockcomp["volumes"][pg_volume_name] = {}
+            dockcomp["volumes"]["lava_job_output"] = {}
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
 

@@ -49,6 +49,8 @@ RUN /etc/init.d/postgresql start && \
  bash /build-lava lava-server 2018.4 2018.4-1 && \
  /etc/init.d/postgresql stop
 
+COPY backup /
+
 RUN a2enmod proxy \
  && a2enmod proxy_http \
  && a2dissite 000-default \

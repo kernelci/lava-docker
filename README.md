@@ -215,6 +215,7 @@ masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
     webadmin_https:	Does the LAVA webadmin is accessed via https
+    persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     users:
     - name: LAVA username
       token: The token of this user
@@ -320,6 +321,17 @@ For the moment, it is unsupported and unbuilded.
 
 ## Backporting LAVA patches
 All upstream LAVA patches could be backported by placing them in lava-master/lava-patch/
+
+## Backups / restore
+For backupping a running docker, the "backup.sh" script could be used.
+It will store boards.yaml + postgresql database backup + joboutputs.
+
+For restoring a backup, postgresql database backup + joboutputs must be copied in master backup directory before build.
+
+Example:
+./backup.sh
+This produce a backup-20180704_1206 directory
+For restoring this backup, simply cp backup-20180704_1206/* output/local/master/backup/
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
