@@ -1,0 +1,6 @@
+services:
+  master1:
+    build: {context: zmq_auth_gen }
+    hostname: zmqauth_builder
+    volumes: ['../output:/root/output']
+version: '2.0'

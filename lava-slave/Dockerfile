@@ -86,6 +86,8 @@ RUN ssh-keygen -q -f /root/.ssh/id_rsa
 RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
 COPY lava-screen.conf /root/
 
+COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
+
 EXPOSE 69/udp 80
 
 CMD /start.sh
