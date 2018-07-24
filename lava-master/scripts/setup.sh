@@ -29,6 +29,7 @@ if [ -e /root/lava-users ];then
 		USER_OPTION=""
 		STAFF=0
 		SUPERUSER=0
+		TOKEN=""
 		. /root/lava-users/$ut
 		if [ -z "$PASSWORD" -o "$PASSWORD" = "$TOKEN" ];then
 			echo "Generating password..."
@@ -48,6 +49,7 @@ if [ -e /root/lava-users ];then
 			echo "Adding username $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
 			lava-server manage users add --passwd $PASSWORD $USER_OPTION $USER || exit 1
 			if [ ! -z "$TOKEN" ];then
+				echo "Adding token to user $USER"
 				lava-server manage tokens add --user $USER --secret $TOKEN || exit 1
 			fi
 		fi

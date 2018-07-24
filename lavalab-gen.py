@@ -159,8 +159,9 @@ def main():
                         print("WARNING: unknown keyword %s" % keyword)
                 username = user["name"]
                 ftok = open("%s/%s" % (userdir, username), "w")
-                token = user["token"]
-                ftok.write("TOKEN=" + token + "\n")
+                if "token" in user:
+                    token = user["token"]
+                    ftok.write("TOKEN=" + token + "\n")
                 if "password" in user:
                     password = user["password"]
                     ftok.write("PASSWORD=" + password + "\n")

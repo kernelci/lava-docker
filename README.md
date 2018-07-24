@@ -221,7 +221,7 @@ masters:
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     users:
     - name: LAVA username
-      token: The token of this user
+      token: The token of this user 	(optional)
       password: Password the this user (generated if not provided)
       superuser: yes/no (default no)
       staff: yes/no (default no)
