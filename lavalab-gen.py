@@ -150,7 +150,7 @@ def main():
         fsettings.close()
         master_use_zmq_auth = False
         if "zmq_auth" in worker:
-            master_use_zmq_auth = True
+            master_use_zmq_auth = worker["zmq_auth"]
         if master_use_zmq_auth:
             if "zmq_auth_key" in worker:
                 shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
@@ -285,6 +285,8 @@ def main():
                     if fuser["name"] == remote_user:
                         remote_token = fuser["token"]
                 if "zmq_auth" in fm:
+                    master_use_zmq_auth = fm["zmq_auth"]
+                if master_use_zmq_auth:
                     if "zmq_auth_key" in fm:
                         shutil.copy(fm["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
                     if "zmq_auth_key" in worker:
