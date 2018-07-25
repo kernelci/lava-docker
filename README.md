@@ -339,6 +339,14 @@ Example:
 This produce a backup-20180704_1206 directory
 For restoring this backup, simply cp backup-20180704_1206/* output/local/master/backup/
 
+## Upgrading from a previous lava-docker
+For upgrading between two LAVA version, the only method is:
+- backup data with ./backup.sh (See Backups / restore)
+- checkout the new lava-docker and a your boards.yaml
+- run lavalab-gen.py
+- copy your backup data in output/yourhost/master/backup directory
+- build and run docker-compose
+
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
 
