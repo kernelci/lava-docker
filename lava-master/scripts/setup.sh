@@ -58,6 +58,10 @@ if [ -e /root/lava-users ];then
 				echo "Adding token to user $USER"
 				lava-server manage tokens add --user $USER --secret $TOKEN || exit 1
 			fi
+			if [ ! -z "$EMAIL" ];then
+				echo "Adding email to user $USER"
+				lava-server manage users update --email $EMAIL $USER || exit 1
+			fi
 		fi
 	done
 fi

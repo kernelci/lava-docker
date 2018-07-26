@@ -160,7 +160,7 @@ def main():
                 need_zmq_auth_gen = True
         if "users" in worker:
             for user in worker["users"]:
-                keywords_users = [ "name", "staff", "superuser", "password", "token" ]
+                keywords_users = [ "name", "staff", "superuser", "password", "token", "email" ]
                 for keyword in user:
                     if not keyword in keywords_users:
                         print("WARNING: unknown keyword %s" % keyword)
@@ -173,6 +173,9 @@ def main():
                     password = user["password"]
                     ftok.write("PASSWORD=" + password + "\n")
                     # libyaml convert yes/no to true/false...
+                if "email" in user:
+                    email = user["email"]
+                    ftok.write("EMAIL=" + email + "\n")
                 if "staff" in user:
                     value = user["staff"]
                     if value is True:

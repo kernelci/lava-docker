@@ -224,6 +224,7 @@ masters:
     - name: LAVA username
       token: The token of this user 	(optional)
       password: Password the this user (generated if not provided)
+      email:	email of the user	(optional)
       superuser: yes/no (default no)
       staff: yes/no (default no)
     tokens:
