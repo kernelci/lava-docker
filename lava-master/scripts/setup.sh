@@ -21,6 +21,12 @@ if [ -e /db_lavaserver ];then
 fi
 chown -R lavaserver:lavaserver /var/lib/lava-server/default/media/job-output/
 
+# default site is set as example.com
+if [ -e /root/lava_http_fqdn ];then
+	sudo -u postgres psql lavaserver -c "UPDATE django_site SET name = '$(cat /root/lava_http_fqdn)'" || exit $?
+	sudo -u postgres psql lavaserver -c "UPDATE django_site SET domain = '$(cat /root/lava_http_fqdn)'" || exit $?
+fi
+
 if [ -e /root/lava-users ];then
 	for ut in $(ls /root/lava-users)
 	do
@@ -51,6 +57,10 @@ if [ -e /root/lava-users ];then
 			if [ ! -z "$TOKEN" ];then
 				echo "Adding token to user $USER"
 				lava-server manage tokens add --user $USER --secret $TOKEN || exit 1
+			fi
+			if [ ! -z "$EMAIL" ];then
+				echo "Adding email to user $USER"
+				lava-server manage users update --email $EMAIL $USER || exit 1
 			fi
 		fi
 	done

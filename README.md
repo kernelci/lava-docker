@@ -219,10 +219,12 @@ masters:
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
+    http_fqdn:			The FQDN used to access the LAVA web interface
     users:
     - name: LAVA username
       token: The token of this user 	(optional)
       password: Password the this user (generated if not provided)
+      email:	email of the user	(optional)
       superuser: yes/no (default no)
       staff: yes/no (default no)
     tokens:
@@ -337,6 +339,14 @@ Example:
 ./backup.sh
 This produce a backup-20180704_1206 directory
 For restoring this backup, simply cp backup-20180704_1206/* output/local/master/backup/
+
+## Upgrading from a previous lava-docker
+For upgrading between two LAVA version, the only method is:
+- backup data with ./backup.sh (See Backups / restore)
+- checkout the new lava-docker and a your boards.yaml
+- run lavalab-gen.py
+- copy your backup data in output/yourhost/master/backup directory
+- build and run docker-compose
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:

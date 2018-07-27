@@ -87,7 +87,7 @@ def main():
         sys.exit(1)
     masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret" ]
+        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -138,12 +138,19 @@ def main():
         else:
             cookie_secure = "false"
             session_cookie_secure = "false"
+        if "http_fqdn" in worker:
+            lava_http_fqdn = worker["http_fqdn"]
+        else:
+            lava_http_fqdn = "example.com"
+        f_fqdn = open("%s/lava_http_fqdn" % workerdir, 'w')
+        f_fqdn.write(lava_http_fqdn)
+        f_fqdn.close()
         fsettings = open("%s/settings.conf" % workerdir, 'w')
         fsettings.write(template_settings_conf.substitute(cookie_secure=cookie_secure, session_cookie_secure=session_cookie_secure))
         fsettings.close()
         master_use_zmq_auth = False
         if "zmq_auth" in worker:
-            master_use_zmq_auth = True
+            master_use_zmq_auth = worker["zmq_auth"]
         if master_use_zmq_auth:
             if "zmq_auth_key" in worker:
                 shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
@@ -153,7 +160,7 @@ def main():
                 need_zmq_auth_gen = True
         if "users" in worker:
             for user in worker["users"]:
-                keywords_users = [ "name", "staff", "superuser", "password", "token" ]
+                keywords_users = [ "name", "staff", "superuser", "password", "token", "email" ]
                 for keyword in user:
                     if not keyword in keywords_users:
                         print("WARNING: unknown keyword %s" % keyword)
@@ -166,6 +173,9 @@ def main():
                     password = user["password"]
                     ftok.write("PASSWORD=" + password + "\n")
                     # libyaml convert yes/no to true/false...
+                if "email" in user:
+                    email = user["email"]
+                    ftok.write("EMAIL=" + email + "\n")
                 if "staff" in user:
                     value = user["staff"]
                     if value is True:
@@ -278,6 +288,8 @@ def main():
                     if fuser["name"] == remote_user:
                         remote_token = fuser["token"]
                 if "zmq_auth" in fm:
+                    master_use_zmq_auth = fm["zmq_auth"]
+                if master_use_zmq_auth:
                     if "zmq_auth_key" in fm:
                         shutil.copy(fm["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
                     if "zmq_auth_key" in worker:
