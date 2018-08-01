@@ -90,7 +90,22 @@ do
 				echo "ERROR: $devicename already present on another worker"
 				exit 1
 			fi
-			lavacli $LAVACLIOPTS devices update --worker $worker --health UNKNOWN $devicename || exit $?
+			DEVICE_HEALTH=$(grep "$devicename[[:space:]]" /tmp/devices.list | sed 's/.*,//')
+			case "$DEVICE_HEALTH" in
+			Retired)
+				echo "DEBUG: Keep $devicename state: $DEVICE_HEALTH"
+				DEVICE_HEALTH='RETIRED'
+			;;
+			Maintenance)
+				echo "DEBUG: Keep $devicename state: $DEVICE_HEALTH"
+				DEVICE_HEALTH='MAINTENANCE'
+			;;
+			*)
+				echo "DEBUG: Set $devicename state to UNKNOWN (from $DEVICE_HEALTH)"
+				DEVICE_HEALTH='UNKNOWN'
+			;;
+			esac
+			lavacli $LAVACLIOPTS devices update --worker $worker --health $DEVICE_HEALTH $devicename || exit $?
 			# always reset the device dict in case of update of it
 			lavacli $LAVACLIOPTS devices dict set $devicename /root/devices/$worker/$device || exit $?
 		else
