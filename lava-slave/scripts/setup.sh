@@ -40,6 +40,14 @@ if [ -e /root/device-types ];then
 	done
 fi
 
+lavacli $LAVACLIOPTS device-types list > /tmp/device-types.list
+if [ $? -ne 0 ];then
+	exit 1
+fi
+lavacli $LAVACLIOPTS devices list -a > /tmp/devices.list
+if [ $? -ne 0 ];then
+	exit 1
+fi
 for worker in $(ls /root/devices/)
 do
 	lavacli $LAVACLIOPTS workers list |grep -q $worker
@@ -63,7 +71,7 @@ do
 			echo "Skip devicetype $devicetype"
 		else
 			echo "Add devicetype $devicetype"
-			lavacli $LAVACLIOPTS device-types list | grep -q "$devicetype[[:space:]]"
+			grep -q "$devicetype[[:space:]]" /tmp/device-types.list
 			if [ $? -eq 0 ];then
 				echo "Skip devicetype $devicetype"
 			else
@@ -72,7 +80,7 @@ do
 			touch /root/.lavadocker/devicetype-$devicetype
 		fi
 		echo "Add device $devicename on $worker"
-		lavacli $LAVACLIOPTS devices list -a | grep -q $devicename
+		grep -q "$devicename[[:space:]]" /tmp/devices.list
 		if [ $? -eq 0 ];then
 			echo "$devicename already present"
 			#verify if present on another worker
