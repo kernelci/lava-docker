@@ -41,7 +41,7 @@ do_start()
 	#   0 if daemon has been started
 	#   1 if daemon was already running
 	#   other if daemon could not be started or a failure occured
-	start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- manage lava-logs --level $LOGLEVEL $SOCKET $MASTER_SOCKET $IPV6 $ENCRYPT $MASTER_CERT $SLAVES_CERTS
+	start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --exec $DAEMON -- manage lava-logs --level $LOGLEVEL $SOCKET $MASTER_SOCKET $IPV6 $ENCRYPT $MASTER_CERT $SLAVES_CERTS
 }
 
 do_stop()
