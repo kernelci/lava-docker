@@ -68,6 +68,7 @@ template_settings_conf = string.Template("""
     "HTTPS_XML_RPC": false,
     "LOGIN_URL": "/accounts/login/",
     "LOGIN_REDIRECT_URL": "/",
+    "CSRF_TRUSTED_ORIGINS": ["$lava_http_fqdn"],
     "CSRF_COOKIE_SECURE": $cookie_secure,
     "SESSION_COOKIE_SECURE": $session_cookie_secure
 }
@@ -146,7 +147,7 @@ def main():
         f_fqdn.write(lava_http_fqdn)
         f_fqdn.close()
         fsettings = open("%s/settings.conf" % workerdir, 'w')
-        fsettings.write(template_settings_conf.substitute(cookie_secure=cookie_secure, session_cookie_secure=session_cookie_secure))
+        fsettings.write(template_settings_conf.substitute(cookie_secure=cookie_secure, session_cookie_secure=session_cookie_secure, lava_http_fqdn=lava_http_fqdn))
         fsettings.close()
         master_use_zmq_auth = False
         if "zmq_auth" in worker:

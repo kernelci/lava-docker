@@ -40,6 +40,14 @@ if [ -e /root/device-types ];then
 	done
 fi
 
+lavacli $LAVACLIOPTS device-types list > /tmp/device-types.list
+if [ $? -ne 0 ];then
+	exit 1
+fi
+lavacli $LAVACLIOPTS devices list -a > /tmp/devices.list
+if [ $? -ne 0 ];then
+	exit 1
+fi
 for worker in $(ls /root/devices/)
 do
 	lavacli $LAVACLIOPTS workers list |grep -q $worker
@@ -63,7 +71,7 @@ do
 			echo "Skip devicetype $devicetype"
 		else
 			echo "Add devicetype $devicetype"
-			lavacli $LAVACLIOPTS device-types list | grep -q "$devicetype[[:space:]]"
+			grep -q "$devicetype[[:space:]]" /tmp/device-types.list
 			if [ $? -eq 0 ];then
 				echo "Skip devicetype $devicetype"
 			else
@@ -72,7 +80,7 @@ do
 			touch /root/.lavadocker/devicetype-$devicetype
 		fi
 		echo "Add device $devicename on $worker"
-		lavacli $LAVACLIOPTS devices list -a | grep -q $devicename
+		grep -q "$devicename[[:space:]]" /tmp/devices.list
 		if [ $? -eq 0 ];then
 			echo "$devicename already present"
 			#verify if present on another worker
@@ -82,7 +90,22 @@ do
 				echo "ERROR: $devicename already present on another worker"
 				exit 1
 			fi
-			lavacli $LAVACLIOPTS devices update --worker $worker --health UNKNOWN $devicename || exit $?
+			DEVICE_HEALTH=$(grep "$devicename[[:space:]]" /tmp/devices.list | sed 's/.*,//')
+			case "$DEVICE_HEALTH" in
+			Retired)
+				echo "DEBUG: Keep $devicename state: $DEVICE_HEALTH"
+				DEVICE_HEALTH='RETIRED'
+			;;
+			Maintenance)
+				echo "DEBUG: Keep $devicename state: $DEVICE_HEALTH"
+				DEVICE_HEALTH='MAINTENANCE'
+			;;
+			*)
+				echo "DEBUG: Set $devicename state to UNKNOWN (from $DEVICE_HEALTH)"
+				DEVICE_HEALTH='UNKNOWN'
+			;;
+			esac
+			lavacli $LAVACLIOPTS devices update --worker $worker --health $DEVICE_HEALTH $devicename || exit $?
 			# always reset the device dict in case of update of it
 			lavacli $LAVACLIOPTS devices dict set $devicename /root/devices/$worker/$device || exit $?
 		else
