@@ -15,17 +15,18 @@ cd /root/lavacli
 LAVACLIOPTS="--uri $LAVA_MASTER_URI"
 
 # do a sort of ping for letting master to be up
-TIMEOUT=30
+TIMEOUT=300
 while [ $TIMEOUT -ge 1 ];
 do
+	STEP=2
 	lavacli $LAVACLIOPTS device-types list 2>/dev/null >/dev/null
 	if [ $? -eq 0 ];then
 		TIMEOUT=0
 	else
 		echo "Wait for master...."
-		sleep 2	
+		sleep $STEP
 	fi
-	TIMEOUT=$(($TIMEOUT-1))
+	TIMEOUT=$(($TIMEOUT-$STEP))
 done
 
 # This directory is used for storing device-types already added
