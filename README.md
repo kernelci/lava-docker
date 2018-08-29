@@ -243,6 +243,7 @@ slaves:
     remote_user: 		the user used for connecting to the master
     remote_proto:		http(default) or https
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
+    export_ser2net:		Do ser2net ports need to be available on host
     extra_actions:		An optional list of action to do at end of the docker build
     - "apt-get install package"
 
