@@ -219,7 +219,7 @@ def main():
         sys.exit(1)
     slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
