@@ -331,29 +331,29 @@ def main():
     for board in boards:
         board_name = board["name"]
         if "slave" in board:
-            slave_name = board["slave"]
+            worker_name = board["slave"]
         else:
-            slave_name = default_slave
-        print("\tFound %s on %s" % (board_name, slave_name))
+            worker_name = default_slave
+        print("\tFound %s on %s" % (board_name, worker_name))
         found_slave = False
         for fs in workers["slaves"]:
-            if fs["name"] == slave_name:
+            if fs["name"] == worker_name:
                 slave = fs
                 found_slave = True
         if not found_slave:
-            print("Cannot find slave %s" % slave_name)
+            print("Cannot find slave %s" % worker_name)
             sys.exit(1)
         if not "host" in slave:
             host = "local"
         else:
             host = slave["host"]
-        workerdir = "output/%s/%s" % (host, slave_name)
+        workerdir = "output/%s/%s" % (host, worker_name)
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         fp = open(dockcomposeymlpath, "r")
         dockcomp = yaml.load(fp)
         fp.close()
         device_path = "%s/devices/" % workerdir
-        devices_path = "%s/devices/%s" % (workerdir, slave_name)
+        devices_path = "%s/devices/%s" % (workerdir, worker_name)
         devicetype = board["type"]
         device_line = template_device.substitute(devicetype=devicetype)
         if "pdu_generic" in board:
