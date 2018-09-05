@@ -242,6 +242,7 @@ slaves:
     remote_rpc_port: 		the port used by the LAVA RPC2 (default 80)
     remote_user: 		the user used for connecting to the master
     remote_proto:		http(default) or https
+    default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     extra_actions:		An optional list of action to do at end of the docker build
     - "apt-get install package"
 
