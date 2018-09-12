@@ -236,11 +236,13 @@ slaves:
     host: name			name of the host running lava-slave-XX (default to "local")
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
+    zmq_auth_master_key:	optional path to the public master ZMQ key. This option is necessary only if no master node exists in boards.yaml.
     dispatcher_ip: 		the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
     remote_master: 		the name of the master to connect to
     remote_address: 		the FQDN or IP address of the master (if different from remote_master)
     remote_rpc_port: 		the port used by the LAVA RPC2 (default 80)
     remote_user: 		the user used for connecting to the master
+    remote_user_token:		The remote_user's token. This option is necessary only if no master node exists in boards.yaml. Otherwise lavalab-gen.py will get from it.
     remote_proto:		http(default) or https
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     export_ser2net:		Do ser2net ports need to be available on host

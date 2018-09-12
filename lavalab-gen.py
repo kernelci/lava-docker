@@ -86,9 +86,9 @@ def main():
     zmq_auth_genlist = open("zmqauth/zmq_auth_gen/zmq_genlist", 'w')
 
     if "masters" not in workers:
-        print("Missing masters entry in boards.yaml")
-        sys.exit(1)
-    masters = workers["masters"]
+        masters = {}
+    else:
+        masters = workers["masters"]
     for master in masters:
         keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn" ]
         for keyword in master:
@@ -217,11 +217,11 @@ def main():
 
     default_slave = "lab-slave-0"
     if "slaves" not in workers:
-        print("Missing slaves entry in boards.yaml")
-        sys.exit(1)
-    slaves = workers["slaves"]
+        slaves = {}
+    else:
+        slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "remote_user_token", "zmq_auth_master_key" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -285,7 +285,17 @@ def main():
         remote_user = worker["remote_user"]
         # find master
         remote_token = "BAD"
-        for fm in workers["masters"]:
+        if "masters" in workers:
+            masters = workers["masters"]
+        else:
+            masters = {}
+            if "remote_user_token" in worker:
+                remote_token = worker["remote_user_token"]
+                if "zmq_auth_key" in worker:
+                    shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
+                    shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/" % workerdir)
+                    shutil.copy(worker["zmq_auth_master_key"], "%s/zmq_auth/" % workerdir)
+        for fm in masters:
             if fm["name"] == remote_master:
                 for fuser in fm["users"]:
                     if fuser["name"] == remote_user:
@@ -326,9 +336,9 @@ def main():
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
 
     if "boards" not in workers:
-        print("Missing boards")
-        sys.exit(1)
-    boards = workers["boards"]
+        boards = {}
+    else:
+        boards = workers["boards"]
     for board in boards:
         board_name = board["name"]
         if "slave" in board:
