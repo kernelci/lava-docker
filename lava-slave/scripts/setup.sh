@@ -113,6 +113,13 @@ do
 			lavacli $LAVACLIOPTS devices add --type $devicetype --worker $worker $devicename || exit $?
 			lavacli $LAVACLIOPTS devices dict set $devicename /root/devices/$worker/$device || exit $?
 		fi
+		if [ -e /root/tags/$devicename ];then
+			while read tag
+			do
+				echo "DEBUG: Add tag $tag to $devicename"
+				lavacli $LAVACLIOPTS devices tags add $devicename $tag || exit $?
+			done < /root/tags/$devicename
+		fi
 	done
 done
 

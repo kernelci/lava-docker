@@ -456,6 +456,12 @@ def main():
         if "fastboot_serial_number" in board:
             fserial = board["fastboot_serial_number"]
             device_line += "{%% set fastboot_serial_number = '%s' %%}" % fserial
+        if "tags" in board:
+            tagdir = "%s/tags/" % workerdir
+            ftag = open("%s/%s" % (tagdir, board_name), 'w')
+            for tag in board["tags"]:
+                ftag.write("%s\n" % tag)
+            ftag.close()
         if "custom_option" in board:
             for coption in board["custom_option"]:
                 device_line += "{%% %s %%}\n" % coption

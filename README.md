@@ -257,6 +257,9 @@ boards:
     uboot_macaddr:	(Optional) the MAC address to set in uboot
     custom_option:	(optional) All following strings will be directly append to devicefile
     - "set x=1"
+    tags:		(optional) List of tag to set on this device
+    - tag1
+    - tag2
 # One of uart or connection_command must be choosen
     uart:
       idvendor: The VID of the UART (Formated as 0xXXXX)

@@ -43,6 +43,7 @@ COPY scripts/retire.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/retire.sh
 
 COPY devices/ /root/devices/
+COPY tags/ /root/tags/
 
 COPY scripts/extra_actions /root/
 RUN if [ -x /root/extra_actions ] ; then /root/extra_actions ; fi
