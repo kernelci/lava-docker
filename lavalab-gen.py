@@ -156,8 +156,8 @@ def main():
             master_use_zmq_auth = worker["zmq_auth"]
         if master_use_zmq_auth:
             if "zmq_auth_key" in worker:
-                shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
-                shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/" % workerdir)
+                shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/%s.key" % (workerdir, name))
+                shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/%s.key_secret" % (workerdir, name))
             else:
                 zmq_auth_genlist.write("%s/%s\n" % (host, name))
                 need_zmq_auth_gen = True
@@ -294,12 +294,12 @@ def main():
                     master_use_zmq_auth = fm["zmq_auth"]
                 if master_use_zmq_auth:
                     if "zmq_auth_key" in fm:
-                        shutil.copy(fm["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
+                        shutil.copy(fm["zmq_auth_key"], "%s/zmq_auth/%s.key" % (workerdir, remote_address))
                     if "zmq_auth_key" in worker:
-                        shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
-                        shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/" % workerdir)
+                        shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/%s.key" % (workerdir, name))
+                        shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/%s.key_secret" % (workerdir, name))
                         if "zmq_auth_key" in fm:
-                            shutil.copy(worker["zmq_auth_key"], "output/%s/%s/zmq_auth/" % (fm["host"], fm["name"]))
+                            shutil.copy(worker["zmq_auth_key"], "output/%s/%s/zmq_auth/%s.key" % (fm["host"], fm["name"], name))
                     else:
                         zmq_auth_genlist.write("%s/%s %s/%s\n" % (host, name, fm["host"], fm["name"]))
                         need_zmq_auth_gen = True
