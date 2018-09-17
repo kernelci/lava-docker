@@ -21,6 +21,7 @@ lava-docker has currently been tested primarily on Debian stable (stretch).
 The following packages are necessary on the host machine:
 * docker
 * docker-compose
+* pyyaml
 
 ## Quickstart
 Example to use lava-docker with only one QEMU device:
@@ -219,7 +220,7 @@ masters:
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
-    http_fqdn:			The FQDN used to access the LAVA web interface
+    http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     users:
     - name: LAVA username
       token: The token of this user 	(optional)

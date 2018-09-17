@@ -18,7 +18,6 @@ COPY scripts/setup.sh /
 # warning the address used must be network accessible by all slave
 #RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
 
-#comment this if you do HTTPS (For reenabling CSRF cookie)
 COPY settings.conf /etc/lava-server/
 
 COPY device-types-patch/ /root/device-types-patch/
