@@ -359,3 +359,11 @@ Note that this container provides defaults which are unsecure. If you plan on de
   * Changing the default admin password (in tokens.taml)
   * Using HTTPS
   * Re-enable CSRF cookie (disabled in lava-master/Dockerfile)
+
+## Non amd64 build
+Since LAVA upstream provides only amd64 and arm64 debian packages, lava-docker support only thoses architectures.
+For building an arm64 lava-docker, some little trick are necesssary:
+- replace "baylibre/lava-xxxx-base" by "baylibre/lava-xxxx-base-arm64" for lava-master and lava-slave dockerfiles
+
+For building lava-xxx-base images
+- replace "bitnami/minideb" by "arm64v8/debian" on lava-master-base/lava-slave-base dockerfiles.
