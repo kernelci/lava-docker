@@ -21,6 +21,7 @@ lava-docker has currently been tested primarily on Debian stable (stretch).
 The following packages are necessary on the host machine:
 * docker
 * docker-compose
+* pyyaml
 
 ## Quickstart
 Example to use lava-docker with only one QEMU device:
@@ -219,7 +220,7 @@ masters:
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
-    http_fqdn:			The FQDN used to access the LAVA web interface
+    http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     users:
     - name: LAVA username
       token: The token of this user 	(optional)
@@ -361,3 +362,11 @@ Note that this container provides defaults which are unsecure. If you plan on de
   * Changing the default admin password (in tokens.taml)
   * Using HTTPS
   * Re-enable CSRF cookie (disabled in lava-master/Dockerfile)
+
+## Non amd64 build
+Since LAVA upstream provides only amd64 and arm64 debian packages, lava-docker support only thoses architectures.
+For building an arm64 lava-docker, some little trick are necesssary:
+- replace "baylibre/lava-xxxx-base" by "baylibre/lava-xxxx-base-arm64" for lava-master and lava-slave dockerfiles
+
+For building lava-xxx-base images
+- replace "bitnami/minideb" by "arm64v8/debian" on lava-master-base/lava-slave-base dockerfiles.
