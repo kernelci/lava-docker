@@ -6,7 +6,8 @@ COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
-COPY scripts/cu-loop /usr/local/bin/
+COPY scripts/ /usr/local/bin/
+RUN chmod a+x /usr/local/bin/*
 COPY conmux/ /etc/conmux/
 
 # Caution to not use any port between the Linux dynamic port range: 32768-60999
@@ -36,16 +37,9 @@ RUN git clone https://git.linaro.org/lava/lavacli.git /root/lavacli && cd /root/
 COPY phyhostname /root/
 COPY scripts/setup.sh .
 
-COPY scripts/setdispatcherip.py /usr/local/bin/
-RUN chmod 755 /usr/local/bin/setdispatcherip.py
-
-COPY scripts/retire.sh /usr/local/bin/
-RUN chmod 755 /usr/local/bin/retire.sh
-
 COPY devices/ /root/devices/
 COPY tags/ /root/tags/
 
-COPY scripts/extra_actions /root/
 RUN if [ -x /root/extra_actions ] ; then /root/extra_actions ; fi
 
 RUN apt-get -y install screen openssh-server
