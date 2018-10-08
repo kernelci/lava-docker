@@ -221,7 +221,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "remote_user_token", "zmq_auth_master_key" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -325,6 +325,9 @@ def main():
 
         if "dispatcher_ip" in worker:
             dockcomp["services"][worker_name]["environment"]["LAVA_DISPATCHER_IP"] = worker["dispatcher_ip"]
+        if "expose_ports" in worker:
+            for eports in worker["expose_ports"]:
+                dockcomp["services"][name]["ports"].append("%s" % eports)
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
         if "extra_actions" in worker:
