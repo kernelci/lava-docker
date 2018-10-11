@@ -80,6 +80,15 @@ do
 			fi
 			touch /root/.lavadocker/devicetype-$devicetype
 		fi
+		DEVICE_OPTS=""
+		if [ -e /root/deviceinfo/$devicename ];then
+			echo "Found customization for $devicename"
+			. /root/deviceinfo/$devicename
+			if [ ! -z "$DEVICE_USER" ];then
+				echo "DEBUG: give $devicename to $DEVICE_USER"
+				DEVICE_OPTS="$DEVICE_OPTS --user $DEVICE_USER"
+			fi
+		fi
 		echo "Add device $devicename on $worker"
 		grep -q "$devicename[[:space:]]" /tmp/devices.list
 		if [ $? -eq 0 ];then
@@ -106,11 +115,11 @@ do
 				DEVICE_HEALTH='UNKNOWN'
 			;;
 			esac
-			lavacli $LAVACLIOPTS devices update --worker $worker --health $DEVICE_HEALTH $devicename || exit $?
+			lavacli $LAVACLIOPTS devices update --worker $worker --health $DEVICE_HEALTH $DEVICE_OPTS $devicename || exit $?
 			# always reset the device dict in case of update of it
 			lavacli $LAVACLIOPTS devices dict set $devicename /root/devices/$worker/$device || exit $?
 		else
-			lavacli $LAVACLIOPTS devices add --type $devicetype --worker $worker $devicename || exit $?
+			lavacli $LAVACLIOPTS devices add --type $devicetype --worker $worker $DEVICE_OPTS $devicename || exit $?
 			lavacli $LAVACLIOPTS devices dict set $devicename /root/devices/$worker/$device || exit $?
 		fi
 		if [ -e /root/tags/$devicename ];then
