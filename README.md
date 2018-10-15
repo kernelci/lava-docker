@@ -246,7 +246,7 @@ slaves:
     remote_user_token:		The remote_user's token. This option is necessary only if no master node exists in boards.yaml. Otherwise lavalab-gen.py will get from it.
     remote_proto:		http(default) or https
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
-    export_ser2net:		Do ser2net ports need to be available on host
+    expose_ser2net:		Do ser2net ports need to be available on host
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
       - p1:p2
     extra_actions:		An optional list of action to do at end of the docker build
