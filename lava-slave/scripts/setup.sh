@@ -88,6 +88,10 @@ do
 				echo "DEBUG: give $devicename to $DEVICE_USER"
 				DEVICE_OPTS="$DEVICE_OPTS --user $DEVICE_USER"
 			fi
+			if [ ! -z "$DEVICE_GROUP" ];then
+				echo "DEBUG: give $devicename to group $DEVICE_GROUP"
+				DEVICE_OPTS="$DEVICE_OPTS --group $DEVICE_GROUP"
+			fi
 		fi
 		echo "Add device $devicename on $worker"
 		grep -q "$devicename[[:space:]]" /tmp/devices.list

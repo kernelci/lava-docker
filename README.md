@@ -268,7 +268,8 @@ boards:
     tags:		(optional) List of tag to set on this device
     - tag1
     - tag2
-    user:		(optional) Name of user owning the board (LAVA default is admin)
+    user:		(optional) Name of user owning the board (LAVA default is admin) user is exclusive with group
+    group:		(optional) Name of group owning the board (no LAVA default) group is exclusive with user
 # One of uart or connection_command must be choosen
     uart:
       idvendor: The VID of the UART (Formated as 0xXXXX)

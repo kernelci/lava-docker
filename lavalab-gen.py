@@ -490,6 +490,13 @@ def main():
             deviceinfo = open("%s/deviceinfo/%s" % (workerdir, board_name), 'w')
             deviceinfo.write("DEVICE_USER=%s\n" % board["user"])
             deviceinfo.close()
+        if "group" in board:
+            if "user" in board:
+                    print("user and group are exclusive")
+                    sys.exit(1)
+            deviceinfo = open("%s/deviceinfo/%s" % (workerdir, board_name), 'w')
+            deviceinfo.write("DEVICE_GROUP=%s\n" % board["group"])
+            deviceinfo.close()
         if "custom_option" in board:
             for coption in board["custom_option"]:
                 device_line += "{%% %s %%}\n" % coption
