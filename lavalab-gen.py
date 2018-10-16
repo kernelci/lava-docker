@@ -90,7 +90,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -131,6 +131,8 @@ def main():
         # handle users / tokens
         userdir = "%s/users" % workerdir
         os.mkdir(userdir)
+        groupdir = "%s/groups" % workerdir
+        os.mkdir(groupdir)
         worker = master
         webadmin_https = False
         if "webadmin_https" in worker:
@@ -163,7 +165,7 @@ def main():
                 need_zmq_auth_gen = True
         if "users" in worker:
             for user in worker["users"]:
-                keywords_users = [ "name", "staff", "superuser", "password", "token", "email" ]
+                keywords_users = [ "name", "staff", "superuser", "password", "token", "email", "groups" ]
                 for keyword in user:
                     if not keyword in keywords_users:
                         print("WARNING: unknown keyword %s" % keyword)
@@ -188,6 +190,25 @@ def main():
                     if value is True:
                         ftok.write("SUPERUSER=1\n")
                 ftok.close()
+                if "groups" in user:
+                    for group in user["groups"]:
+                        groupname = group["name"]
+                        print("\tAdd user %s to %s" % (username, groupname))
+                        fgrp_userlist = open("%s/%s.group.list" % (groupdir, groupname), "a")
+                        fgrp_userlist.write("%s\n" % username)
+                        fgrp_userlist.close()
+        if "groups" in worker:
+            for group in worker["groups"]:
+                groupname = group["name"]
+                print("\tAdding group %s" % groupname)
+                fgrp = open("%s/%s.group" % (groupdir, groupname), "w")
+                fgrp.write("GROUPNAME=%s\n" % groupname)
+                submitter = False
+                if "submitter" in group:
+                    submitter = group["submitter"]
+                if submitter:
+                    fgrp.write("SUBMIT=1\n")
+                fgrp.close()
         tokendir = "%s/tokens" % workerdir
         os.mkdir(tokendir)
         if "tokens" in worker:

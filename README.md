@@ -228,6 +228,11 @@ masters:
       email:	email of the user	(optional)
       superuser: yes/no (default no)
       staff: yes/no (default no)
+      groups:
+      - name: 			Name of the group this user should join
+    groups:
+    - name: 			LAVA group name
+      submitter: True/False	Can this group can submit jobs
     tokens:
     - username: The LAVA user owning the token below. (This user should be created via users:)
       token: The token for this callback

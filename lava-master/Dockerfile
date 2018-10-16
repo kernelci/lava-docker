@@ -11,6 +11,7 @@ COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
+COPY groups/ /root/lava-groups/
 COPY tokens/ /root/lava-callback-tokens/
 COPY scripts/setup.sh /
 
