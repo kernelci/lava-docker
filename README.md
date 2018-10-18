@@ -228,6 +228,11 @@ masters:
       email:	email of the user	(optional)
       superuser: yes/no (default no)
       staff: yes/no (default no)
+      groups:
+      - name: 			Name of the group this user should join
+    groups:
+    - name: 			LAVA group name
+      submitter: True/False	Can this group can submit jobs
     tokens:
     - username: The LAVA user owning the token below. (This user should be created via users:)
       token: The token for this callback
@@ -263,6 +268,8 @@ boards:
     tags:		(optional) List of tag to set on this device
     - tag1
     - tag2
+    user:		(optional) Name of user owning the board (LAVA default is admin) user is exclusive with group
+    group:		(optional) Name of group owning the board (no LAVA default) group is exclusive with user
 # One of uart or connection_command must be choosen
     uart:
       idvendor: The VID of the UART (Formated as 0xXXXX)

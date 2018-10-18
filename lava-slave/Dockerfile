@@ -39,6 +39,7 @@ COPY scripts/setup.sh .
 
 COPY devices/ /root/devices/
 COPY tags/ /root/tags/
+COPY deviceinfo/ /root/deviceinfo/
 
 RUN if [ -x /root/extra_actions ] ; then /root/extra_actions ; fi
 

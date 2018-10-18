@@ -66,6 +66,30 @@ if [ -e /root/lava-users ];then
 	done
 fi
 
+if [ -e /root/lava-groups ];then
+	for group in $(ls /root/lava-groups/*group)
+	do
+		GROUPNAME=""
+		SUBMIT=0
+		OPTION_SUBMIT=""
+		. $group
+		if [ $SUBMIT -eq 1 ];then
+			echo "DEBUG: $GROUPNAME can submit jobs"
+			OPTION_SUBMIT="--submitting"
+		fi
+		echo "DEBUG: Add group $GROUPNAME"
+		lava-server manage groups add $OPTION_SUBMIT $GROUPNAME || exit 1
+		if [ -e ${group}.list ];then
+			echo "DEBUG: Found ${group}.list"
+			while read username
+			do
+				echo "DEBUG: Add user $username to group $GROUPNAME"
+				lava-server manage groups update --username $username $GROUPNAME || exit 1
+			done < ${group}.list
+		fi
+	done
+fi
+
 if [ -e /root/lava-callback-tokens ];then
 	for ct in $(ls /root/lava-callback-tokens)
 	do
