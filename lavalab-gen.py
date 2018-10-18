@@ -76,6 +76,9 @@ template_settings_conf = string.Template("""
 }
 """)
 
+def usage():
+    print("%s [boardsfile.yaml]" % sys.argv[0])
+
 def main():
     need_zmq_auth_gen = False
     fp = open(boards_yaml, "r")
@@ -542,6 +545,11 @@ def main():
         print("Gen ZMQ auth files")
         subprocess.check_call(["./zmqauth/zmq_auth_fill.sh"], stdin=None)
 
+if len(sys.argv) > 1:
+    if sys.argv[1] == '-h' or sys.argv[1] == '--help':
+        usage()
+        sys.exit(0)
+    boards_yaml = sys.argv[1]
 
 if __name__ == "__main__":
     main()
