@@ -379,3 +379,14 @@ For building an arm64 lava-docker, some little trick are necesssary:
 
 For building lava-xxx-base images
 - replace "bitnami/minideb" by "arm64v8/debian" on lava-master-base/lava-slave-base dockerfiles.
+
+## How to add custom LAVA patchs
+You can add custom or backported LAVA patchs in lava-master/lava-patch
+Doing the same for lava-slave will be done later.
+
+## How to add/modify custom devices type
+There are two way to add custom devices types.
+* Copy a device type file directly in lava-master/device-types/
+	If you have a brand new device-type, it is the simpliest way.
+* Copy a patch addding/modifying a device-type in lava-master/device-types-patch/
+	If you are modifying an already present (upstream) device-type, it is the best way.
