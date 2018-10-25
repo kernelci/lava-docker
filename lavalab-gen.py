@@ -93,7 +93,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -243,6 +243,16 @@ def main():
                 ftok.write("TOKEN=" + vtoken + "\n")
                 ftok.write("DESCRIPTION=\"%s\"" % description)
                 ftok.close()
+        if "slaveenv" in worker:
+            for slaveenv in worker["slaveenv"]:
+                slavename = slaveenv["name"]
+                envdir = "%s/env/%s" % (workerdir, slavename)
+                os.mkdir(envdir)
+                fenv = open("%s/env.yaml" % envdir, 'w')
+                fenv.write("overrides:")
+                for line in slaveenv["env"]:
+                    fenv.write("  %s\n" % line)
+                fenv.close()
 
     default_slave = "lab-slave-0"
     if "slaves" not in workers:

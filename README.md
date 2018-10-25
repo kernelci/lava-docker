@@ -237,6 +237,11 @@ masters:
     - username: The LAVA user owning the token below. (This user should be created via users:)
       token: The token for this callback
       description: The description of this token. This string could be used with LAVA-CI.
+    slaveenv:			A list of environment to pass to slave
+      - name: slavename		The name of slave (mandatory)
+        env:
+	- line1			A list of line to set as environment
+	- line2
 slaves:
   - name: lab-slave-XX		The name of the slave (where XX is a number)
     host: name			name of the host running lava-slave-XX (default to "local")
