@@ -250,7 +250,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -297,6 +297,7 @@ def main():
 
         worker = slave
         worker_name = name
+        slave_master = None
         #NOTE remote_master is on slave
         if not "remote_master" in worker:
             remote_master = "lava-master"
@@ -326,6 +327,7 @@ def main():
                     shutil.copy(worker["zmq_auth_master_key"], "%s/zmq_auth/" % workerdir)
         for fm in masters:
             if fm["name"] == remote_master:
+                slave_master = fm
                 for fuser in fm["users"]:
                     if fuser["name"] == remote_user:
                         remote_token = fuser["token"]
@@ -345,6 +347,17 @@ def main():
         if remote_token is "BAD":
             print("Cannot find %s on %s" % (remote_user, remote_master))
             sys.exit(1)
+        if "env" in slave:
+            if not slave_master:
+                print("Cannot set env without master")
+                sys.exit(1)
+            envdir = "output/%s/%s/env/%s" % (slave_master["host"], slave_master["name"], name)
+            os.mkdir(envdir)
+            fenv = open("%s/env.yaml" % envdir, 'w')
+            fenv.write("overrides:")
+            for line in slave["env"]:
+                fenv.write("  %s\n" % line)
+            fenv.close()
         if not "remote_proto" in worker:
             remote_proto = "http"
         else:

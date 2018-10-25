@@ -16,10 +16,6 @@ COPY groups/ /root/lava-groups/
 COPY tokens/ /root/lava-callback-tokens/
 COPY scripts/setup.sh /
 
-#uncomment if you want to use squid
-# warning the address used must be network accessible by all slave
-#RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
-
 COPY settings.conf /etc/lava-server/
 
 COPY device-types-patch/ /root/device-types-patch/
@@ -31,6 +27,8 @@ RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*pat
 COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
 COPY lava_http_fqdn /root/
+
+COPY env/ /etc/lava-server/dispatcher.d/
 
 EXPOSE 69/udp 80 3079 5555 5556
 
