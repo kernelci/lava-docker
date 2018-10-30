@@ -219,6 +219,7 @@ masters:
     zmq_auth: True/False	Does the master requires ZMQ authentication.
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
+    slave_keys:			optional path to a directory with slaves public key. Usefull when you want to create a master without slaves nodes in boards.yaml.
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     users:
