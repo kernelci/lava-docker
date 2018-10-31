@@ -7,6 +7,7 @@ COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 RUN git clone https://github.com/BayLibre/lava-healthchecks.git
 RUN cp lava-healthchecks/health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
+RUN chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/health-checks/
 
 COPY devices/ /root/devices/
 COPY device-types/ /root/device-types/
