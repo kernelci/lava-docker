@@ -93,7 +93,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -166,6 +166,11 @@ def main():
             else:
                 zmq_auth_genlist.write("%s/%s\n" % (host, name))
                 need_zmq_auth_gen = True
+            if "slave_keys" in worker:
+                src_files = os.listdir(worker["slave_keys"])
+                for file_name in src_files:
+                    full_file_name = os.path.join(worker["slave_keys"], file_name)
+                    shutil.copy(full_file_name, "%s/zmq_auth/" % workerdir)
         if "users" in worker:
             for user in worker["users"]:
                 keywords_users = [ "name", "staff", "superuser", "password", "token", "email", "groups" ]

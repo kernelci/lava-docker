@@ -41,7 +41,7 @@ COPY devices/ /root/devices/
 COPY tags/ /root/tags/
 COPY deviceinfo/ /root/deviceinfo/
 
-RUN if [ -x /root/extra_actions ] ; then /root/extra_actions ; fi
+RUN if [ -x /usr/local/bin/extra_actions ] ; then /usr/local/bin/extra_actions ; fi
 
 RUN apt-get -y install screen openssh-server
 RUN ssh-keygen -q -f /root/.ssh/id_rsa
