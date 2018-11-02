@@ -37,6 +37,9 @@ RUN git clone https://git.linaro.org/lava/lavacli.git /root/lavacli && cd /root/
 COPY phyhostname /root/
 COPY scripts/setup.sh .
 
+COPY lava-patch/ /root/lava-patch
+RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
+
 COPY devices/ /root/devices/
 COPY tags/ /root/tags/
 COPY deviceinfo/ /root/deviceinfo/
