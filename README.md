@@ -141,7 +141,6 @@ beagleboneblack, with FTDI (serial 1234567), connected to port 5 of an ACME
 The basic setup is composed of a host which runs the following docker images and DUT to be tested.<br/>
 * lava-master: run lava-server along with the web interface
 * lava-slave: run lava-dispatcher, the compoment which sends jobs to DUTs
-* squid: an HTTP proxy for caching downloaded contents (kernel/dtb/rootfs) (Work in progress)
 
 The host and DUTs must share a common LAN.<br/>
 The host IP on this LAN must be set as dispatcher_ip in boards.yaml.<br/>
@@ -238,6 +237,11 @@ masters:
     - username: The LAVA user owning the token below. (This user should be created via users:)
       token: The token for this callback
       description: The description of this token. This string could be used with LAVA-CI.
+    slaveenv:			A list of environment to pass to slave
+      - name: slavename		The name of slave (mandatory)
+        env:
+	- line1			A list of line to set as environment
+	- line2
 slaves:
   - name: lab-slave-XX		The name of the slave (where XX is a number)
     host: name			name of the host running lava-slave-XX (default to "local")
@@ -257,6 +261,9 @@ slaves:
       - p1:p2
     extra_actions:		An optional list of action to do at end of the docker build
     - "apt-get install package"
+    env:
+      - line1			A list of line to set as environment (See /etc/lava-server/env.yaml for examples)
+      - line2
 
 boards:
   - name: devicename	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
@@ -392,3 +399,9 @@ There are two way to add custom devices types.
 	If you have a brand new device-type, it is the simpliest way.
 * Copy a patch addding/modifying a device-type in lava-master/device-types-patch/
 	If you are modifying an already present (upstream) device-type, it is the best way.
+
+## How to made LAVA slave use a proxy ?
+Add env to a slave like:
+slave:
+  env:
+  - "http_proxy: http://dns:port"
