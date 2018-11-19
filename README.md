@@ -287,6 +287,9 @@ boards:
       devpath: the UDEV devpath to this uart for UART without serial number
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
       use_ser2net: True/false (Use ser2net instead of conmux-console)
+      ser2net_options	(optional) A list of ser2net options to add
+        - option1
+        - option2
       use_screen: True/false (Use screen via ssh instead of conmux-console)
     connection_command: A command to be ran for getting a serial console
     pdu_generic:
