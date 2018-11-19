@@ -49,13 +49,6 @@ template_device_screen = string.Template("""
 {% set connection_command = 'ssh -o StrictHostKeyChecking=no -t root@127.0.0.1 "TERM=xterm screen -x ${board}"' %}
 """)
 
-template_udev_serial = string.Template("""#
-SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{serial}=="${serial}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
-""")
-template_udev_devpath = string.Template("""#
-SUBSYSTEM=="tty", ATTRS{idVendor}=="${idvendor}", ATTRS{idProduct}=="${idproduct}", ATTRS{devpath}=="${devpath}", MODE="0664", OWNER="uucp", SYMLINK+="${board}"
-""")
-
 template_settings_conf = string.Template("""
 {
     "DEBUG": false,
@@ -451,12 +444,14 @@ def main():
             if type(idvendor) == str:
                 print("Please put hexadecimal IDs for vendor %s (like 0x%s)" % (board_name, idvendor))
                 sys.exit(1)
+            udev_line = 'SUBSYSTEM=="tty", ATTRS{idVendor}=="%04x", ATTRS{idProduct}=="%04x",' % (idvendor, idproduct)
             if "serial" in uart:
-                serial = board["uart"]["serial"]
-                udev_line = template_udev_serial.substitute(board=board_name, serial=serial, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
-            else:
-                devpath = board["uart"]["devpath"]
-                udev_line = template_udev_devpath.substitute(board=board_name, devpath=devpath, idvendor="%04x" % idvendor, idproduct="%04x" % idproduct)
+                udev_line += 'ATTRS{serial}=="%s", ' % board["uart"]["serial"]
+            if "devpath" in uart:
+                udev_line += 'ATTRS{devpath}=="%s", ' % board["uart"]["devpath"]
+            if "interfacenum" in uart:
+                udev_line += 'ENV{ID_USB_INTERFACE_NUM}=="%s", ' % board["uart"]["interfacenum"]
+            udev_line += 'MODE="0664", OWNER="uucp", SYMLINK+="%s"\n' % board_name
             if not os.path.isdir("output/%s/udev" % host):
                 os.mkdir("output/%s/udev" % host)
             fp = open("output/%s/udev/99-lavaworker-udev.rules" % host, "a")
