@@ -405,3 +405,7 @@ Add env to a slave like:
 slave:
   env:
   - "http_proxy: http://dns:port"
+
+## Bugs, Contact
+The prefered way to submit bugs are via the github issue tracker
+You can also contact us on #lava-docker on the freenode IRC network
