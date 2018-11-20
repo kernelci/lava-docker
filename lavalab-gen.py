@@ -38,9 +38,6 @@ template_device_pdu_generic = string.Template("""
 {% set power_on_command = '${power_on_command}' %}
 """)
 
-template_ser2net = string.Template("""
-${port}:telnet:600:/dev/${board}:${baud} 8DATABITS NONE 1STOPBIT banner
-""")
 template_device_ser2net = string.Template("""
 {% set connection_command = 'telnet 127.0.0.1 ${port}' %}
 """)
@@ -482,13 +479,16 @@ def main():
                 if not worker_name in ser2net_ports:
                     ser2net_ports[worker_name] = ser2net_port_start
                     fp = open("%s/ser2net.conf" % workerdir, "a")
-                    fp.write("DEFAULT:max-connections:10")
+                    fp.write("DEFAULT:max-connections:10\n")
                     fp.close()
-                ser2net_line = template_ser2net.substitute(port=ser2net_ports[worker_name],baud=baud,board=board_name)
+                ser2net_line = "%d:telnet:600:/dev/%s:%d 8DATABITS NONE 1STOPBIT" % (ser2net_ports[worker_name], board_name, baud)
+                if "ser2net_options" in uart:
+                    for ser2net_option in uart["ser2net_options"]:
+                        ser2net_line += " %s" % ser2net_option
                 device_line += template_device_ser2net.substitute(port=ser2net_ports[worker_name])
                 ser2net_ports[worker_name] += 1
                 fp = open("%s/ser2net.conf" % workerdir, "a")
-                fp.write(ser2net_line)
+                fp.write(ser2net_line + " banner\n")
                 fp.close()
             if use_screen:
                 device_line += template_device_screen.substitute(board=board_name)
