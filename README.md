@@ -299,6 +299,7 @@ boards:
 ```
 Notes on UART:
 * Only one of devpath/serial is necessary.
+* screen usage is discouraged and should not be used, it was added as a workaround for some boards, but ser2net now can handle them.
 * For finding the right devpath, you could use
 ```
 udevadm info -a -n /dev/ttyUSBx |grep devpath | head -n1
