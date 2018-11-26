@@ -1,6 +1,7 @@
 FROM bitnami/minideb:stretch
 
 RUN echo "deb http://deb.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list
+COPY 99-stretch-backports /etc/apt/preferences.d/
 
 RUN apt-get update
 
@@ -25,7 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
 RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
  && apt-key add production-repo.key.asc \
  && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
- && apt-get clean && apt-get update
+ && apt-get clean && apt-get update && apt-get -y upgrade
 
 RUN service postgresql start \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install lava \
@@ -50,6 +51,7 @@ COPY scripts/lava-server-gunicorn /etc/init.d/
 RUN chmod 755 /etc/init.d/lava-server-gunicorn
 
 RUN dpkg -l | grep lava
+RUN dpkg -l | grep lava | sed 's,[[:space:]][[:space:]]*, ,g' | cut -d' ' -f3 | tr '+~' _
 
 EXPOSE 80 3079 5555 5556
 

@@ -27,7 +27,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget gnupg
 RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc
 RUN apt-key add production-repo.key.asc
 RUN echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list
+RUN echo "deb http://deb.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list
 RUN apt-get clean && apt-get update
+COPY 99-stretch-backports /etc/apt/preferences.d/
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
 
 COPY scripts/lava-slave /etc/init.d/
