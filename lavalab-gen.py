@@ -250,7 +250,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -370,6 +370,9 @@ def main():
         if "expose_ports" in worker:
             for eports in worker["expose_ports"]:
                 dockcomp["services"][name]["ports"].append("%s" % eports)
+        if "bind_dev" in worker:
+            dockcomp["services"][worker_name]["volumes"].append("/dev:/dev")
+            dockcomp["services"][worker_name]["privileged"] = True
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
         if "extra_actions" in worker:
@@ -459,7 +462,8 @@ def main():
             else:
                 dockcomp["services"][worker_name]["devices"] = []
                 dc_devices = dockcomp["services"][worker_name]["devices"]
-            dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
+            if not "bind_dev" in slave:
+                dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = True
             use_ser2net = False
             use_screen = False
