@@ -67,18 +67,28 @@ if [ -e /root/lava-users ];then
 fi
 
 if [ -e /root/lava-groups ];then
+	echo "======================================================"
+	echo "Handle groups"
+	echo "======================================================"
+	GROUP_CURRENT_LIST=/tmp/group.list
+	lava-server manage groups list |grep '^\*' > $GROUP_CURRENT_LIST || exit 1
 	for group in $(ls /root/lava-groups/*group)
 	do
 		GROUPNAME=""
 		SUBMIT=0
 		OPTION_SUBMIT=""
 		. $group
-		if [ $SUBMIT -eq 1 ];then
-			echo "DEBUG: $GROUPNAME can submit jobs"
-			OPTION_SUBMIT="--submitting"
+		grep -q $GROUPNAME $GROUP_CURRENT_LIST
+		if [ $? -eq 0 ];then
+			echo "DEBUG: SKIP creation of $GROUPNAME which already exists"
+		else
+			if [ $SUBMIT -eq 1 ];then
+				echo "DEBUG: $GROUPNAME can submit jobs"
+				OPTION_SUBMIT="--submitting"
+			fi
+			echo "DEBUG: Add group $GROUPNAME"
+			lava-server manage groups add $OPTION_SUBMIT $GROUPNAME || exit 1
 		fi
-		echo "DEBUG: Add group $GROUPNAME"
-		lava-server manage groups add $OPTION_SUBMIT $GROUPNAME || exit 1
 		if [ -e ${group}.list ];then
 			echo "DEBUG: Found ${group}.list"
 			while read username
