@@ -464,15 +464,18 @@ def main():
                 dc_devices = dockcomp["services"][worker_name]["devices"]
             if not "bind_dev" in slave:
                 dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
-            use_conmux = True
-            use_ser2net = False
+            use_conmux = False
+            use_ser2net = True
             use_screen = False
-            if "use_ser2net" in uart:
-                use_conmux = False
-                use_ser2net = True
             if "use_screen" in uart:
-                use_conmux = False
-                use_screen = True
+                use_screen = uart["use_screen"]
+            if "use_conmux" in uart:
+                use_conmux = uart["use_conmux"]
+            if "use_ser2net" in uart:
+                use_ser2net = uart["use_ser2net"]
+            if (use_conmux and use_ser2net) or (use_conmux and use_screen) or (use_screen and use_ser2net):
+                print("ERROR: Only one uart handler must be configured")
+                sys.exit(1)
             if use_conmux:
                 conmuxline = template_conmux.substitute(board=board_name, baud=baud)
                 device_line += template_device_conmux.substitute(board=board_name)
