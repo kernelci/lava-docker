@@ -33,3 +33,7 @@ Pin-Priority: 500
 Package: lava-server-doc
 Pin: release n=stretch-backports
 Pin-Priority: 500
+
+Package: lavacli
+Pin: release n=stretch-backports
+Pin-Priority: 500
