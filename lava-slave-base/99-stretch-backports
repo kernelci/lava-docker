@@ -17,3 +17,7 @@ Pin-Priority: 500
 Package: lava-dispatcher
 Pin: release n=stretch-backports
 Pin-Priority: 500
+
+Package: lavacli
+Pin: release n=stretch-backports
+Pin-Priority: 500

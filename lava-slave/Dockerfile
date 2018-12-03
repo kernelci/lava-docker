@@ -30,9 +30,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install ser2net
 RUN rm /etc/apt/sources.list.d/sid.list
 RUN apt-get update
 
-# lava-cli dependencies
-RUN apt-get -y install python3-setuptools python3-dev python3-zmq
-RUN git clone https://git.linaro.org/lava/lavacli.git /root/lavacli && cd /root/lavacli && git checkout v0.7 && python3 setup.py install
+RUN apt-get -y install lavacli
 
 COPY phyhostname /root/
 COPY scripts/setup.sh .
