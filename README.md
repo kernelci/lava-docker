@@ -287,11 +287,12 @@ boards:
       serial: The serial number in case of FTDI uart
       devpath: the UDEV devpath to this uart for UART without serial number
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
-      use_ser2net: True/false (Use ser2net instead of conmux-console)
+      use_conmux:	True/False (Use conmux-console instead of ser2net)
+      use_ser2net: 	True/False (Deprecated, ser2net is the default uart handler)
       ser2net_options	(optional) A list of ser2net options to add
         - option1
         - option2
-      use_screen: True/false (Use screen via ssh instead of conmux-console)
+      use_screen: 	True/False (Use screen via ssh instead of ser2net)
     connection_command: A command to be ran for getting a serial console
     pdu_generic:
       hard_reset_command: commandline to reset the board
@@ -312,7 +313,7 @@ Bus 001 Device 054: ID 0403:6001 Future Technology Devices International, Ltd FT
 ```
 This device must use "0403" for idvendor and 6001 for idproduct.
 
-Note on connection_command: connection_command is for people which want to use other way than conmux to handle the console. (ser2net).
+Note on connection_command: connection_command is for people which want to use other custom way than ser2net to handle the console.
 
 Examples: see [boards.yaml.example](boards.yaml.example)
 
