@@ -71,7 +71,8 @@ if [ -e /root/lava-groups ];then
 	echo "Handle groups"
 	echo "======================================================"
 	GROUP_CURRENT_LIST=/tmp/group.list
-	lava-server manage groups list |grep '^\*' > $GROUP_CURRENT_LIST || exit 1
+	lava-server manage groups list > ${GROUP_CURRENT_LIST}.raw || exit 1
+	grep '^\*' ${GROUP_CURRENT_LIST}.raw > ${GROUP_CURRENT_LIST}
 	for group in $(ls /root/lava-groups/*group)
 	do
 		GROUPNAME=""
