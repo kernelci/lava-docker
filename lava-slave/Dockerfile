@@ -1,4 +1,4 @@
-FROM baylibre/lava-slave-base:latest
+FROM baylibre/lava-slave-base:2018.11-1_bpo9_1
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux
 
