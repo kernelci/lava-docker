@@ -465,7 +465,7 @@ def main():
             if not "bind_dev" in slave:
                 dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = False
-            use_ser2net = True
+            use_ser2net = False
             use_screen = False
             if "use_screen" in uart:
                 use_screen = uart["use_screen"]
@@ -476,6 +476,8 @@ def main():
             if (use_conmux and use_ser2net) or (use_conmux and use_screen) or (use_screen and use_ser2net):
                 print("ERROR: Only one uart handler must be configured")
                 sys.exit(1)
+            if not use_conmux and not use_screen and not use_ser2net:
+                use_ser2net = True
             if use_conmux:
                 conmuxline = template_conmux.substitute(board=board_name, baud=baud)
                 device_line += template_device_conmux.substitute(board=board_name)
