@@ -11,7 +11,6 @@ if [ -z "$LAVA_MASTER_URI" ];then
 fi
 
 echo "Dynamic slave for $LAVA_MASTER ($LAVA_MASTER_URI)"
-cd /root/lavacli
 LAVACLIOPTS="--uri $LAVA_MASTER_URI"
 
 # do a sort of ping for letting master to be up
