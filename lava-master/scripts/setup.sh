@@ -7,18 +7,19 @@ fi
 sudo -u postgres psql -c "ALTER USER lavaserver WITH PASSWORD '$(cat /root/pg_lava_password)';" || exit $?
 sed -i "s,^LAVA_DB_PASSWORD=.*,LAVA_DB_PASSWORD='$(cat /root/pg_lava_password)'," /etc/lava-server/instance.conf || exit $?
 
-if [ -e /db_lavaserver.gz ];then
-	gunzip /db_lavaserver.gz || exit $?
+if [ -e /root/backup/db_lavaserver.gz ];then
+	gunzip /root/backup/db_lavaserver.gz || exit $?
 fi
 
-if [ -e /db_lavaserver ];then
+if [ -e /root/backup/db_lavaserver ];then
 	echo "Restore database from backup"
-	sudo -u postgres psql < /db_lavaserver || exit $?
+	sudo -u postgres psql < /root/backup/db_lavaserver || exit $?
 	lava-server manage migrate || exit $?
 	echo "Restore jobs output from backup"
 	rm -r /var/lib/lava-server/default/media/job-output/*
-	tar xzf /joboutput.tar.gz || exit $?
+	tar xzf /root/backup/joboutput.tar.gz || exit $?
 fi
+
 chown -R lavaserver:lavaserver /var/lib/lava-server/default/media/job-output/
 
 # default site is set as example.com

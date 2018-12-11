@@ -1,6 +1,6 @@
 FROM baylibre/lava-master-base:latest
 
-COPY backup /
+COPY backup /root/backup/
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
