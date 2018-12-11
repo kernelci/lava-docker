@@ -20,4 +20,5 @@ docker cp $DOCKERID:/root/joboutput.tar.gz $BACKUP_DIR/ || exit $?
 docker exec -ti $DOCKERID rm /root/joboutput.tar.gz || exit $?
 
 echo "Backup done in $BACKUP_DIR"
+rm -f backup-latest
 ln -sf $BACKUP_DIR backup-latest
