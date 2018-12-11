@@ -9,6 +9,10 @@ DOCKERID=$(docker ps |grep master | cut -d' ' -f1)
 if [ -z "$DOCKERID" ];then
 	exit 1
 fi
+
+docker exec -ti $DOCKERID tar czf /root/devices.tar.gz /etc/lava-server/dispatcher-config/devices/ || exit $?
+docker cp $DOCKERID:/root/devices.tar.gz $BACKUP_DIR/ || exit $?
+
 # for an unknown reason pg_dump > file doesnt work
 docker exec -ti $DOCKERID sudo -u postgres pg_dump --create --clean lavaserver --file /tmp/db_lavaserver || exit $?
 docker exec -ti $DOCKERID gzip /tmp/db_lavaserver || exit $?

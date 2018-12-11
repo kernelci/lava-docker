@@ -20,6 +20,12 @@ if [ -e /root/backup/db_lavaserver ];then
 	tar xzf /root/backup/joboutput.tar.gz || exit $?
 fi
 
+if [ -e /root/backup/devices.tar.gz ];then
+	echo "INFO: Restoring devices files"
+	tar xzf /root/backup/devices.tar.gz
+	chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/devices
+fi
+
 chown -R lavaserver:lavaserver /var/lib/lava-server/default/media/job-output/
 
 # default site is set as example.com
