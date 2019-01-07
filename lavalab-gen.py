@@ -66,6 +66,17 @@ template_settings_conf = string.Template("""
 }
 """)
 
+def dockcomp_add_device(dockcomp, worker_name, devicemap):
+    if "devices" in dockcomp["services"][worker_name]:
+        dc_devices = dockcomp["services"][worker_name]["devices"]
+    else:
+        dockcomp["services"][worker_name]["devices"] = []
+        dc_devices = dockcomp["services"][worker_name]["devices"]
+    for dmap in dc_devices:
+        if dmap == devicemap:
+            return
+    dc_devices.append(devicemap)
+
 def usage():
     print("%s [boardsfile.yaml]" % sys.argv[0])
 
@@ -424,12 +435,7 @@ def main():
         if "kvm" in board:
             use_kvm = board["kvm"]
         if use_kvm:
-            if "devices" in dockcomp["services"][worker_name]:
-                dc_devices = dockcomp["services"][worker_name]["devices"]
-            else:
-                dockcomp["services"][worker_name]["devices"] = []
-                dc_devices = dockcomp["services"][worker_name]["devices"]
-            dc_devices.append("/dev/kvm:/dev/kvm")
+            dockcomp_add_device(dockcomp, worker_name, "/dev/kvm:/dev/kvm")
             # board specific hacks
         if devicetype == "qemu" and not use_kvm:
             device_line += "{% set no_kvm = True %}\n"
@@ -457,13 +463,8 @@ def main():
             fp = open("output/%s/udev/99-lavaworker-udev.rules" % host, "a")
             fp.write(udev_line)
             fp.close()
-            if "devices" in dockcomp["services"][worker_name]:
-                dc_devices = dockcomp["services"][worker_name]["devices"]
-            else:
-                dockcomp["services"][worker_name]["devices"] = []
-                dc_devices = dockcomp["services"][worker_name]["devices"]
             if not "bind_dev" in slave:
-                dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
+                dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = False
             use_ser2net = False
             use_screen = False
