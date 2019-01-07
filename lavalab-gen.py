@@ -437,6 +437,11 @@ def main():
         if use_kvm:
             dockcomp_add_device(dockcomp, worker_name, "/dev/kvm:/dev/kvm")
             # board specific hacks
+        use_tap = False
+        if "tap" in board:
+            use_tap = board["tap"]
+        if use_tap:
+            dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
         if devicetype == "qemu" and not use_kvm:
             device_line += "{% set no_kvm = True %}\n"
         if "uart" in board:

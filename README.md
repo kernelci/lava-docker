@@ -271,6 +271,7 @@ boards:
     type: the LAVA device-type of this device
     slave:		(optional) Name of the slave managing this device. Default to first slave found or default_slave if set.
     kvm: (For qemu only) Does the qemu could use KVM (default: no)
+    tap: (For qemu only) Does the qemu could use TAP devices (default: no)
     uboot_ipaddr:	(optional) a static IP to set in uboot
     uboot_macaddr:	(Optional) the MAC address to set in uboot
     custom_option:	(optional) All following strings will be directly append to devicefile
