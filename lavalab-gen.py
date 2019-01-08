@@ -533,8 +533,12 @@ def main():
             deviceinfo.write("DEVICE_GROUP=%s\n" % board["group"])
             deviceinfo.close()
         if "custom_option" in board:
-            for coption in board["custom_option"]:
-                device_line += "{%% %s %%}\n" % coption
+            if type(board["custom_option"]) == list:
+                for coption in board["custom_option"]:
+                    device_line += "{%% %s %%}\n" % coption
+            else:
+                for line in board["custom_option"].splitlines():
+                    device_line += "{%% %s %%}\n" % line
         if not os.path.isdir(device_path):
             os.mkdir(device_path)
         if not os.path.isdir(devices_path):
