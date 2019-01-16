@@ -66,6 +66,17 @@ template_settings_conf = string.Template("""
 }
 """)
 
+def dockcomp_add_device(dockcomp, worker_name, devicemap):
+    if "devices" in dockcomp["services"][worker_name]:
+        dc_devices = dockcomp["services"][worker_name]["devices"]
+    else:
+        dockcomp["services"][worker_name]["devices"] = []
+        dc_devices = dockcomp["services"][worker_name]["devices"]
+    for dmap in dc_devices:
+        if dmap == devicemap:
+            return
+    dc_devices.append(devicemap)
+
 def usage():
     print("%s [boardsfile.yaml]" % sys.argv[0])
 
@@ -83,7 +94,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -243,6 +254,18 @@ def main():
                 for line in slaveenv["env"]:
                     fenv.write("  %s\n" % line)
                 fenv.close()
+        if "loglevel" in worker:
+            for component in worker["loglevel"]:
+                if component != "lava-master" and component != "lava-logs" and component != 'lava-server-gunicorn':
+                    print("ERROR: invalid loglevel component %s" % component)
+                    sys.exit(1)
+                loglevel = worker["loglevel"][component]
+                if loglevel != 'DEBUG' and loglevel != 'INFO' and loglevel != 'WARN' and loglevel != 'ERROR':
+                    print("ERROR: invalid loglevel %s for %s" % (loglevel, component))
+                    sys.exit(1)
+                fcomponent = open("%s/default/%s" % (workerdir, component), 'w')
+                fcomponent.write("LOGLEVEL=%s\n" % loglevel)
+                fcomponent.close()
 
     default_slave = "lab-slave-0"
     if "slaves" not in workers:
@@ -250,7 +273,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -382,6 +405,18 @@ def main():
                 fp.write("\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
+        if "loglevel" in worker:
+            for component in worker["loglevel"]:
+                if component != "lava-slave":
+                    print("ERROR: invalid loglevel component %s" % component)
+                    sys.exit(1)
+                loglevel = worker["loglevel"][component]
+                if loglevel != 'DEBUG' and loglevel != 'INFO' and loglevel != 'WARN' and loglevel != 'ERROR':
+                    print("ERROR: invalid loglevel %s for %s" % (loglevel, component))
+                    sys.exit(1)
+                fcomponent = open("%s/default/%s" % (workerdir, component), 'w')
+                fcomponent.write("LOGLEVEL=%s\n" % loglevel)
+                fcomponent.close()
 
     if "boards" not in workers:
         boards = {}
@@ -424,13 +459,13 @@ def main():
         if "kvm" in board:
             use_kvm = board["kvm"]
         if use_kvm:
-            if "devices" in dockcomp["services"][worker_name]:
-                dc_devices = dockcomp["services"][worker_name]["devices"]
-            else:
-                dockcomp["services"][worker_name]["devices"] = []
-                dc_devices = dockcomp["services"][worker_name]["devices"]
-            dc_devices.append("/dev/kvm:/dev/kvm")
+            dockcomp_add_device(dockcomp, worker_name, "/dev/kvm:/dev/kvm")
             # board specific hacks
+        use_tap = False
+        if "tap" in board:
+            use_tap = board["tap"]
+        if use_tap:
+            dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
         if devicetype == "qemu" and not use_kvm:
             device_line += "{% set no_kvm = True %}\n"
         if "uart" in board:
@@ -457,13 +492,8 @@ def main():
             fp = open("output/%s/udev/99-lavaworker-udev.rules" % host, "a")
             fp.write(udev_line)
             fp.close()
-            if "devices" in dockcomp["services"][worker_name]:
-                dc_devices = dockcomp["services"][worker_name]["devices"]
-            else:
-                dockcomp["services"][worker_name]["devices"] = []
-                dc_devices = dockcomp["services"][worker_name]["devices"]
             if not "bind_dev" in slave:
-                dc_devices.append("/dev/%s:/dev/%s" % (board_name, board_name))
+                dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = False
             use_ser2net = False
             use_screen = False

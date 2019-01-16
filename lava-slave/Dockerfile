@@ -1,5 +1,7 @@
 FROM baylibre/lava-slave-base:2018.11-1_bpo9_1
 
+RUN apt-get update
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
@@ -31,6 +33,8 @@ RUN rm /etc/apt/sources.list.d/sid.list
 RUN apt-get update
 
 RUN apt-get -y install lavacli
+
+COPY default/* /etc/default/
 
 COPY phyhostname /root/
 COPY scripts/setup.sh .

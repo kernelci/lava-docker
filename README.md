@@ -221,6 +221,11 @@ masters:
     slave_keys:			optional path to a directory with slaves public key. Usefull when you want to create a master without slaves nodes in boards.yaml.
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
+    loglevel:
+      lava-logs: DEBUG/INFO/WARN/ERROR			(optional) select the loglevel of lava-logs (default to DEBUG)
+      lava-slave: DEBUG/INFO/WARN/ERROR			(optional) select the loglevel of lava-slave (default to DEBUG)
+      lava-master: DEBUG/INFO/WARN/ERROR		(optional) select the loglevel of lava-master (default to DEBUG)
+      lava-server-gunicorn: DEBUG/INFO/WARN/ERROR	(optional) select the loglevel of lava-server-gunicorn (default to DEBUG)
     users:
     - name: LAVA username
       token: The token of this user 	(optional)
@@ -271,6 +276,7 @@ boards:
     type: the LAVA device-type of this device
     slave:		(optional) Name of the slave managing this device. Default to first slave found or default_slave if set.
     kvm: (For qemu only) Does the qemu could use KVM (default: no)
+    tap: (For qemu only) Does the qemu could use TAP devices (default: no)
     uboot_ipaddr:	(optional) a static IP to set in uboot
     uboot_macaddr:	(Optional) the MAC address to set in uboot
     custom_option:	(optional) All following strings will be directly append to devicefile

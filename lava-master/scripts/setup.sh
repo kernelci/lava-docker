@@ -55,12 +55,24 @@ if [ -e /root/lava-users ];then
 		if [ $SUPERUSER -eq 1 ];then
 			USER_OPTION="$USER_OPTION --superuser"
 		fi
-		lava-server manage users list | grep -q "[[:space:]]$USER$"
+		lava-server manage users list --all > /tmp/allusers
+		if [ $? -ne 0 ];then
+			echo "ERROR: cannot generate user list"
+			exit 1
+		fi
+		#filter first name/last name (enclose by "()")
+		sed -i 's,[[:space:]](.*$,,' /tmp/allusers
+		grep -q "[[:space:]]${USER}$" /tmp/allusers
 		if [ $? -eq 0 ];then
 			echo "Skip already existing $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
 		else
 			echo "Adding username $USER DEBUG(with $TOKEN / $PASSWORD / $USER_OPTION)"
-			lava-server manage users add --passwd $PASSWORD $USER_OPTION $USER || exit 1
+			lava-server manage users add --passwd $PASSWORD $USER_OPTION $USER
+			if [ $? -ne 0 ];then
+				echo "ERROR: Adding user $USER"
+				cat /tmp/allusers
+				exit 1
+			fi
 			if [ ! -z "$TOKEN" ];then
 				echo "Adding token to user $USER"
 				lava-server manage tokens add --user $USER --secret $TOKEN || exit 1

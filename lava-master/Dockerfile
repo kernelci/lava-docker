@@ -4,6 +4,8 @@ COPY backup /root/backup/
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
+COPY default/* /etc/default/
+
 RUN git clone https://github.com/BayLibre/lava-healthchecks.git
 RUN cp lava-healthchecks/health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
