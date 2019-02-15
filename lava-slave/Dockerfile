@@ -34,6 +34,11 @@ RUN apt-get update
 
 RUN apt-get -y install lavacli
 
+# PXE stuff
+RUN apt-get -y install grub-efi-amd64-bin
+RUN cd /var/lib/lava/dispatcher/tmp && grub-mknetdir --net-directory=.
+COPY grub.cfg /var/lib/lava/dispatcher/tmp/boot/grub/
+
 COPY default/* /etc/default/
 
 COPY phyhostname /root/
