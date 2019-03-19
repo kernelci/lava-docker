@@ -1,4 +1,4 @@
-FROM baylibre/lava-master-base:2018.11-1_bpo9_1
+FROM baylibre/lava-master-base:2019.03_stretch
 
 COPY backup /root/backup/
 

@@ -1,4 +1,4 @@
-FROM baylibre/lava-slave-base:2018.11-1_bpo9_1
+FROM baylibre/lava-slave-base:2019.03_stretch
 
 RUN apt-get update
 
