@@ -10,6 +10,8 @@ RUN \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
  vim \
+ letsencrypt \
+ apt-transport-https \
  sudo \
  python-setproctitle \
  tftpd-hpa \
@@ -24,11 +26,11 @@ RUN \
 RUN if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "x86" ] ;then apt-get -y install qemu-kvm ; fi
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget gnupg
-RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc
-RUN apt-key add production-repo.key.asc
-RUN echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list
-RUN echo "deb http://deb.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list
-RUN apt-get clean && apt-get update
+RUN wget https://apt.lavasoftware.org/lavasoftware.key.asc \
+ && apt-key add lavasoftware.key.asc \
+ && echo 'deb https://apt.lavasoftware.org/release stretch-backports main' > /etc/apt/sources.list.d/lava.list \
+ && echo "deb http://deb.debian.org/debian/ stretch-backports main" >> /etc/apt/sources.list \
+ && apt-get clean && apt-get update
 COPY 99-stretch-backports /etc/apt/preferences.d/
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
 

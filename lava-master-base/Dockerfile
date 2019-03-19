@@ -20,16 +20,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  sudo \
  wget \
  e2fsprogs \
+ letsencrypt \
+ apt-transport-https \
  gnupg \
  vim
 
-RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
- && apt-key add production-repo.key.asc \
- && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
+RUN wget https://apt.lavasoftware.org/lavasoftware.key.asc \
+ && apt-key add lavasoftware.key.asc \
+ && echo 'deb https://apt.lavasoftware.org/release stretch-backports main' > /etc/apt/sources.list.d/lava.list \
  && apt-get clean && apt-get update && apt-get -y upgrade
 
 RUN service postgresql start \
- && DEBIAN_FRONTEND=noninteractive apt-get -y install lava \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install lava lava-server \
  && sudo -u postgres psql lavaserver -c "DELETE FROM lava_scheduler_app_worker WHERE lava_scheduler_app_worker.hostname = 'example.com';" \
  && service postgresql stop
 
