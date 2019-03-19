@@ -35,7 +35,9 @@ RUN apt-get update
 RUN apt-get -y install lavacli
 
 # PXE stuff
-RUN apt-get -y install grub-efi-amd64-bin
+RUN if [ $(uname -m) != amd64 ]; then dpkg --add-architecture amd64 && apt-get update; fi
+RUN apt-get -y install grub-efi-amd64-bin:amd64
+RUN if [ $(uname -m) != amd64 ]; then dpkg --remove architecture amd64 && apt-get update; fi
 RUN cd /var/lib/lava/dispatcher/tmp && grub-mknetdir --net-directory=.
 COPY grub.cfg /var/lib/lava/dispatcher/tmp/boot/grub/
 
