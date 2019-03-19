@@ -24,7 +24,7 @@ COPY device-types-patch/ /root/device-types-patch/
 RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && patch < $patch || exit $?; done
 
 COPY lava-patch/ /root/lava-patch
-RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
+RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch| sort) ; do echo $patch && patch -p1 < $patch || exit $?;done
 
 COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
