@@ -1,5 +1,7 @@
 FROM bitnami/minideb:stretch
 
+RUN echo "APT::Install-Recommends false;" > /etc/apt/apt.conf.d/01norecommands
+
 RUN apt-get update
 
 # e2fsprogs is for libguestfs
