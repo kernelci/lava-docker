@@ -44,6 +44,7 @@ COPY default/* /etc/default/
 COPY phyhostname /root/
 COPY scripts/setup.sh .
 
+RUN apt-get -y install patch
 COPY lava-patch/ /root/lava-patch
 RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
 
