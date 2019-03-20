@@ -2,7 +2,7 @@ FROM baylibre/lava-slave-base:2018.11-1_bpo9_1
 
 RUN apt-get update
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux telnet
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
