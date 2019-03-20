@@ -151,6 +151,10 @@ mkdir -p /root/.lavadocker/
 if [ -e /root/device-types ];then
 	for i in $(ls /root/device-types/*jinja2)
 	do
+		if [ -e /etc/lava-server/dispatcher-config/device-types/$(basename $i) ];then
+			echo "WARNING: overwriting device-type $i"
+			diff -u "/etc/lava-server/dispatcher-config/device-types/$(basename $i)" $i
+		fi
 		cp $i /etc/lava-server/dispatcher-config/device-types/
 		devicetype=$(basename $i |sed 's,.jinja2,,')
 		lava-server manage device-types list | grep -q "[[:space:]]$devicetype[[:space:]]"
