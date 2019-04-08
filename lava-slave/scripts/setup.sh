@@ -18,7 +18,7 @@ TIMEOUT=300
 while [ $TIMEOUT -ge 1 ];
 do
 	STEP=2
-	lavacli $LAVACLIOPTS device-types list 2>/dev/null >/dev/null
+	lavacli $LAVACLIOPTS device-types list >/dev/null
 	if [ $? -eq 0 ];then
 		TIMEOUT=0
 	else

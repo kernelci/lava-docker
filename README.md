@@ -221,6 +221,9 @@ masters:
     slave_keys:			optional path to a directory with slaves public key. Usefull when you want to create a master without slaves nodes in boards.yaml.
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
+    allowed_hosts:		A list of FQDN used to access the LAVA master
+    - "fqdn1"
+    - "fqdn2"
     loglevel:
       lava-logs: DEBUG/INFO/WARN/ERROR			(optional) select the loglevel of lava-logs (default to DEBUG)
       lava-slave: DEBUG/INFO/WARN/ERROR			(optional) select the loglevel of lava-slave (default to DEBUG)

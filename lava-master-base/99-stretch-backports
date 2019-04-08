@@ -37,3 +37,7 @@ Pin-Priority: 500
 Package: lavacli
 Pin: release n=stretch-backports
 Pin-Priority: 500
+
+Package: python3-junit.xml
+Pin: release n=stretch-backports
+Pin-Priority: 500

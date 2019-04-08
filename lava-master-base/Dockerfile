@@ -12,6 +12,8 @@ RUN echo 'lava-server   lava-server/instance-name string lava-docker-instance' |
  && echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections \
  && echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections
 
+RUN echo "APT::Install-Recommends false;" > /etc/apt/apt.conf.d/01norecommands
+
 # e2fsprogs is for libguestfs
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
@@ -20,16 +22,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  sudo \
  wget \
  e2fsprogs \
+ letsencrypt \
+ apt-transport-https \
  gnupg \
  vim
 
-RUN wget http://images.validation.linaro.org/production-repo/production-repo.key.asc \
- && apt-key add production-repo.key.asc \
- && echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list \
+RUN wget https://apt.lavasoftware.org/lavasoftware.key.asc \
+ && apt-key add lavasoftware.key.asc \
+ && echo 'deb https://apt.lavasoftware.org/release stretch-backports main' > /etc/apt/sources.list.d/lava.list \
  && apt-get clean && apt-get update && apt-get -y upgrade
 
 RUN service postgresql start \
- && DEBIAN_FRONTEND=noninteractive apt-get -y install lava \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install lava lava-server \
  && sudo -u postgres psql lavaserver -c "DELETE FROM lava_scheduler_app_worker WHERE lava_scheduler_app_worker.hostname = 'example.com';" \
  && service postgresql stop
 
