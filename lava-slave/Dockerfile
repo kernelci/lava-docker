@@ -2,7 +2,10 @@ FROM baylibre/lava-slave-base:2019.03_stretch
 
 RUN apt-get update
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux telnet
+# cu conmux is for console via conmux
+# telnet is for using ser2net
+# git is necessary for checkout tests
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux telnet git
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
