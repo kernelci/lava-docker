@@ -422,6 +422,19 @@ slave:
   env:
   - "http_proxy: http://dns:port"
 
+## How to use a board which uses PXE ?
+All boards which uses PXE, could be used with LAVA via grub.
+But you need to add a configuration in your DHCP server for that board.
+This configuration need tell to the PXE to get GRUB for the dispatcher TFTP.
+EXample for an upsquare and a dispatcher availlable at 192.168.66.1:
+```
+  	host upsquare {
+		hardware ethernet 00:07:32:54:41:bb;
+		filename "/boot/grub/x86_64-efi/core.efi";
+		next-server 192.168.66.1;
+	}
+```
+
 ## Bugs, Contact
 The prefered way to submit bugs are via the github issue tracker
 You can also contact us on #lava-docker on the freenode IRC network
