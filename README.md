@@ -266,6 +266,7 @@ slaves:
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
+    arch:			The arch of the worker (if not x86_64), only accept arm64
     expose_ser2net:		Do ser2net ports need to be available on host
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
       - p1:p2

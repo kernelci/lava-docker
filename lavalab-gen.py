@@ -281,7 +281,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -329,6 +329,13 @@ def main():
         worker = slave
         worker_name = name
         slave_master = None
+        if "arch" in worker:
+            if worker["arch"] == 'arm64':
+                dockerfile = open("%s/Dockerfile" % workerdir, "r+")
+                dockerfilec = dockerfile.read().replace("lava-slave-base", "lava-slave-base-arm64")
+                dockerfile.seek(0)
+                dockerfile.write(dockerfilec)
+                dockerfile.close()
         #NOTE remote_master is on slave
         if not "remote_master" in worker:
             remote_master = "lava-master"
