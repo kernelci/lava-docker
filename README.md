@@ -265,6 +265,7 @@ slaves:
     remote_proto:		http(default) or https
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
+    use_nfs:			Does the LAVA dispatcher will run NFS jobs
     expose_ser2net:		Do ser2net ports need to be available on host
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
       - p1:p2
@@ -404,6 +405,12 @@ For building an arm64 lava-docker, some little trick are necesssary:
 
 For building lava-xxx-base images
 - replace "bitnami/minideb" by "arm64v8/debian" on lava-master-base/lava-slave-base dockerfiles.
+
+# How to ran NFS jobs
+You need to se use_nfs: True on slave that will ran NFS jobs.
+A working NFS server must be working on the host.
+Furthermore, you must create a /var/lib/lava/dispatcher/tmp directory on the host and export it like:
+/var/lib/lava/dispatcher/tmp 192.168.66.0/24(no_root_squash,rw,no_subtree_check)
 
 ## How to add custom LAVA patchs
 You can add custom or backported LAVA patchs in lava-master/lava-patch
