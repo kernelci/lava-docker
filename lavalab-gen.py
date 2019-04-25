@@ -281,7 +281,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -420,6 +420,22 @@ def main():
                 fp.write("\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
+
+        if "devices" in worker:
+            if not os.path.isdir("output/%s/udev" % host):
+                os.mkdir("output/%s/udev" % host)
+            for udev_dev in worker["devices"]:
+                udev_line = 'SUBSYSTEM=="tty", ATTRS{idVendor}=="%04x", ATTRS{idProduct}=="%04x",' % (udev_dev["idvendor"], udev_dev["idproduct"])
+                if "serial" in udev_dev:
+                    udev_line += 'ATTRS{serial}=="%s", ' % udev_dev["serial"]
+                if "devpath" in udev_dev:
+                    udev_line += 'ATTRS{devpath}=="%s", ' % udev_dev["devpath"]
+                udev_line += 'MODE="0664", OWNER="uucp", SYMLINK+="%s"\n' % udev_dev["name"]
+                fudev = open("output/%s/udev/99-lavaworker-udev.rules" % host, "a")
+                fudev.write(udev_line)
+                fudev.close()
+                if not "bind_dev" in slave:
+                    dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (udev_dev["name"], udev_dev["name"]))
         use_nfs = False
         if "use_nfs" in worker:
             use_nfs = worker["use_nfs"]

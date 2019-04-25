@@ -275,6 +275,12 @@ slaves:
     env:
       - line1			A list of line to set as environment (See /etc/lava-server/env.yaml for examples)
       - line2
+    devices:			A list of devices which need UDEV rules
+      - name:			The name of the device
+        vendorid:		The VID of the UART (Formated as 0xXXXX)
+        productid:		the PID of the UART (Formated as 0xXXXX)
+        serial:			The serial number of the device if the device got one
+        devpath:		The UDEV devpath to this device if more than one is present
 
 boards:
   - name: devicename	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
