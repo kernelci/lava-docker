@@ -265,6 +265,8 @@ slaves:
     remote_proto:		http(default) or https
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
+    use_nfs:			Does the LAVA dispatcher will run NFS jobs
+    arch:			The arch of the worker (if not x86_64), only accept arm64
     expose_ser2net:		Do ser2net ports need to be available on host
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
       - p1:p2
@@ -273,6 +275,12 @@ slaves:
     env:
       - line1			A list of line to set as environment (See /etc/lava-server/env.yaml for examples)
       - line2
+    devices:			A list of devices which need UDEV rules
+      - name:			The name of the device
+        vendorid:		The VID of the UART (Formated as 0xXXXX)
+        productid:		the PID of the UART (Formated as 0xXXXX)
+        serial:			The serial number of the device if the device got one
+        devpath:		The UDEV devpath to this device if more than one is present
 
 boards:
   - name: devicename	Each board must be named by their device-type as "device-type-XX" (where XX is a number)
@@ -405,6 +413,12 @@ For building an arm64 lava-docker, some little trick are necesssary:
 For building lava-xxx-base images
 - replace "bitnami/minideb" by "arm64v8/debian" on lava-master-base/lava-slave-base dockerfiles.
 
+# How to ran NFS jobs
+You need to se use_nfs: True on slave that will ran NFS jobs.
+A working NFS server must be working on the host.
+Furthermore, you must create a /var/lib/lava/dispatcher/tmp directory on the host and export it like:
+/var/lib/lava/dispatcher/tmp 192.168.66.0/24(no_root_squash,rw,no_subtree_check)
+
 ## How to add custom LAVA patchs
 You can add custom or backported LAVA patchs in lava-master/lava-patch
 Doing the same for lava-slave will be done later.
@@ -421,6 +435,19 @@ Add env to a slave like:
 slave:
   env:
   - "http_proxy: http://dns:port"
+
+## How to use a board which uses PXE ?
+All boards which uses PXE, could be used with LAVA via grub.
+But you need to add a configuration in your DHCP server for that board.
+This configuration need tell to the PXE to get GRUB for the dispatcher TFTP.
+EXample for an upsquare and a dispatcher availlable at 192.168.66.1:
+```
+  	host upsquare {
+		hardware ethernet 00:07:32:54:41:bb;
+		filename "/boot/grub/x86_64-efi/core.efi";
+		next-server 192.168.66.1;
+	}
+```
 
 ## Bugs, Contact
 The prefered way to submit bugs are via the github issue tracker
