@@ -53,6 +53,10 @@ RUN apt-get -y install patch
 COPY lava-patch/ /root/lava-patch
 RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
 
+RUN mkdir /etc/lava-coordinator/
+COPY lava-coordinator/* /etc/lava-coordinator/
+RUN if [ -e /etc/lava-coordinator/lava-coordinator.cnf ]; then DEBIAN_FRONTEND=noninteractive apt-get -y install lava-coordinator && mv /etc/lava-coordinator/lava-coordinator.cnf /etc/lava-coordinator/lava-coordinator.conf ; fi
+
 COPY devices/ /root/devices/
 COPY tags/ /root/tags/
 COPY deviceinfo/ /root/deviceinfo/

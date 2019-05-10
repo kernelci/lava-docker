@@ -219,6 +219,7 @@ masters:
     zmq_auth_key:		optional path to a public ZMQ key
     zmq_auth_key_secret:	optional path to a private ZMQ key
     slave_keys:			optional path to a directory with slaves public key. Usefull when you want to create a master without slaves nodes in boards.yaml.
+    lava-coordinator:		Does the master should ran a lava-coordinator and export its port
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     allowed_hosts:		A list of FQDN used to access the LAVA master
@@ -267,6 +268,7 @@ slaves:
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
     arch:			The arch of the worker (if not x86_64), only accept arm64
+    lava-coordinator:		Does the slave should ran a lava-coordinator
     expose_ser2net:		Do ser2net ports need to be available on host
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
       - p1:p2
