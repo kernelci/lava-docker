@@ -413,6 +413,9 @@ def main():
             remote_proto = worker["remote_proto"]
         remote_uri = "%s://%s:%s@%s:%s/RPC2" % (remote_proto, remote_user, remote_token, remote_address, remote_rpc_port)
         dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = remote_uri
+        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_USER"] = remote_user
+        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_BASEURI"] = "%s://%s:%s/RPC2" % (remote_proto, remote_address, remote_rpc_port)
+        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_TOKEN"] = remote_token
 
         if "lava-coordinator" in worker and worker["lava-coordinator"]:
             fcoordinator = open("%s/lava-coordinator/lava-coordinator.cnf" % workerdir, 'w')

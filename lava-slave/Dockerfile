@@ -57,6 +57,9 @@ RUN mkdir /etc/lava-coordinator/
 COPY lava-coordinator/* /etc/lava-coordinator/
 RUN if [ -e /etc/lava-coordinator/lava-coordinator.cnf ]; then DEBIAN_FRONTEND=noninteractive apt-get -y install lava-coordinator && mv /etc/lava-coordinator/lava-coordinator.cnf /etc/lava-coordinator/lava-coordinator.conf ; fi
 
+# needed for lavacli identities
+RUN mkdir -p /root/.config
+
 COPY devices/ /root/devices/
 COPY tags/ /root/tags/
 COPY deviceinfo/ /root/deviceinfo/
