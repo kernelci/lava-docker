@@ -10,6 +10,8 @@ if [ -z "$LAVA_MASTER_URI" ];then
 	exit 11
 fi
 
+lavacli identities add --uri $LAVA_MASTER_BASEURI --token $LAVA_MASTER_TOKEN --username $LAVA_MASTER_USER default
+
 echo "Dynamic slave for $LAVA_MASTER ($LAVA_MASTER_URI)"
 LAVACLIOPTS="--uri $LAVA_MASTER_URI"
 

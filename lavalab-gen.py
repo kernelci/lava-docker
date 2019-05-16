@@ -68,6 +68,15 @@ template_settings_conf = string.Template("""
 }
 """)
 
+template_lava_coordinator_conf = string.Template("""
+{
+    "port": 3079,
+    "blocksize": 4096,
+    "poll_delay": 3,
+    "coordinator_hostname": "$masterurl"
+}
+""")
+
 def dockcomp_add_device(dockcomp, worker_name, devicemap):
     if "devices" in dockcomp["services"][worker_name]:
         dc_devices = dockcomp["services"][worker_name]["devices"]
@@ -96,7 +105,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -119,6 +128,8 @@ def main():
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
+        if "lava-coordinator" in master and master["lava-coordinator"]:
+            dockcomp["services"][name]["ports"].append('3079:3079')
         persistent_db = False
         if "persistent_db" in master:
             persistent_db = master["persistent_db"]
@@ -281,7 +292,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -402,7 +413,14 @@ def main():
             remote_proto = worker["remote_proto"]
         remote_uri = "%s://%s:%s@%s:%s/RPC2" % (remote_proto, remote_user, remote_token, remote_address, remote_rpc_port)
         dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = remote_uri
+        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_USER"] = remote_user
+        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_BASEURI"] = "%s://%s:%s/RPC2" % (remote_proto, remote_address, remote_rpc_port)
+        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_TOKEN"] = remote_token
 
+        if "lava-coordinator" in worker and worker["lava-coordinator"]:
+            fcoordinator = open("%s/lava-coordinator/lava-coordinator.cnf" % workerdir, 'w')
+            fcoordinator.write(template_lava_coordinator_conf.substitute(masterurl=remote_address))
+            fcoordinator.close()
         if "dispatcher_ip" in worker:
             dockcomp["services"][worker_name]["environment"]["LAVA_DISPATCHER_IP"] = worker["dispatcher_ip"]
         if "expose_ports" in worker:

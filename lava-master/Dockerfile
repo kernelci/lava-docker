@@ -26,6 +26,7 @@ RUN rsync -avr /usr/lib/python3/dist-packages/lava_scheduler_app/tests/device-ty
 
 COPY device-types-patch/ /root/device-types-patch/
 RUN cd /etc/lava-server/dispatcher-config/device-types/ && for patch in $(ls /root/device-types-patch/*patch) ; do sed -i 's,lava_scheduler_app/tests/device-types/,,' $patch && echo $patch && patch < $patch || exit $?; done
+RUN chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/device-types/
 
 COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
