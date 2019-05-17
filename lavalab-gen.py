@@ -292,7 +292,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -429,6 +429,10 @@ def main():
         if "bind_dev" in worker:
             dockcomp["services"][worker_name]["volumes"].append("/dev:/dev")
             dockcomp["services"][worker_name]["privileged"] = True
+        if "use_tap" in worker and worker["use_tap"]:
+            dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
+            dockcomp["services"][worker_name]["cap_add"] = []
+            dockcomp["services"][worker_name]["cap_add"].append("NET_ADMIN")
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
         if "extra_actions" in worker:
@@ -519,11 +523,6 @@ def main():
         if use_kvm:
             dockcomp_add_device(dockcomp, worker_name, "/dev/kvm:/dev/kvm")
             # board specific hacks
-        use_tap = False
-        if "tap" in board:
-            use_tap = board["tap"]
-        if use_tap:
-            dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
         if devicetype == "qemu" and not use_kvm:
             device_line += "{% set no_kvm = True %}\n"
         if "uart" in board:
