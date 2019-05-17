@@ -426,7 +426,7 @@ def main():
         if "expose_ports" in worker:
             for eports in worker["expose_ports"]:
                 dockcomp["services"][name]["ports"].append("%s" % eports)
-        if "bind_dev" in worker:
+        if "bind_dev" in worker and worker["bind_dev"]:
             dockcomp["services"][worker_name]["volumes"].append("/dev:/dev")
             dockcomp["services"][worker_name]["privileged"] = True
         if "use_tap" in worker and worker["use_tap"]:
@@ -454,7 +454,7 @@ def main():
                 fudev = open("output/%s/udev/99-lavaworker-udev.rules" % host, "a")
                 fudev.write(udev_line)
                 fudev.close()
-                if not "bind_dev" in slave:
+                if not "bind_dev" in slave or not slave["bind_dev"]:
                     dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (udev_dev["name"], udev_dev["name"]))
         use_nfs = False
         if "use_nfs" in worker:
@@ -549,7 +549,7 @@ def main():
             fp = open("output/%s/udev/99-lavaworker-udev.rules" % host, "a")
             fp.write(udev_line)
             fp.close()
-            if not "bind_dev" in slave:
+            if not "bind_dev" in slave or not slave["bind_dev"]:
                 dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = False
             use_ser2net = False
