@@ -433,8 +433,6 @@ def main():
             dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
             dockcomp["services"][worker_name]["cap_add"] = []
             dockcomp["services"][worker_name]["cap_add"].append("NET_ADMIN")
-        with open(dockcomposeymlpath, 'w') as f:
-            yaml.dump(dockcomp, f)
         if "extra_actions" in worker:
             fp = open("%s/scripts/extra_actions" % workerdir, "w")
             for eaction in worker["extra_actions"]:
@@ -467,6 +465,8 @@ def main():
             fp.write("apt-get -y install nfs-kernel-server\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
+        with open(dockcomposeymlpath, 'w') as f:
+            yaml.dump(dockcomp, f)
         if "loglevel" in worker:
             for component in worker["loglevel"]:
                 if component != "lava-slave":
