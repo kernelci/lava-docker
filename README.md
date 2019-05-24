@@ -267,6 +267,7 @@ slaves:
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
+    use_tap:			Does TAP netdevices could be used
     arch:			The arch of the worker (if not x86_64), only accept arm64
     lava-coordinator:		Does the slave should ran a lava-coordinator
     expose_ser2net:		Do ser2net ports need to be available on host
@@ -289,7 +290,6 @@ boards:
     type: the LAVA device-type of this device
     slave:		(optional) Name of the slave managing this device. Default to first slave found or default_slave if set.
     kvm: (For qemu only) Does the qemu could use KVM (default: no)
-    tap: (For qemu only) Does the qemu could use TAP devices (default: no)
     uboot_ipaddr:	(optional) a static IP to set in uboot
     uboot_macaddr:	(Optional) the MAC address to set in uboot
     custom_option:	(optional) All following strings will be directly append to devicefile
