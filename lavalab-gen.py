@@ -105,7 +105,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -151,6 +151,10 @@ def main():
         groupdir = "%s/groups" % workerdir
         os.mkdir(groupdir)
         worker = master
+        if "healthcheck_url" in master:
+            f_hc = open("%s/health-checks/healthcheck_url" % workerdir, 'w')
+            f_hc.write(master["healthcheck_url"])
+            f_hc.close()
         webadmin_https = False
         if "webadmin_https" in worker:
             webadmin_https = worker["webadmin_https"]
@@ -292,7 +296,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -433,6 +437,12 @@ def main():
             dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
             dockcomp["services"][worker_name]["cap_add"] = []
             dockcomp["services"][worker_name]["cap_add"].append("NET_ADMIN")
+        if "host_healthcheck" in worker and worker["host_healthcheck"]:
+            dockcomp["services"]["healthcheck"] = {}
+            dockcomp["services"]["healthcheck"]["ports"] = ["8080:8080"]
+            dockcomp["services"]["healthcheck"]["build"] = {}
+            dockcomp["services"]["healthcheck"]["build"]["context"] = "healthcheck"
+            shutil.copytree("healthcheck", "output/%s/healthcheck" % host)
         if "extra_actions" in worker:
             fp = open("%s/scripts/extra_actions" % workerdir, "w")
             for eaction in worker["extra_actions"]:

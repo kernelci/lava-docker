@@ -9,6 +9,7 @@ COPY default/* /etc/default/
 RUN git clone https://github.com/BayLibre/lava-healthchecks.git
 RUN cp lava-healthchecks/health-checks/* /etc/lava-server/dispatcher-config/health-checks/
 COPY health-checks/* /etc/lava-server/dispatcher-config/health-checks/
+RUN if [ -e /etc/lava-server/dispatcher-config/health-checks/healthcheck_url ];then sed -i "s,http.*blob/master,$(cat /etc/lava-server/dispatcher-config/health-checks/healthcheck_url)," /etc/lava-server/dispatcher-config/health-checks/* && sed -i 's,?.*$,,' /etc/lava-server/dispatcher-config/health-checks/* ;fi
 RUN chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/health-checks/
 
 COPY devices/ /root/devices/
