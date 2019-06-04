@@ -222,6 +222,7 @@ masters:
     lava-coordinator:		Does the master should ran a lava-coordinator and export its port
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
+    healthcheck_url:		Hack healthchecks hosting URL. See hosting healthchecks below
     allowed_hosts:		A list of FQDN used to access the LAVA master
     - "fqdn1"
     - "fqdn2"
@@ -269,6 +270,7 @@ slaves:
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
     use_tap:			Does TAP netdevices could be used
     arch:			The arch of the worker (if not x86_64), only accept arm64
+    host_healthcheck:		If true, enable the optional healthcheck container. See hosting healthchecks below
     lava-coordinator:		Does the slave should ran a lava-coordinator
     expose_ser2net:		Do ser2net ports need to be available on host
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
@@ -450,6 +452,24 @@ EXample for an upsquare and a dispatcher availlable at 192.168.66.1:
 		next-server 192.168.66.1;
 	}
 ```
+
+## How to host healthchecks
+Healthchecks jobs needs externals ressources (rootfs, images, etc...).
+By default, lava-docker healthchecks uses ones hosted on our github, but this imply usage of external networks and some bandwith.
+For hosting locally healthchecks files, you can set healthcheck_host on a slave for hosting them.
+Note that doing that bring some constraints:
+- Since healthchecks jobs are hosted by the master, The healthcheck hostname must be the same accross all slaves.
+- You need to set the base URL on the master via healthcheck_url
+- If you have qemu devices, Since they are inside the docker which provides an internal DNS , you probably must use the container("healthcheck") name as hostname.
+- In case of a simple setup, you can use the slave IP as healthcheck_url
+- In more complex setup (slave sprayed on different site with different network subnets) you need to set a DNS server for having the same DNS availlable on all sites.
+
+For setting a DNS server, the easiest way is to use dnsmasq and add in /etc/hosts "healtcheck ipaddressoftheslave"
+
+Example:
+One master and slave on DC A, and one slave on DC B.
+Both slave need to have healthcheck_host to true and master will have healthcheck_url set to healthcheck:8080
+You have to add a DNS server on both slave with an healthcheck entry.
 
 ## Bugs, Contact
 The prefered way to submit bugs are via the github issue tracker
