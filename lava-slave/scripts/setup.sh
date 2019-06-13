@@ -10,6 +10,12 @@ if [ -z "$LAVA_MASTER_URI" ];then
 	exit 11
 fi
 
+# Install PXE
+OPWD=$(pwd)
+cd /var/lib/lava/dispatcher/tmp && grub-mknetdir --net-directory=.
+cp /root/grub.cfg /var/lib/lava/dispatcher/tmp/boot/grub/
+cd $OPWD
+
 lavacli identities add --uri $LAVA_MASTER_BASEURI --token $LAVA_MASTER_TOKEN --username $LAVA_MASTER_USER default
 
 echo "Dynamic slave for $LAVA_MASTER ($LAVA_MASTER_URI)"
