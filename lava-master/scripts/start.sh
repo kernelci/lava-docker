@@ -32,9 +32,7 @@ start apache2 || exit $?
 start lava-logs || exit $?
 start lava-master || exit $?
 start lava-coordinator || exit $?
-start lava-slave || exit $?
 start lava-server-gunicorn || exit $?
-start tftpd-hpa || exit $?
 
 postgres-ready
 service apache2 reload #added after the website not running a few times on boot
