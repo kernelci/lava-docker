@@ -18,6 +18,7 @@ COPY users/ /root/lava-users/
 COPY groups/ /root/lava-groups/
 COPY tokens/ /root/lava-callback-tokens/
 COPY scripts/setup.sh /
+COPY scripts/start.sh /
 
 COPY settings.conf /etc/lava-server/
 
