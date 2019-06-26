@@ -34,6 +34,8 @@ COPY lava_http_fqdn /root/
 
 COPY env/ /etc/lava-server/dispatcher.d/
 
+COPY apache2/ /etc/apache2/
+
 EXPOSE 3079 5555 5556
 
 CMD /start.sh && while [ true ];do sleep 365d; done
