@@ -573,7 +573,7 @@ def main():
             if (use_conmux and use_ser2net) or (use_conmux and use_screen) or (use_screen and use_ser2net):
                 print("ERROR: Only one uart handler must be configured")
                 sys.exit(1)
-            if not use_conmux and not use_screen and not use_ser2net:
+            if not use_conmux and not use_screen and not use_ser2net and not "connection_command" in board:
                 use_ser2net = True
             if use_conmux:
                 conmuxline = template_conmux.substitute(board=board_name, baud=baud)
@@ -601,7 +601,7 @@ def main():
                 fp = open("%s/lava-screen.conf" % workerdir, "a")
                 fp.write("%s\n" % board_name)
                 fp.close()
-        elif "connection_command" in board:
+        if "connection_command" in board:
             connection_command = board["connection_command"]
             device_line += template_device_connection_command.substitute(connection_command=connection_command)
         if "uboot_ipaddr" in board:

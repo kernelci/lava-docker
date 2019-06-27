@@ -2,8 +2,6 @@ FROM baylibre/lava-master-base:2019.03_stretch
 
 COPY backup /root/backup/
 
-COPY configs/tftpd-hpa /etc/default/tftpd-hpa
-
 COPY default/* /etc/default/
 
 RUN git clone https://github.com/BayLibre/lava-healthchecks.git
@@ -18,6 +16,7 @@ COPY users/ /root/lava-users/
 COPY groups/ /root/lava-groups/
 COPY tokens/ /root/lava-callback-tokens/
 COPY scripts/setup.sh /
+COPY scripts/start.sh /
 
 COPY settings.conf /etc/lava-server/
 
@@ -35,6 +34,8 @@ COPY lava_http_fqdn /root/
 
 COPY env/ /etc/lava-server/dispatcher.d/
 
-EXPOSE 69/udp 80 3079 5555 5556
+COPY apache2/ /etc/apache2/
+
+EXPOSE 3079 5555 5556
 
 CMD /start.sh && while [ true ];do sleep 365d; done
