@@ -156,6 +156,7 @@ if [ -e /root/device-types ];then
 			diff -u "/etc/lava-server/dispatcher-config/device-types/$(basename $i)" $i
 		fi
 		cp $i /etc/lava-server/dispatcher-config/device-types/
+		chown lavaserver:lavaserver /etc/lava-server/dispatcher-config/device-types/$(basename $i)
 		devicetype=$(basename $i |sed 's,.jinja2,,')
 		lava-server manage device-types list | grep -q "[[:space:]]$devicetype[[:space:]]"
 		if [ $? -eq 0 ];then

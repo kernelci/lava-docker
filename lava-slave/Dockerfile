@@ -1,4 +1,4 @@
-FROM baylibre/lava-slave-base:2019.03_stretch
+FROM lavasoftware/lava-dispatcher:2019.07
 
 RUN apt-get update
 
@@ -74,4 +74,4 @@ COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
 EXPOSE 69/udp 80
 
-CMD /start.sh
+CMD /usr/local/bin/start.sh

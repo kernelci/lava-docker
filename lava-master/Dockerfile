@@ -1,4 +1,6 @@
-FROM baylibre/lava-master-base:2019.03_stretch
+FROM lavasoftware/lava-server:2019.07
+
+RUN apt-get update && apt-get -y install sudo lava-coordinator git
 
 COPY backup /root/backup/
 
@@ -15,8 +17,7 @@ COPY device-types/ /root/device-types/
 COPY users/ /root/lava-users/
 COPY groups/ /root/lava-groups/
 COPY tokens/ /root/lava-callback-tokens/
-COPY scripts/setup.sh /
-COPY scripts/start.sh /
+COPY entrypoint.d/*sh /root/entrypoint.d/
 
 COPY settings.conf /etc/lava-server/
 
@@ -33,9 +34,18 @@ COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 COPY lava_http_fqdn /root/
 
 COPY env/ /etc/lava-server/dispatcher.d/
+RUN chown -R lavaserver:lavaserver /etc/lava-server/dispatcher.d/
 
 COPY apache2/ /etc/apache2/
 
+# Fixes 'postgresql ERROR:  invalid locale name: "en_US.UTF-8"' when restoring a backup
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8
+
+# TODO: send this fix to upstream
+RUN sed -i 's,find /root/entrypoint.d/ -type f,find /root/entrypoint.d/ -type f | sort,' /root/entrypoint.sh
+# TODO: send this fix to upstream
+RUN sed -i 's,pidfile =.*,pidfile = "/run/lava-coordinator/lava-coordinator.pid",' /usr/bin/lava-coordinator
+
 EXPOSE 3079 5555 5556
 
-CMD /start.sh && while [ true ];do sleep 365d; done
+CMD /root/entrypoint.sh && while [ true ];do sleep 365d; done

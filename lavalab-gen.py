@@ -128,8 +128,6 @@ def main():
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
-        if "lava-coordinator" in master and master["lava-coordinator"]:
-            dockcomp["services"][name]["ports"].append('3079:3079')
         persistent_db = False
         if "persistent_db" in master:
             persistent_db = master["persistent_db"]
@@ -140,8 +138,6 @@ def main():
             dockcomp["volumes"] = {}
             dockcomp["volumes"][pg_volume_name] = {}
             dockcomp["volumes"]["lava_job_output"] = {}
-        with open(dockcomposeymlpath, 'w') as f:
-            yaml.dump(dockcomp, f)
 
         shutil.copytree("lava-master", workerdir)
         os.mkdir("%s/devices" % workerdir)
@@ -151,6 +147,18 @@ def main():
         groupdir = "%s/groups" % workerdir
         os.mkdir(groupdir)
         worker = master
+        if "lava-coordinator" in master and master["lava-coordinator"]:
+            dockcomp["services"][name]["ports"].append('3079:3079')
+            f_entrypoint = open("%s/entrypoint.d/02_lava-coordinator.sh" % workerdir, 'w')
+            f_entrypoint.write("#!/bin/sh\n")
+            f_entrypoint.write("echo 'Start lava-coordinator'\n")
+            f_entrypoint.write("mkdir /run/lava-coordinator && chown lavaserver /run/lava-coordinator\n")
+            f_entrypoint.write("start-stop-daemon --start --chuid lavaserver --background --exec /usr/bin/lava-coordinator -- --logfile=/var/log/lava-server/lava-coordinator.log\n")
+            f_entrypoint.write("exit $?\n")
+            f_entrypoint.close()
+            os.chmod("%s/entrypoint.d/02_lava-coordinator.sh" % workerdir, 0o755)
+        with open(dockcomposeymlpath, 'w') as f:
+            yaml.dump(dockcomp, f)
         if "healthcheck_url" in master:
             f_hc = open("%s/health-checks/healthcheck_url" % workerdir, 'w')
             f_hc.write(master["healthcheck_url"])
