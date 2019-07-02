@@ -61,6 +61,7 @@ RUN mkdir -p /root/.config
 
 COPY devices/ /root/devices/
 COPY tags/ /root/tags/
+COPY aliases/ /root/aliases/
 COPY deviceinfo/ /root/deviceinfo/
 
 RUN if [ -x /usr/local/bin/extra_actions ] ; then /usr/local/bin/extra_actions ; fi

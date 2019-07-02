@@ -626,6 +626,12 @@ def main():
             for tag in board["tags"]:
                 ftag.write("%s\n" % tag)
             ftag.close()
+        if "aliases" in board:
+            aliases_dir = "%s/aliases/" % workerdir
+            falias = open("%s/%s" % (aliases_dir, board["type"]), 'a')
+            for alias in board["aliases"]:
+                falias.write("%s\n" % alias)
+            falias.close()
         if "user" in board:
             deviceinfo = open("%s/deviceinfo/%s" % (workerdir, board_name), 'w')
             deviceinfo.write("DEVICE_USER=%s\n" % board["user"])
