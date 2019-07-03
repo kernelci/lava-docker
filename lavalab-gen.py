@@ -275,7 +275,7 @@ def main():
                 fenv = open("%s/env.yaml" % envdir, 'w')
                 fenv.write("overrides:\n")
                 for line in slaveenv["env"]:
-                    fenv.write("  %s\n" % line)
+                    fenv.write("  %s" % yaml.dump(line, default_flow_style=False))
                 fenv.close()
         if "loglevel" in worker:
             for component in worker["loglevel"]:
@@ -409,7 +409,7 @@ def main():
             fenv = open("%s/env.yaml" % envdir, 'w')
             fenv.write("overrides:\n")
             for line in slave["env"]:
-                fenv.write("  %s\n" % line)
+                fenv.write("  %s" % yaml.dump(line, default_flow_style=False))
             fenv.close()
         if not "remote_proto" in worker:
             remote_proto = "http"
