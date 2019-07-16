@@ -1,5 +1,10 @@
 FROM baylibre/lava-slave-base:2019.03_stretch
 
+# Switch repositories to avoid errors with non-existing amd64_Packages.diff_Index file
+RUN echo "deb https://deb.debian.org/debian/ stretch main contrib non-free \ 
+  deb https://deb.debian.org/debian/ stretch-updates main contrib non-free \ 
+  deb https://deb.debian.org/debian-security/ stretch/updates main contrib non-free \ 
+  deb https://deb.debian.org/debian/ stretch-backports main contrib non-free" > /etc/apt/sources.list
 RUN apt-get update
 
 # cu conmux is for console via conmux
