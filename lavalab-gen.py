@@ -364,7 +364,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker", "custom_volumes" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -479,6 +479,13 @@ def main():
             for line in slave["env"]:
                 fenv.write("  %s\n" % line)
             fenv.close()
+        if "custom_volumes" in slave:
+            for cvolume in slave["custom_volumes"]:
+                dockcomp["services"][worker_name]["volumes"].append(cvolume)
+                volume_name = cvolume.split(':')[0]
+                if "volumes" not in dockcomp:
+                    dockcomp["volumes"] = {}
+                dockcomp["volumes"][volume_name] = {}
         if not "remote_proto" in worker:
             remote_proto = "http"
         else:
