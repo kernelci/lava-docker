@@ -143,6 +143,22 @@ do
 	done
 done
 
+for devicetype in $(ls /root/aliases/)
+do
+	lavacli $LAVACLIOPTS device-types aliases list $devicetype > /tmp/device-types-aliases-$devicetype.list
+	while read alias
+	do
+		grep -q " $alias$" /tmp/device-types-aliases-$devicetype.list
+		if [ $? -eq 0 ];then
+			echo "DEBUG: $alias for $devicetype already present"
+			continue
+		fi
+		echo "DEBUG: Add alias $alias to $devicetype"
+		lavacli $LAVACLIOPTS device-types aliases add $devicetype $alias || exit $?
+		echo " $alias" >> /tmp/device-types-aliases-$devicetype.list
+	done < /root/aliases/$devicetype
+done
+
 if [ -e /etc/lava-dispatcher/certificates.d/$(hostname).key ];then
 	echo "INFO: Enabling encryption"
 	sed -i 's,.*ENCRYPT=.*,ENCRYPT="--encrypt",' /etc/lava-dispatcher/lava-slave

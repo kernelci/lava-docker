@@ -94,7 +94,7 @@ def usage():
 def main():
     need_zmq_auth_gen = False
     fp = open(boards_yaml, "r")
-    workers = yaml.load(fp)
+    workers = yaml.safe_load(fp)
     fp.close()
 
     os.mkdir("output")
@@ -128,8 +128,6 @@ def main():
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
-        if "lava-coordinator" in master and master["lava-coordinator"]:
-            dockcomp["services"][name]["ports"].append('3079:3079')
         persistent_db = False
         if "persistent_db" in master:
             persistent_db = master["persistent_db"]
@@ -140,8 +138,6 @@ def main():
             dockcomp["volumes"] = {}
             dockcomp["volumes"][pg_volume_name] = {}
             dockcomp["volumes"]["lava_job_output"] = {}
-        with open(dockcomposeymlpath, 'w') as f:
-            yaml.dump(dockcomp, f)
 
         shutil.copytree("lava-master", workerdir)
         os.mkdir("%s/devices" % workerdir)
@@ -151,6 +147,18 @@ def main():
         groupdir = "%s/groups" % workerdir
         os.mkdir(groupdir)
         worker = master
+        if "lava-coordinator" in master and master["lava-coordinator"]:
+            dockcomp["services"][name]["ports"].append('3079:3079')
+            f_entrypoint = open("%s/entrypoint.d/02_lava-coordinator.sh" % workerdir, 'w')
+            f_entrypoint.write("#!/bin/sh\n")
+            f_entrypoint.write("echo 'Start lava-coordinator'\n")
+            f_entrypoint.write("mkdir /run/lava-coordinator && chown lavaserver /run/lava-coordinator\n")
+            f_entrypoint.write("start-stop-daemon --start --chuid lavaserver --background --exec /usr/bin/lava-coordinator -- --logfile=/var/log/lava-server/lava-coordinator.log\n")
+            f_entrypoint.write("exit $?\n")
+            f_entrypoint.close()
+            os.chmod("%s/entrypoint.d/02_lava-coordinator.sh" % workerdir, 0o755)
+        with open(dockcomposeymlpath, 'w') as f:
+            yaml.dump(dockcomp, f)
         if "healthcheck_url" in master:
             f_hc = open("%s/health-checks/healthcheck_url" % workerdir, 'w')
             f_hc.write(master["healthcheck_url"])
@@ -321,7 +329,7 @@ def main():
         else:
             #master exists
             fp = open(dockcomposeymlpath, "r")
-            dockcomp = yaml.load(fp)
+            dockcomp = yaml.safe_load(fp)
             fp.close()
         dockcomp["services"][name] = {}
         dockcomp["services"][name]["hostname"] = name
@@ -516,7 +524,7 @@ def main():
         workerdir = "output/%s/%s" % (host, worker_name)
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         fp = open(dockcomposeymlpath, "r")
-        dockcomp = yaml.load(fp)
+        dockcomp = yaml.safe_load(fp)
         fp.close()
         device_path = "%s/devices/" % workerdir
         devices_path = "%s/devices/%s" % (workerdir, worker_name)
@@ -618,6 +626,12 @@ def main():
             for tag in board["tags"]:
                 ftag.write("%s\n" % tag)
             ftag.close()
+        if "aliases" in board:
+            aliases_dir = "%s/aliases/" % workerdir
+            falias = open("%s/%s" % (aliases_dir, board["type"]), 'a')
+            for alias in board["aliases"]:
+                falias.write("%s\n" % alias)
+            falias.close()
         if "user" in board:
             deviceinfo = open("%s/deviceinfo/%s" % (workerdir, board_name), 'w')
             deviceinfo.write("DEVICE_USER=%s\n" % board["user"])
@@ -666,7 +680,7 @@ def main():
         print("Add ser2net ports for %s (%s) %s-%s" % (slave_name, host, ser2net_port_start, ser2net_ports[slave_name]))
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         fp = open(dockcomposeymlpath, "r")
-        dockcomp = yaml.load(fp)
+        dockcomp = yaml.safe_load(fp)
         fp.close()
         ser2net_port_max = ser2net_ports[slave_name] - 1
         dockcomp["services"][slave_name]["ports"].append("%s-%s:%s-%s" % (ser2net_port_start, ser2net_port_max, ser2net_port_start, ser2net_port_max))
