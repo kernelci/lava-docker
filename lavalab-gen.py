@@ -304,7 +304,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -334,7 +334,7 @@ def main():
         dockcomp["services"][name] = {}
         dockcomp["services"][name]["hostname"] = name
         dockcomp["services"][name]["dns_search"] = ""
-        dockcomp["services"][name]["ports"] = [ "80:80" ]
+        dockcomp["services"][name]["ports"] = []
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["environment"] = {}
         dockcomp["services"][name]["build"] = {}
@@ -485,6 +485,11 @@ def main():
             use_nbd = worker["use_nbd"]
         if use_nbd:
             dockcomp["services"][name]["ports"].append("61950-62000:61950-62000")
+        use_overlay_server = True
+        if "use_overlay_server" in worker:
+            use_overlay_server = worker["use_overlay_server"]
+        if use_overlay_server:
+            dockcomp["services"][name]["ports"].append("80:80")
         use_nfs = False
         if "use_nfs" in worker:
             use_nfs = worker["use_nfs"]

@@ -269,6 +269,7 @@ slaves:
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
     use_tftp:			Does LAVA need a TFTP server (default True)
     use_nbd:			Does LAVA need a NBD server (default True)
+    use_overlay_server:		Does LAVA need an overlay server (default True)
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
     use_tap:			Does TAP netdevices could be used
     arch:			The arch of the worker (if not x86_64), only accept arm64
