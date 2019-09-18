@@ -304,7 +304,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -334,7 +334,7 @@ def main():
         dockcomp["services"][name] = {}
         dockcomp["services"][name]["hostname"] = name
         dockcomp["services"][name]["dns_search"] = ""
-        dockcomp["services"][name]["ports"] = [ "69:69/udp", "80:80", "61950-62000:61950-62000" ]
+        dockcomp["services"][name]["ports"] = [ "80:80", "61950-62000:61950-62000" ]
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["environment"] = {}
         dockcomp["services"][name]["build"] = {}
@@ -474,6 +474,11 @@ def main():
                 fudev.close()
                 if not "bind_dev" in slave or not slave["bind_dev"]:
                     dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (udev_dev["name"], udev_dev["name"]))
+        use_tftp = True
+        if "use_tftp" in worker:
+            use_tftp = worker["use_tftp"]
+        if use_tftp:
+            dockcomp["services"][name]["ports"].append("69:69/udp")
         use_nfs = False
         if "use_nfs" in worker:
             use_nfs = worker["use_nfs"]
