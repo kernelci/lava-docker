@@ -383,8 +383,8 @@ docker-compose up -d
 
 ## Proxy cache (Work in progress)
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
-You have to uncomment a line in lava-master/Dockerfile to enable it.<br/>
 For the moment, it is unsupported and unbuilded.
+For using an external squid server see "How to made LAVA slave use a proxy" below
 
 ## Backporting LAVA patches
 All upstream LAVA patches could be backported by placing them in lava-master/lava-patch/
@@ -445,6 +445,13 @@ Add env to a slave like:
 slave:
   env:
   - "http_proxy: http://dns:port"
+Or on master via
+    slaveenv:
+    - name: lab
+      env:
+       - "http_proxy: http://squid_IP_address:3128"
+       - "https_proxy: http://squid_IP_address:3128"
+
 
 ## How to use a board which uses PXE ?
 All boards which uses PXE, could be used with LAVA via grub.
