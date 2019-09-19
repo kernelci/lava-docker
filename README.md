@@ -247,6 +247,14 @@ masters:
     - username: The LAVA user owning the token below. (This user should be created via users:)
       token: The token for this callback
       description: The description of this token. This string could be used with LAVA-CI.
+    smtp:			WARNING: Usage of an SMTP server makes it mandatory for each user to have an email address
+      email_host:		The host to use for sending email
+      email_host_user:		Username to use for the SMTP server
+      email_host_password:	Password to use for the SMTP server
+      email_port:		Port to use for the SMTP server (default: 25)
+      email_use_tls:		Whether to use a TLS (secure) connection when talking to the SMTP server
+      email_use_ssl:		Whether to use an implicit TLS (secure) connection when talking to the SMTP server
+      email_backend:		The backend to use for sending emails (default: 'django.core.mail.backends.smtp.EmailBackend')
     slaveenv:			A list of environment to pass to slave
       - name: slavename		The name of slave (mandatory)
         env:
@@ -267,6 +275,9 @@ slaves:
     remote_proto:		http(default) or https
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
+    use_tftp:			Does LAVA need a TFTP server (default True)
+    use_nbd:			Does LAVA need a NBD server (default True)
+    use_overlay_server:		Does LAVA need an overlay server (default True)
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
     use_tap:			Does TAP netdevices could be used
     arch:			The arch of the worker (if not x86_64), only accept arm64
@@ -380,8 +391,8 @@ docker-compose up -d
 
 ## Proxy cache (Work in progress)
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
-You have to uncomment a line in lava-master/Dockerfile to enable it.<br/>
 For the moment, it is unsupported and unbuilded.
+For using an external squid server see "How to made LAVA slave use a proxy" below
 
 ## Backporting LAVA patches
 All upstream LAVA patches could be backported by placing them in lava-master/lava-patch/
@@ -442,6 +453,13 @@ Add env to a slave like:
 slave:
   env:
   - "http_proxy: http://dns:port"
+Or on master via
+    slaveenv:
+    - name: lab
+      env:
+       - "http_proxy: http://squid_IP_address:3128"
+       - "https_proxy: http://squid_IP_address:3128"
+
 
 ## How to use a board which uses PXE ?
 All boards which uses PXE, could be used with LAVA via grub.
