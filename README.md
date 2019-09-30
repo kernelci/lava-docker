@@ -291,6 +291,9 @@ slaves:
     env:
       - line1			A list of line to set as environment (See /etc/lava-server/env.yaml for examples)
       - line2
+    tags:			(optional) List of tag to set on all devices attached to this slave
+    - tag1
+    - tag2
     devices:			A list of devices which need UDEV rules
       - name:			The name of the device
         vendorid:		The VID of the UART (Formated as 0xXXXX)
