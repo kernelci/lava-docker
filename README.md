@@ -279,6 +279,7 @@ slaves:
     use_nbd:			Does LAVA need a NBD server (default True)
     use_overlay_server:		Does LAVA need an overlay server (default True)
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
+    use_sshfs:			'true' if the LAVA dispatcher needs to mount a SSHFS volume
     use_tap:			Does TAP netdevices could be used
     arch:			The arch of the worker (if not x86_64), only accept arm64
     host_healthcheck:		If true, enable the optional healthcheck container. See hosting healthchecks below
@@ -476,6 +477,19 @@ EXample for an upsquare and a dispatcher availlable at 192.168.66.1:
 		next-server 192.168.66.1;
 	}
 ```
+
+## How to mount a SSHFS volume in the LAVA slave
+lava-docker automates the mounting of an existing SSHFS installation into the docker container.
+
+Setup:
+- Install SSHFS on the host
+- Configure SSHFS to use /media/sshfs_mnt/ as the mount point on the host.
+
+lava-docker usage:
+- Set use_sshfs 'true' in the slave section of the boards.yaml
+- docker-compose will be configured to mount /media/sshfs_mnt/ on the host into the same path within the container.
+
+If you wish to use different paths please modify the paths specified in lavalab-gen.py
 
 ## How to host healthchecks
 Healthchecks jobs needs externals ressources (rootfs, images, etc...).

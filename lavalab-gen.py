@@ -364,7 +364,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_sshfs" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -559,6 +559,11 @@ def main():
             fp.write("apt-get -y install nfs-kernel-server\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
+        use_sshfs = False
+        if "use_sshfs" in worker:
+            use_sshfs = worker["use_sshfs"]
+        if use_sshfs:
+            dockcomp["services"][worker_name]["volumes"].append("/media/sshfs_mnt:/media/sshfs_mnt")
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
         if "loglevel" in worker:
