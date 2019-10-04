@@ -364,7 +364,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -700,6 +700,12 @@ def main():
             tagdir = "%s/tags/" % workerdir
             ftag = open("%s/%s" % (tagdir, board_name), 'w')
             for tag in board["tags"]:
+                ftag.write("%s\n" % tag)
+            ftag.close()
+        if "tags" in slave:
+            tagdir = "%s/tags/" % workerdir
+            ftag = open("%s/%s" % (tagdir, board_name), 'a')
+            for tag in slave["tags"]:
                 ftag.write("%s\n" % tag)
             ftag.close()
         if "aliases" in board:

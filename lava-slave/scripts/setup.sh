@@ -105,10 +105,14 @@ do
 		if [ $? -eq 0 ];then
 			echo "$devicename already present"
 			#verify if present on another worker
-			#TODO
-			lavacli $LAVACLIOPTS devices show $devicename |grep ^worker |grep -q $worker
-			if [ $? -ne 0 ];then
-				echo "ERROR: $devicename already present on another worker"
+			lavacli $LAVACLIOPTS devices show $devicename |grep ^worker > /tmp/current-worker
+			if [ $? -ne 0 ]; then
+				CURR_WORKER=""
+			else
+				CURR_WORKER=$(cat /tmp/current-worker | sed '^.* ,,')
+			fi
+			if [ ! -z "$CURR_WORKER" -a "$CURR_WORKER" != "$worker" ];then
+				echo "ERROR: $devicename already present on another worker $CURR_WORKER"
 				exit 1
 			fi
 			DEVICE_HEALTH=$(grep "$devicename[[:space:]]" /tmp/devices.list | sed 's/.*,//')

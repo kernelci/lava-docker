@@ -14,7 +14,7 @@ fi
 if [ -e /root/backup/db_lavaserver ];then
 	echo "Restore database from backup"
 	sudo -u postgres psql < /root/backup/db_lavaserver || exit $?
-	lava-server manage migrate || exit $?
+	yes yes | lava-server manage migrate || exit $?
 	echo "Restore jobs output from backup"
 	rm -r /var/lib/lava-server/default/media/job-output/*
 	tar xzf /root/backup/joboutput.tar.gz || exit $?
