@@ -556,6 +556,8 @@ def main():
         if use_nfs:
             dockcomp["services"][worker_name]["volumes"].append("/var/lib/lava/dispatcher/tmp:/var/lib/lava/dispatcher/tmp")
             fp = open("%s/scripts/extra_actions" % workerdir, "a")
+            # LAVA check if this package is installed when doing NFS jobs
+            # So we need to install it, even if it is not used
             fp.write("apt-get -y install nfs-kernel-server\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)

@@ -414,10 +414,14 @@ For restoring this backup, simply cp backup-20180704_1206/* output/local/master/
 ## Upgrading from a previous lava-docker
 For upgrading between two LAVA version, the only method is:
 - backup data by running ./backup.sh on the host running the master (See Backups / restore)
-- checkout the new lava-docker and your boards.yaml
+- checkout the new lava-docker and update your boards.yaml
+- Move the old output directory away
 - run lavalab-gen.sh
 - copy your backup data in output/yourhost/master/backup directory
-- build and run docker-compose
+- build via docker-compose build
+- Stop the old docker via docker-compose down
+- Run the new version via docker-compose up -d
+- Check everything is ok via docker-compose logs -f
 
 ## Security
 Note that this container provides defaults which are unsecure. If you plan on deploying this in a production enviroment please consider the following items:
