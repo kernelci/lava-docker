@@ -24,7 +24,8 @@ docker exec -ti $DOCKERID gzip /tmp/db_lavaserver || exit $?
 docker cp $DOCKERID:/tmp/db_lavaserver.gz $BACKUP_DIR/ || exit $?
 docker exec -ti $DOCKERID rm /tmp/db_lavaserver.gz || exit $?
 
-docker exec -ti $DOCKERID tar czf /root/joboutput.tar.gz /var/lib/lava-server/default/media/job-output/ || exit $?
+# tar outputs warnings when file changes on disk while creating tar file. So do not "exit on error"
+docker exec -ti $DOCKERID tar czf /root/joboutput.tar.gz /var/lib/lava-server/default/media/job-output/ || echo "WARNING: tar operation returned $?"
 docker cp $DOCKERID:/root/joboutput.tar.gz $BACKUP_DIR/ || exit $?
 docker exec -ti $DOCKERID rm /root/joboutput.tar.gz || exit $?
 
