@@ -1,6 +1,11 @@
 #!/bin/sh
 
 BACKUP_DIR="backup-$(date +%Y%m%d_%H%M)"
+# use /tmp by default on host (this is used by tar)
+TMPDIR=${TMPDIR:-/tmp}
+export TMPDIR
+
+mkdir -p $TMPDIR
 
 mkdir $BACKUP_DIR
 cp boards.yaml $BACKUP_DIR
