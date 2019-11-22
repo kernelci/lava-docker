@@ -280,6 +280,7 @@ slaves:
     use_overlay_server:		Does LAVA need an overlay server (default True)
     use_nfs:			Does the LAVA dispatcher will run NFS jobs
     use_tap:			Does TAP netdevices could be used
+    use_docker:			Permit to use docker commands in slave
     arch:			The arch of the worker (if not x86_64), only accept arm64
     host_healthcheck:		If true, enable the optional healthcheck container. See hosting healthchecks below
     lava-coordinator:		Does the slave should ran a lava-coordinator
