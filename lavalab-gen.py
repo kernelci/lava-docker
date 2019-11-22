@@ -545,6 +545,10 @@ def main():
             use_nbd = worker["use_nbd"]
         if use_nbd:
             dockcomp["services"][name]["ports"].append("61950-62000:61950-62000")
+            fp = open("%s/scripts/extra_actions" % workerdir, "a")
+            fp.write("apt-get -y install xnbd-server\n")
+            fp.close()
+            os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
         use_overlay_server = True
         if "use_overlay_server" in worker:
             use_overlay_server = worker["use_overlay_server"]
