@@ -309,8 +309,10 @@ boards:
     kvm: (For qemu only) Does the qemu could use KVM (default: no)
     uboot_ipaddr:	(optional) a static IP to set in uboot
     uboot_macaddr:	(Optional) the MAC address to set in uboot
-    custom_option:	(optional) All following strings will be directly append to devicefile
+    custom_option:	(optional) All following strings will be directly append to devicefile included in {% opt %}
     - "set x=1"
+    raw_custom_option:	(optional) All following strings will be directly append to devicefile
+    - "{% set x=1 %}"
     tags:		(optional) List of tag to set on this device
     - tag1
     - tag2

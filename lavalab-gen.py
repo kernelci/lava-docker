@@ -743,6 +743,9 @@ def main():
             else:
                 for line in board["custom_option"].splitlines():
                     device_line += "{%% %s %%}\n" % line
+        if "raw_custom_option" in board:
+            for coption in board["raw_custom_option"]:
+                device_line += "%s\n" % coption
         if not os.path.isdir(device_path):
             os.mkdir(device_path)
         if not os.path.isdir(devices_path):
