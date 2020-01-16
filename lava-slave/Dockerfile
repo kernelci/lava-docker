@@ -63,6 +63,8 @@ COPY devices/ /root/devices/
 COPY tags/ /root/tags/
 COPY aliases/ /root/aliases/
 COPY deviceinfo/ /root/deviceinfo/
+COPY entrypoint.d/*sh /root/entrypoint.d/
+RUN chmod +x /root/entrypoint.d/*
 
 RUN if [ -x /usr/local/bin/extra_actions ] ; then /usr/local/bin/extra_actions ; fi
 
