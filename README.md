@@ -56,7 +56,7 @@ You will see it in the "All Jobs" list: http://localhost:10080/scheduler/alljobs
 To add a board you need to find its device-type, standard naming is to use the same as the official kernel DT name.
 (But a very few DUT differ from that)
 
-You could check in https://github.com/Linaro/lava-server/tree/release/lava_scheduler_app/tests/device-types if you find yours.
+You could check in https://github.com/Linaro/lava/tree/master/etc/dispatcher-config/device-types if you find yours.
 
 Example:
 For a beagleboneblack, the device-type is beaglebone-black (Even if official DT name is am335x-boneblack)
