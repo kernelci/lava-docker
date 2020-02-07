@@ -351,6 +351,12 @@ Example:
 Bus 001 Device 054: ID 0403:6001 Future Technology Devices International, Ltd FT232 Serial (UART) IC
 ```
 This device must use "0403" for idvendor and 6001 for idproduct.
+* Some boards reset serial on power on. This can cause ser2net/telnet to disconnect resulting in the LAVA Worker being unable to program the board. This may be mitigated by passing LOCAL as an option to ser2net in the boards.yaml.
+Example:
+```
+      ser2net_options:
+        - LOCAL
+```
 
 Note on connection_command: connection_command is for people which want to use other custom way than ser2net to handle the console.
 
