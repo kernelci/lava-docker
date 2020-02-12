@@ -328,7 +328,7 @@ boards:
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
       use_conmux:	True/False (Use conmux-console instead of ser2net)
       use_ser2net: 	True/False (Deprecated, ser2net is the default uart handler)
-      ser2net_options	(optional) A list of ser2net options to add
+      ser2net_options:	(optional) A list of ser2net options to add
         - option1
         - option2
       use_screen: 	True/False (Use screen via ssh instead of ser2net)
@@ -351,6 +351,12 @@ Example:
 Bus 001 Device 054: ID 0403:6001 Future Technology Devices International, Ltd FT232 Serial (UART) IC
 ```
 This device must use "0403" for idvendor and 6001 for idproduct.
+* Some boards reset serial on power on. This can cause ser2net/telnet to disconnect resulting in the LAVA Worker being unable to program the board. This may be mitigated by passing LOCAL as an option to ser2net in the boards.yaml.
+Example:
+```
+      ser2net_options:
+        - LOCAL
+```
 
 Note on connection_command: connection_command is for people which want to use other custom way than ser2net to handle the console.
 
