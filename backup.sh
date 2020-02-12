@@ -1,6 +1,11 @@
 #!/bin/sh
 
 BACKUP_DIR="backup-$(date +%Y%m%d_%H%M)"
+# use /tmp by default on host (this is used by tar)
+TMPDIR=${TMPDIR:-/tmp}
+export TMPDIR
+
+mkdir -p $TMPDIR
 
 mkdir $BACKUP_DIR
 cp boards.yaml $BACKUP_DIR
@@ -10,18 +15,19 @@ if [ -z "$DOCKERID" ];then
 	exit 1
 fi
 
-docker exec -ti $DOCKERID tar czf /root/devices.tar.gz /etc/lava-server/dispatcher-config/devices/ || exit $?
+docker exec -t $DOCKERID tar czf /root/devices.tar.gz /etc/lava-server/dispatcher-config/devices/ || exit $?
 docker cp $DOCKERID:/root/devices.tar.gz $BACKUP_DIR/ || exit $?
 
 # for an unknown reason pg_dump > file doesnt work
-docker exec -ti $DOCKERID sudo -u postgres pg_dump --create --clean lavaserver --file /tmp/db_lavaserver || exit $?
-docker exec -ti $DOCKERID gzip /tmp/db_lavaserver || exit $?
+docker exec -t $DOCKERID sudo -u postgres pg_dump --create --clean lavaserver --file /tmp/db_lavaserver || exit $?
+docker exec -t $DOCKERID gzip /tmp/db_lavaserver || exit $?
 docker cp $DOCKERID:/tmp/db_lavaserver.gz $BACKUP_DIR/ || exit $?
-docker exec -ti $DOCKERID rm /tmp/db_lavaserver.gz || exit $?
+docker exec -t $DOCKERID rm /tmp/db_lavaserver.gz || exit $?
 
-docker exec -ti $DOCKERID tar czf /root/joboutput.tar.gz /var/lib/lava-server/default/media/job-output/ || exit $?
+# tar outputs warnings when file changes on disk while creating tar file. So do not "exit on error"
+docker exec -t $DOCKERID tar czf /root/joboutput.tar.gz /var/lib/lava-server/default/media/job-output/ || echo "WARNING: tar operation returned $?"
 docker cp $DOCKERID:/root/joboutput.tar.gz $BACKUP_DIR/ || exit $?
-docker exec -ti $DOCKERID rm /root/joboutput.tar.gz || exit $?
+docker exec -t $DOCKERID rm /root/joboutput.tar.gz || exit $?
 
 echo "Backup done in $BACKUP_DIR"
 rm -f backup-latest

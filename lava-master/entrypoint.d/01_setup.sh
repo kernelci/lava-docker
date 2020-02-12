@@ -17,6 +17,10 @@ if [ -e /root/backup/db_lavaserver ];then
 	yes yes | lava-server manage migrate || exit $?
 	echo "Restore jobs output from backup"
 	rm -r /var/lib/lava-server/default/media/job-output/*
+
+        # allow using different folder for tar operations (/tmp by default)
+        TMPDIR=${TMPDIR:-/tmp}
+
 	tar xzf /root/backup/joboutput.tar.gz || exit $?
 fi
 
