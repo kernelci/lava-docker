@@ -23,6 +23,8 @@ if [ -e /root/backup/db_lavaserver ];then
 
 	tar xzf /root/backup/joboutput.tar.gz || exit $?
 fi
+	lava-server manage makemigrations
+	yes yes | lava-server manage migrate || exit $?
 
 if [ -e /root/backup/devices.tar.gz ];then
 	echo "INFO: Restoring devices files"

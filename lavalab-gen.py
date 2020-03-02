@@ -4,6 +4,7 @@ from __future__ import print_function
 import os, sys, time
 import subprocess
 import yaml
+import re
 import string
 import socket
 import shutil
@@ -113,7 +114,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "smtp" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "smtp", "version" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -155,6 +156,12 @@ def main():
         groupdir = "%s/groups" % workerdir
         os.mkdir(groupdir)
         worker = master
+        if "version" in worker:
+            dockerfile = open("%s/Dockerfile" % workerdir, "r+")
+            dockerfilec = re.sub('(^FROM.*:).*', '\g<1>%s' % worker["version"], dockerfile.read())
+            dockerfile.seek(0)
+            dockerfile.write(dockerfilec)
+            dockerfile.close()
         if "lava-coordinator" in master and master["lava-coordinator"]:
             dockcomp["services"][name]["ports"].append('3079:3079')
             f_entrypoint = open("%s/entrypoint.d/02_lava-coordinator.sh" % workerdir, 'w')
@@ -364,7 +371,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker", "version", "custom_volumes" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -412,6 +419,12 @@ def main():
         worker = slave
         worker_name = name
         slave_master = None
+        if "version" in worker:
+            dockerfile = open("%s/Dockerfile" % workerdir, "r+")
+            dockerfilec = re.sub('(^FROM.*:).*', '\g<1>%s' % worker["version"], dockerfile.read())
+            dockerfile.seek(0)
+            dockerfile.write(dockerfilec)
+            dockerfile.close()
         if "arch" in worker:
             if worker["arch"] == 'arm64':
                 dockerfile = open("%s/Dockerfile" % workerdir, "r+")
@@ -479,6 +492,13 @@ def main():
             for line in slave["env"]:
                 fenv.write("  %s\n" % line)
             fenv.close()
+        if "custom_volumes" in slave:
+            for cvolume in slave["custom_volumes"]:
+                dockcomp["services"][worker_name]["volumes"].append(cvolume)
+                volume_name = cvolume.split(':')[0]
+                if "volumes" not in dockcomp:
+                    dockcomp["volumes"] = {}
+                dockcomp["volumes"][volume_name] = {}
         if not "remote_proto" in worker:
             remote_proto = "http"
         else:
@@ -743,6 +763,9 @@ def main():
             else:
                 for line in board["custom_option"].splitlines():
                     device_line += "{%% %s %%}\n" % line
+        if "raw_custom_option" in board:
+            for coption in board["raw_custom_option"]:
+                device_line += "%s\n" % coption
         if not os.path.isdir(device_path):
             os.mkdir(device_path)
         if not os.path.isdir(devices_path):

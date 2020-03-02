@@ -285,6 +285,8 @@ slaves:
     host_healthcheck:		If true, enable the optional healthcheck container. See hosting healthchecks below
     lava-coordinator:		Does the slave should ran a lava-coordinator
     expose_ser2net:		Do ser2net ports need to be available on host
+    custom_volumes:
+      - "name:path"		Add a custom volume
     expose_ports:		Expose port p1 on the host to p2 on the worker slave.
       - p1:p2
     extra_actions:		An optional list of action to do at end of the docker build
@@ -309,8 +311,10 @@ boards:
     kvm: (For qemu only) Does the qemu could use KVM (default: no)
     uboot_ipaddr:	(optional) a static IP to set in uboot
     uboot_macaddr:	(Optional) the MAC address to set in uboot
-    custom_option:	(optional) All following strings will be directly append to devicefile
+    custom_option:	(optional) All following strings will be directly append to devicefile included in {% opt %}
     - "set x=1"
+    raw_custom_option:	(optional) All following strings will be directly append to devicefile
+    - "{% set x=1 %}"
     tags:		(optional) List of tag to set on this device
     - tag1
     - tag2
