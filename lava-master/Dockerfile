@@ -1,4 +1,4 @@
-FROM lavasoftware/lava-server:2019.09
+FROM lavasoftware/lava-server:2020.02
 
 RUN apt-get update && apt-get -y install sudo lava-coordinator git
 
