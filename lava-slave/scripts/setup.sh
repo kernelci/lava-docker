@@ -22,7 +22,7 @@ echo "Dynamic slave for $LAVA_MASTER ($LAVA_MASTER_URI)"
 LAVACLIOPTS="--uri $LAVA_MASTER_URI"
 
 # do a sort of ping for letting master to be up
-TIMEOUT=300
+TIMEOUT=1200
 while [ $TIMEOUT -ge 1 ];
 do
 	STEP=2
@@ -30,7 +30,7 @@ do
 	if [ $? -eq 0 ];then
 		TIMEOUT=0
 	else
-		echo "Wait for master...."
+		echo "Wait for master.... (${TIMEOUT}s remains)"
 		sleep $STEP
 	fi
 	TIMEOUT=$(($TIMEOUT-$STEP))
@@ -50,10 +50,12 @@ fi
 
 lavacli $LAVACLIOPTS device-types list > /tmp/device-types.list
 if [ $? -ne 0 ];then
+	echo "ERROR: fail to list device-types"
 	exit 1
 fi
 lavacli $LAVACLIOPTS devices list -a > /tmp/devices.list
 if [ $? -ne 0 ];then
+	echo "ERROR: fail to list devices"
 	exit 1
 fi
 for worker in $(ls /root/devices/)
