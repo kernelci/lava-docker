@@ -1,4 +1,4 @@
-FROM lavasoftware/lava-dispatcher:2019.09
+FROM lavasoftware/lava-dispatcher:2020.02
 
 RUN apt-get update
 
