@@ -558,7 +558,10 @@ def main():
         if "use_tftp" in worker:
             use_tftp = worker["use_tftp"]
         if use_tftp:
-            dockcomp["services"][name]["ports"].append("69:69/udp")
+            if "dispatcher_ip" in worker:
+                dockcomp["services"][name]["ports"].append(worker["dispatcher_ip"] + ":69:69/udp")
+            else:
+                dockcomp["services"][name]["ports"].append("69:69/udp")
         use_docker = False
         if "use_docker" in worker:
             use_docker = worker["use_docker"]
