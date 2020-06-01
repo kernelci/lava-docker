@@ -564,6 +564,7 @@ def main():
             use_docker = worker["use_docker"]
         if use_docker:
             dockcomp["services"][worker_name]["volumes"].append("/var/run/docker.sock:/var/run/docker.sock")
+            dockcomp["services"][worker_name]["volumes"].append("/run/udev/data:/run/udev/data")
         # TODO permit to change the range of NBD ports
         use_nbd = True
         if "use_nbd" in worker:
@@ -582,8 +583,9 @@ def main():
         use_nfs = False
         if "use_nfs" in worker:
             use_nfs = worker["use_nfs"]
-        if use_nfs:
+        if use_nfs or use_docker:
             dockcomp["services"][worker_name]["volumes"].append("/var/lib/lava/dispatcher/tmp:/var/lib/lava/dispatcher/tmp")
+        if use_nfs:
             fp = open("%s/scripts/extra_actions" % workerdir, "a")
             # LAVA check if this package is installed when doing NFS jobs
             # So we need to install it, even if it is not used
