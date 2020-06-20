@@ -5,7 +5,13 @@ if [ ! -e /root/pg_lava_password ];then
        < /dev/urandom tr -dc A-Za-z0-9 | head -c16 > /root/pg_lava_password
 fi
 sudo -u postgres psql -c "ALTER USER lavaserver WITH PASSWORD '$(cat /root/pg_lava_password)';" || exit $?
-sed -i "s,^LAVA_DB_PASSWORD=.*,LAVA_DB_PASSWORD='$(cat /root/pg_lava_password)'," /etc/lava-server/instance.conf || exit $?
+if [ -e /etc/lava-server/instance.conf ];then
+	# pre 2020.05
+	sed -i "s,^LAVA_DB_PASSWORD=.*,LAVA_DB_PASSWORD='$(cat /root/pg_lava_password)'," /etc/lava-server/instance.conf || exit $?
+else
+	# 2020.05+
+	sed -i "s,PASSWORD:.*,PASSWORD: '$(cat /root/pg_lava_password)'," /etc/lava-server/settings.d/00-database.yaml || exit $?
+fi
 
 if [ -e /root/backup/db_lavaserver.gz ];then
 	gunzip /root/backup/db_lavaserver.gz || exit $?
