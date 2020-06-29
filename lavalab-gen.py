@@ -114,7 +114,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "smtp", "version" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "smtp", "version", "build_args" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -137,6 +137,8 @@ def main():
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
+        if "build_args" in master:
+            dockcomp["services"][name]["build"]["args"] = master['build_args']
         persistent_db = False
         if "persistent_db" in master:
             persistent_db = master["persistent_db"]
@@ -371,7 +373,7 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker", "version", "custom_volumes" ]
+        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker", "version", "custom_volumes","build_args" ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -406,6 +408,8 @@ def main():
         dockcomp["services"][name]["environment"] = {}
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
+        if "build_args" in slave:
+            dockcomp["services"][name]["build"]["args"] = slave['build_args']
         # insert here remote
 
         shutil.copytree("lava-slave", workerdir)
