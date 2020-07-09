@@ -223,6 +223,9 @@ masters:
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     healthcheck_url:		Hack healthchecks hosting URL. See hosting healthchecks below
+    build_args:
+      - line1			A list of line to set docker build-time variables
+      - line2
     allowed_hosts:		A list of FQDN used to access the LAVA master
     - "fqdn1"
     - "fqdn2"
@@ -291,6 +294,9 @@ slaves:
       - p1:p2
     extra_actions:		An optional list of action to do at end of the docker build
     - "apt-get install package"
+    build_args:
+      - line1			A list of line to set docker build-time variables
+      - line2
     env:
       - line1			A list of line to set as environment (See /etc/lava-server/env.yaml for examples)
       - line2
