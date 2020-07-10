@@ -513,7 +513,7 @@ For setting a DNS server, the easiest way is to use dnsmasq and add in /etc/host
 
 Example:
 One master and slave on DC A, and one slave on DC B.
-Both slave need to have healthcheck_host to true and master will have healthcheck_url set to healthcheck:8080
+Both slave need to have healthcheck_host to true and master will have healthcheck_url set to http://healthcheck:8080
 You have to add a DNS server on both slave with an healthcheck entry.
 
 ## Bugs, Contact
