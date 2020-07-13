@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # always reset the lavaserver user, since its password could have been reseted in a "docker build --nocache"
-if [ ! -e /root/pg_lava_password ];then
-       < /dev/urandom tr -dc A-Za-z0-9 | head -c16 > /root/pg_lava_password
+if [ ! -s /root/pg_lava_password ];then
+	echo "DEBUG: Generating a random LAVA password"
+	< /dev/urandom tr -dc A-Za-z0-9 | head -c16 > /root/pg_lava_password
+else
+	echo "DEBUG: use the given LAVA password"
 fi
 sudo -u postgres psql -c "ALTER USER lavaserver WITH PASSWORD '$(cat /root/pg_lava_password)';" || exit $?
 if [ -e /etc/lava-server/instance.conf ];then

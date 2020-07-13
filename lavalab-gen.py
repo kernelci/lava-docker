@@ -121,7 +121,7 @@ def main():
             "healthcheck_url", "host", "http_fqdn",
             "loglevel", "lava-coordinator",
             "name",
-            "persistent_db",
+            "persistent_db", "pg_lava_password",
             "slave_keys", "slaveenv", "smtp",
             "tokens", "type",
             "users",
@@ -172,6 +172,13 @@ def main():
         groupdir = "%s/groups" % workerdir
         os.mkdir(groupdir)
         worker = master
+        if "pg_lava_password" in master:
+            f_pg = open("%s/pg_lava_password" % workerdir, 'w')
+            f_pg.write(master["pg_lava_password"])
+            f_pg.close()
+        else:
+            f_pg = open("%s/pg_lava_password" % workerdir, 'w')
+            f_pg.close()
         if "version" in worker:
             dockerfile = open("%s/Dockerfile" % workerdir, "r+")
             dockerfilec = re.sub('(^FROM.*:).*', '\g<1>%s' % worker["version"], dockerfile.read())
