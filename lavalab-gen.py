@@ -118,7 +118,7 @@ def main():
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
-        name = master["name"]
+        name = master["name"].lower()
         print("Handle %s\n" % name)
         if not "host" in master:
             host = "local"
@@ -377,7 +377,7 @@ def main():
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
-        name = slave["name"]
+        name = slave["name"].lower()
         if len(slaves) == 1:
             default_slave = name
         print("Handle %s" % name)
@@ -464,7 +464,7 @@ def main():
                     shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/" % workerdir)
                     shutil.copy(worker["zmq_auth_master_key"], "%s/zmq_auth/" % workerdir)
         for fm in masters:
-            if fm["name"] == remote_master:
+            if fm["name"].lower() == remote_master.lower():
                 slave_master = fm
                 for fuser in fm["users"]:
                     if fuser["name"] == remote_user:
@@ -627,7 +627,7 @@ def main():
         print("\tFound %s on %s" % (board_name, worker_name))
         found_slave = False
         for fs in workers["slaves"]:
-            if fs["name"] == worker_name:
+            if fs["name"].lower() == worker_name.lower():
                 slave = fs
                 found_slave = True
         if not found_slave:
