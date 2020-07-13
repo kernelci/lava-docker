@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # always reset the lavaserver user, since its password could have been reseted in a "docker build --nocache"
-if [ ! -e /root/pg_lava_password ];then
-       < /dev/urandom tr -dc A-Za-z0-9 | head -c16 > /root/pg_lava_password
+if [ ! -s /root/pg_lava_password ];then
+	echo "DEBUG: Generating a random LAVA password"
+	< /dev/urandom tr -dc A-Za-z0-9 | head -c16 > /root/pg_lava_password
+else
+	echo "DEBUG: use the given LAVA password"
 fi
 sudo -u postgres psql -c "ALTER USER lavaserver WITH PASSWORD '$(cat /root/pg_lava_password)';" || exit $?
 if [ -e /etc/lava-server/instance.conf ];then
@@ -13,32 +16,37 @@ else
 	sed -i "s,PASSWORD:.*,PASSWORD: '$(cat /root/pg_lava_password)'," /etc/lava-server/settings.d/00-database.yaml || exit $?
 fi
 
-if [ -e /root/backup/db_lavaserver.gz ];then
-	gunzip /root/backup/db_lavaserver.gz || exit $?
+# verify that the backup was not already applied in case of persistent_db
+if [ ! -e "/var/lib/postgresql/lava-docker.backup_done" ];then
+	if [ -e /root/backup/db_lavaserver.gz ];then
+		gunzip /root/backup/db_lavaserver.gz || exit $?
+	fi
+
+	if [ -e /root/backup/db_lavaserver ];then
+		echo "Restore database from backup"
+		sudo -u postgres psql < /root/backup/db_lavaserver || exit $?
+		yes yes | lava-server manage migrate || exit $?
+		echo "Restore jobs output from backup"
+		rm -r /var/lib/lava-server/default/media/job-output/*
+
+	        # allow using different folder for tar operations (/tmp by default)
+		TMPDIR=${TMPDIR:-/tmp}
+
+		tar xzf /root/backup/joboutput.tar.gz || exit $?
+		chown -R lavaserver:lavaserver /var/lib/lava-server/default/media/job-output/
+		touch /var/lib/postgresql/lava-docker.backup_done
+	fi
+	if [ -e /root/backup/devices.tar.gz ];then
+		echo "INFO: Restoring devices files"
+		tar xzf /root/backup/devices.tar.gz
+		chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/devices
+	fi
+else
+	echo "DEBUG: backup already applied"
 fi
 
-if [ -e /root/backup/db_lavaserver ];then
-	echo "Restore database from backup"
-	sudo -u postgres psql < /root/backup/db_lavaserver || exit $?
-	yes yes | lava-server manage migrate || exit $?
-	echo "Restore jobs output from backup"
-	rm -r /var/lib/lava-server/default/media/job-output/*
-
-        # allow using different folder for tar operations (/tmp by default)
-        TMPDIR=${TMPDIR:-/tmp}
-
-	tar xzf /root/backup/joboutput.tar.gz || exit $?
-fi
-	lava-server manage makemigrations
-	yes yes | lava-server manage migrate || exit $?
-
-if [ -e /root/backup/devices.tar.gz ];then
-	echo "INFO: Restoring devices files"
-	tar xzf /root/backup/devices.tar.gz
-	chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/devices
-fi
-
-chown -R lavaserver:lavaserver /var/lib/lava-server/default/media/job-output/
+lava-server manage makemigrations
+yes yes | lava-server manage migrate || exit $?
 
 # default site is set as example.com
 if [ -e /root/lava_http_fqdn ];then

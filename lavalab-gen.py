@@ -114,7 +114,21 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "smtp", "version", "build_args" ]
+        keywords_master = [
+            "allowed_hosts",
+            "build_args",
+            "groups",
+            "healthcheck_url", "host", "http_fqdn",
+            "loglevel", "lava-coordinator",
+            "name",
+            "persistent_db", "pg_lava_password",
+            "slave_keys", "slaveenv", "smtp",
+            "tokens", "type",
+            "users",
+            "version",
+            "webadmin_https",
+            "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret",
+            ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -145,8 +159,11 @@ def main():
         if persistent_db:
             pg_volume_name = "pgdata_" + name
             dockcomp["services"][name]["volumes"].append(pg_volume_name + ":/var/lib/postgresql")
+            etc_volume_name = "lava_etc_" + name
+            dockcomp["services"][name]["volumes"].append(etc_volume_name + ":/etc/lava-server/")
             dockcomp["services"][name]["volumes"].append("lava_job_output:/var/lib/lava-server/default/media/job-output/")
             dockcomp["volumes"] = {}
+            dockcomp["volumes"][etc_volume_name] = {}
             dockcomp["volumes"][pg_volume_name] = {}
             dockcomp["volumes"]["lava_job_output"] = {}
 
@@ -158,6 +175,13 @@ def main():
         groupdir = "%s/groups" % workerdir
         os.mkdir(groupdir)
         worker = master
+        if "pg_lava_password" in master:
+            f_pg = open("%s/pg_lava_password" % workerdir, 'w')
+            f_pg.write(master["pg_lava_password"])
+            f_pg.close()
+        else:
+            f_pg = open("%s/pg_lava_password" % workerdir, 'w')
+            f_pg.close()
         if "version" in worker:
             dockerfile = open("%s/Dockerfile" % workerdir, "r+")
             dockerfilec = re.sub('(^FROM.*:).*', '\g<1>%s' % worker["version"], dockerfile.read())
@@ -373,7 +397,22 @@ def main():
     else:
         slaves = workers["slaves"]
     for slave in slaves:
-        keywords_slaves = [ "name", "host", "dispatcher_ip", "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "extra_actions", "zmq_auth_key", "zmq_auth_key_secret", "default_slave", "export_ser2net", "expose_ser2net", "remote_user_token", "zmq_auth_master_key", "expose_ports", "env", "bind_dev", "loglevel", "use_nfs", "arch", "devices", "lava-coordinator", "use_tap", "host_healthcheck", "use_tftp", "use_nbd", "use_overlay_server", "tags", "use_docker", "version", "custom_volumes","build_args" ]
+        keywords_slaves = [
+            "arch",
+            "bind_dev", "build_args",
+            "custom_volumes",
+            "devices", "dispatcher_ip", "default_slave",
+            "extra_actions", "export_ser2net", "expose_ser2net", "expose_ports", "env",
+            "host", "host_healthcheck",
+            "loglevel", "lava-coordinator",
+            "name",
+            "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "remote_user_token",
+            "tags",
+            "use_docker", "use_nfs", "use_nbd", "use_overlay_server", "use_tftp", "use_tap",
+            "version",
+            "zmq_auth_key", "zmq_auth_key_secret",
+            "zmq_auth_master_key",
+        ]
         for keyword in slave:
             if not keyword in keywords_slaves:
                 print("WARNING: unknown keyword %s" % keyword)
