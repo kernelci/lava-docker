@@ -159,8 +159,11 @@ def main():
         if persistent_db:
             pg_volume_name = "pgdata_" + name
             dockcomp["services"][name]["volumes"].append(pg_volume_name + ":/var/lib/postgresql")
+            etc_volume_name = "lava_etc_" + name
+            dockcomp["services"][name]["volumes"].append(etc_volume_name + ":/etc/lava-server/")
             dockcomp["services"][name]["volumes"].append("lava_job_output:/var/lib/lava-server/default/media/job-output/")
             dockcomp["volumes"] = {}
+            dockcomp["volumes"][etc_volume_name] = {}
             dockcomp["volumes"][pg_volume_name] = {}
             dockcomp["volumes"]["lava_job_output"] = {}
 
