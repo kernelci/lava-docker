@@ -501,7 +501,7 @@ def main():
                 if "zmq_auth_key" in worker:
                     shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
                     shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/" % workerdir)
-                    shutil.copy(worker["zmq_auth_master_key"], "%s/zmq_auth/" % workerdir)
+                    shutil.copy(worker["zmq_auth_master_key"], "%s/zmq_auth/%s.key" % (workerdir,remote_master))
         for fm in masters:
             if fm["name"].lower() == remote_master.lower():
                 slave_master = fm
