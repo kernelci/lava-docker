@@ -23,6 +23,8 @@ The following packages are necessary on the host machine:
 * docker-compose
 * pyyaml
 
+If you plan to use docker/fastboot tests, you will need probably also to install lava-dispatcher-host.
+
 ## Quickstart
 Example to use lava-docker with only one QEMU device:
 
