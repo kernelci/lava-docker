@@ -23,6 +23,8 @@ The following packages are necessary on the host machine:
 * docker-compose
 * pyyaml
 
+If you plan to use docker/fastboot tests, you will need probably also to install lava-dispatcher-host.
+
 ## Quickstart
 Example to use lava-docker with only one QEMU device:
 
@@ -409,6 +411,31 @@ For running all images, simply run:
 ```
 docker-compose up -d
 ```
+
+### Enabling ZMQ encryption
+Enabling ZMQ is all or nothing.
+You need to generate keys for both master AND workers.
+Generate thoses keys via:
+```
+zmqauth/zmq_auth_gen/create_certificate.py --directory . nameofyourworker
+```
+This will produce two files:
+* A public key ending with ".key"
+* A private key ending with ".key_secret"
+
+Since ZMQ keys does not store any information like name, filename could be different between master and workers.
+
+As general note, LAVA will use the hostname (and so the name in the master/worker node) for finding ZMQ keys.
+
+#### Naming convention for master
+ZMQ key for master should be named according to the name used in master node.
+ZMQ key for worker should be named according to the name in the worker node
+lava-docker will automaticly copy master zmq_auth_key/zmq_auth_key_secret to name.key/name.key_secret
+
+#### Naming convention for workers
+ZMQ public key for master should be named according to the remote_address used in worker node.
+ZMQ key for worker should be named according to the name in the worker node
+lava-docker will automaticly copy master zmq_auth_master_key to remote_address.key
 
 ## Proxy cache (Work in progress)
 A squid docker is provided for caching all LAVA downloads (image, dtb, rootfs, etc...)<br/>
