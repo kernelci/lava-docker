@@ -408,7 +408,7 @@ def main():
             "name",
             "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "remote_user_token",
             "tags",
-            "use_docker", "use_nfs", "use_nbd", "use_overlay_server", "use_tftp", "use_tap",
+            "use_docker", "use_nfs", "use_nbd", "use_overlay_server", "use_tftp", "use_tap", "use_bridge",
             "version",
             "zmq_auth_key", "zmq_auth_key_secret",
             "zmq_auth_master_key",
@@ -638,6 +638,23 @@ def main():
             fp.write("apt-get -y install nfs-kernel-server\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
+        if "use_bridge" in worker and worker["use_bridge"]:
+            dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
+            if "cap_add" not in dockcomp["services"][worker_name]:
+                dockcomp["services"][worker_name]["cap_add"] = ["NET_ADMIN"]
+            elif "NET_ADMIN" not in dockcomp["services"][worker_name]["cap_add"]:
+                dockcomp["services"][worker_name]["cap_add"].append("NET_ADMIN")
+            dockcomp["services"][worker_name]["privileged"] = True
+            fp = open("%s/scripts/extra_actions" % workerdir, "a")
+            fp.write("apt-get --no-install-recommends -y install libvirt-clients libvirt-daemon-system dnsmasq\n")
+            fp.write("mkdir -p /etc/qemu\n")
+            fp.write("echo 'allow virbr0' > /etc/qemu/bridge.conf\n")
+            fp.write("echo 'service libvirtd start' > /root/entrypoint.d/virtd_start.sh\n")
+            fp.write("echo 'virsh net-start default' >> /root/entrypoint.d/virtd_start.sh\n")
+            fp.write("chmod +x /root/entrypoint.d/virtd_start.sh\n")
+            fp.close()
+            os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
+
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
         if "loglevel" in worker:
