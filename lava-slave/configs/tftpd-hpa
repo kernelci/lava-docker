@@ -3,4 +3,4 @@
 TFTP_USERNAME="tftp"
 TFTP_DIRECTORY="/var/lib/lava/dispatcher/tmp/"
 TFTP_ADDRESS="0.0.0.0:69"
-TFTP_OPTIONS="--secure"
+TFTP_OPTIONS="--secure -4"
