@@ -188,6 +188,7 @@ def main():
             dockerfile.seek(0)
             dockerfile.write(dockerfilec)
             dockerfile.close()
+            dockcomp["services"][name]["image"] = "%s:%s" % (name, worker["version"])
         if "lava-coordinator" in master and master["lava-coordinator"]:
             dockcomp["services"][name]["ports"].append('3079:3079')
             f_entrypoint = open("%s/entrypoint.d/02_lava-coordinator.sh" % workerdir, 'w')
@@ -468,6 +469,7 @@ def main():
             dockerfile.seek(0)
             dockerfile.write(dockerfilec)
             dockerfile.close()
+            dockcomp["services"][name]["image"] = "%s:%s" % (name, worker["version"])
         if "arch" in worker:
             if worker["arch"] == 'arm64':
                 dockerfile = open("%s/Dockerfile" % workerdir, "r+")
