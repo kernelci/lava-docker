@@ -369,7 +369,8 @@ def main():
             for slaveenv in worker["slaveenv"]:
                 slavename = slaveenv["name"]
                 envdir = "%s/env/%s" % (workerdir, slavename)
-                os.mkdir(envdir)
+                if not os.path.isdir(envdir):
+                    os.mkdir(envdir)
                 fenv = open("%s/env.yaml" % envdir, 'w')
                 fenv.write("overrides:\n")
                 for line in slaveenv["env"]:
