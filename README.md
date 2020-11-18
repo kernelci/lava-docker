@@ -344,7 +344,6 @@ boards:
       ser2net_options:	(optional) A list of ser2net options to add
         - option1
         - option2
-      use_screen: 	True/False (Use screen via ssh instead of ser2net)
     connection_command: A command to be ran for getting a serial console
     pdu_generic:
       hard_reset_command: commandline to reset the board
@@ -353,7 +352,6 @@ boards:
 ```
 Notes on UART:
 * Only one of devpath/serial is necessary.
-* screen usage is discouraged and should not be used, it was added as a workaround for some boards, but ser2net now can handle them.
 * For finding the right devpath, you could use
 ```
 udevadm info -a -n /dev/ttyUSBx |grep devpath | head -n1

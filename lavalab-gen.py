@@ -44,10 +44,6 @@ template_device_ser2net = string.Template("""
 {% set connection_command = 'telnet 127.0.0.1 ${port}' %}
 """)
 
-template_device_screen = string.Template("""
-{% set connection_command = 'ssh -o StrictHostKeyChecking=no -t root@127.0.0.1 "TERM=xterm screen -x ${board}"' %}
-""")
-
 template_settings_conf = string.Template("""
 {
     "DEBUG": false,
@@ -728,17 +724,14 @@ def main():
                 dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = False
             use_ser2net = False
-            use_screen = False
-            if "use_screen" in uart:
-                use_screen = uart["use_screen"]
             if "use_conmux" in uart:
                 use_conmux = uart["use_conmux"]
             if "use_ser2net" in uart:
                 use_ser2net = uart["use_ser2net"]
-            if (use_conmux and use_ser2net) or (use_conmux and use_screen) or (use_screen and use_ser2net):
+            if (use_conmux and use_ser2net):
                 print("ERROR: Only one uart handler must be configured")
                 sys.exit(1)
-            if not use_conmux and not use_screen and not use_ser2net and not "connection_command" in board:
+            if not use_conmux and not use_ser2net and not "connection_command" in board:
                 use_ser2net = True
             if use_conmux:
                 conmuxline = template_conmux.substitute(board=board_name, baud=baud)
@@ -760,11 +753,6 @@ def main():
                 ser2net_ports[worker_name] += 1
                 fp = open("%s/ser2net.conf" % workerdir, "a")
                 fp.write(ser2net_line + " banner\n")
-                fp.close()
-            if use_screen:
-                device_line += template_device_screen.substitute(board=board_name)
-                fp = open("%s/lava-screen.conf" % workerdir, "a")
-                fp.write("%s\n" % board_name)
                 fp.close()
         if "connection_command" in board:
             connection_command = board["connection_command"]
