@@ -93,6 +93,11 @@ def dockcomp_add_device(dockcomp, worker_name, devicemap):
             return
     dc_devices.append(devicemap)
 
+def dockcomp_add_cap(dockcomp, worker_name, cap):
+    if "cap_add" not in dockcomp["services"][worker_name]:
+            dockcomp["services"][worker_name]["cap_add"] = []
+    dockcomp["services"][worker_name]["cap_add"].append(cap)
+
 def usage():
     print("%s [boardsfile.yaml]" % sys.argv[0])
 
@@ -567,8 +572,7 @@ def main():
             dockcomp["services"][worker_name]["privileged"] = True
         if "use_tap" in worker and worker["use_tap"]:
             dockcomp_add_device(dockcomp, worker_name, "/dev/net/tun:/dev/net/tun")
-            dockcomp["services"][worker_name]["cap_add"] = []
-            dockcomp["services"][worker_name]["cap_add"].append("NET_ADMIN")
+            dockcomp_add_cap(dockcomp, worker_name, "NET_ADMIN")
         if "host_healthcheck" in worker and worker["host_healthcheck"]:
             dockcomp["services"]["healthcheck"] = {}
             dockcomp["services"]["healthcheck"]["ports"] = ["8080:8080"]
