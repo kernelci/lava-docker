@@ -525,7 +525,7 @@ def main():
                     else:
                         zmq_auth_genlist.write("%s/%s %s/%s\n" % (host, name, fm["host"], fm["name"]))
                         need_zmq_auth_gen = True
-        if remote_token is "BAD":
+        if remote_token == "BAD":
             print("Cannot find %s on %s" % (remote_user, remote_master))
             sys.exit(1)
         if "env" in slave:
