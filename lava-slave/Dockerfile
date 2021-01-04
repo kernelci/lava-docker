@@ -68,11 +68,6 @@ RUN chmod +x /root/entrypoint.d/*
 
 RUN if [ -x /usr/local/bin/extra_actions ] ; then /usr/local/bin/extra_actions ; fi
 
-RUN apt-get -y install screen openssh-server
-RUN ssh-keygen -q -f /root/.ssh/id_rsa
-RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
-COPY lava-screen.conf /root/
-
 COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
 EXPOSE 69/udp 80

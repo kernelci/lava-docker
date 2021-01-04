@@ -68,6 +68,24 @@ do
 	else
 		echo "Adding worker $worker"
 		lavacli $LAVACLIOPTS workers add --description "LAVA dispatcher on $(cat /root/phyhostname)" $worker || exit $?
+		# does we ran 2020.09+ and worker need a token
+	fi
+	grep -q "TOKEN" /root/entrypoint.sh
+	if [ $? -eq 0 ];then
+		echo "DEBUG: Worker need a TOKEN"
+		# TODO use token from env
+		WTOKEN=$(getworkertoken.py $LAVA_MASTER_URI $worker)
+		if [ $? -eq 0 ];then
+			sed -i "s,.*TOKEN.*,TOKEN=\"--token $WTOKEN\"," /etc/lava-dispatcher/lava-worker || exit $?
+		else
+			echo "ERROR: cannot get WORKER TOKEN"
+			exit 1
+		fi
+		echo "DEBUG: set master URL to $LAVA_MASTER_URL"
+		sed -i "s,^# URL.*,URL=\"$LAVA_MASTER_URL\"," /etc/lava-dispatcher/lava-worker || exit $?
+		cat /etc/lava-dispatcher/lava-worker
+	else
+		echo "DEBUG: Worker does not need a TOKEN"
 	fi
 	if [ ! -z "$LAVA_DISPATCHER_IP" ];then
 		echo "Add dispatcher_ip $LAVA_DISPATCHER_IP to $worker"

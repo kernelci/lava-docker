@@ -25,19 +25,6 @@ do
 	/usr/sbin/conmux $item &
 done
 
-HAVE_SCREEN=0
-while read screenboard
-do
-	echo "Start screen for $screenboard"
-	TERM=xterm screen -d -m -S $screenboard /dev/$screenboard 115200 -ixoff -ixon || exit 9
-	HAVE_SCREEN=1
-done < /root/lava-screen.conf
-if [ $HAVE_SCREEN -eq 1 ];then
-	sed -i 's,UsePAM.*yes,UsePAM no,' /etc/ssh/sshd_config || exit 10
-	service ssh start || exit 11
-fi
-
-
 # start an http file server for boot/transfer_overlay support
 (cd /var/lib/lava/dispatcher; python3 -m http.server 80) &
 
