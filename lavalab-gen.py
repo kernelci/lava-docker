@@ -407,7 +407,7 @@ def main():
             "devices", "dispatcher_ip", "default_slave",
             "extra_actions", "export_ser2net", "expose_ser2net", "expose_ports", "env",
             "host", "host_healthcheck",
-            "loglevel", "lava-coordinator",
+            "loglevel", "lava-coordinator", "lava_worker_token",
             "name",
             "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "remote_user_token",
             "tags",
@@ -493,6 +493,8 @@ def main():
         else:
             remote_rpc_port = worker["remote_rpc_port"]
         dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = remote_address
+        if "lava_worker_token" in worker:
+            dockcomp["services"][worker_name]["environment"]["LAVA_WORKER_TOKEN"] = worker["lava_worker_token"]
         remote_user = worker["remote_user"]
         # find master
         remote_token = "BAD"
