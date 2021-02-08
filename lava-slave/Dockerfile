@@ -19,21 +19,8 @@ COPY conmux/ /etc/conmux/
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,'
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,'
 
-#conmux need cu >= 1.07-24 See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=336996
-RUN echo "deb http://deb.debian.org/debian/ testing main" >> /etc/apt/sources.list.d/testing.list
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu
-RUN rm /etc/apt/sources.list.d/testing.list
-
 RUN apt-get -y install ser2net
 COPY ser2net.conf /etc
-
-# ser2net > 3.2 is only availlable from sid
-RUN echo "deb http://deb.debian.org/debian/ sid main" >> /etc/apt/sources.list.d/sid.list
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install ser2net
-RUN rm /etc/apt/sources.list.d/sid.list
-RUN apt-get update
 
 RUN apt-get -y install lavacli
 

@@ -72,15 +72,32 @@ do
 	fi
 	grep -q "TOKEN" /root/entrypoint.sh
 	if [ $? -eq 0 ];then
+		# This is 2020.09+
 		echo "DEBUG: Worker need a TOKEN"
-		# TODO use token from env
-		WTOKEN=$(getworkertoken.py $LAVA_MASTER_URI $worker)
-		if [ $? -eq 0 ];then
-			sed -i "s,.*TOKEN.*,TOKEN=\"--token $WTOKEN\"," /etc/lava-dispatcher/lava-worker || exit $?
+		if [ -z "$LAVA_WORKER_TOKEN" ];then
+			echo "DEBUG: get token dynamicly"
+			# Does not work on 2020.09, since token was not added yet in RPC2
+			WTOKEN=$(getworkertoken.py $LAVA_MASTER_URI $worker)
+			if [ $? -ne 0 ];then
+				echo "ERROR: cannot get WORKER TOKEN"
+				exit 1
+			fi
+			if [ -z "$WTOKEN" ];then
+				echo "ERROR: got an empty token"
+				exit 1
+			fi
 		else
-			echo "ERROR: cannot get WORKER TOKEN"
-			exit 1
+			echo "DEBUG: got token from env"
+			WTOKEN=$LAVA_WORKER_TOKEN
 		fi
+		echo "DEBUG: write token in /var/lib/lava/dispatcher/worker/"
+		mkdir -p /var/lib/lava/dispatcher/worker/
+		echo "$WTOKEN" > /var/lib/lava/dispatcher/worker/token
+		# lava worker ran under root
+		chown root:root /var/lib/lava/dispatcher/worker/token
+		chmod 640 /var/lib/lava/dispatcher/worker/token
+		sed -i "s,.*TOKEN.*,TOKEN=\"--token-file /var/lib/lava/dispatcher/worker/token\"," /etc/lava-dispatcher/lava-worker || exit $?
+
 		echo "DEBUG: set master URL to $LAVA_MASTER_URL"
 		sed -i "s,^# URL.*,URL=\"$LAVA_MASTER_URL\"," /etc/lava-dispatcher/lava-worker || exit $?
 		cat /etc/lava-dispatcher/lava-worker

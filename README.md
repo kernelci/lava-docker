@@ -279,6 +279,7 @@ slaves:
     remote_user: 		the user used for connecting to the master
     remote_user_token:		The remote_user's token. This option is necessary only if no master node exists in boards.yaml. Otherwise lavalab-gen.py will get from it.
     remote_proto:		http(default) or https
+    lava_worker_token:		token to authenticate worker to master/scheduler (LAVA 2020.09+)
     default_slave:		Does this slave is the default slave where to add boards (default: lab-slave-0)
     bind_dev:			Bind /dev from host to slave. This is needed when using some HID PDU
     use_tftp:			Does LAVA need a TFTP server (default True)
