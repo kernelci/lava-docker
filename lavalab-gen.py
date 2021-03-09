@@ -102,13 +102,11 @@ def usage():
     print("%s [boardsfile.yaml]" % sys.argv[0])
 
 def main():
-    need_zmq_auth_gen = False
     fp = open(boards_yaml, "r")
     workers = yaml.safe_load(fp)
     fp.close()
 
     os.mkdir("output")
-    zmq_auth_genlist = open("zmqauth/zmq_auth_gen/zmq_genlist", 'w')
 
     if "masters" not in workers:
         masters = {}
@@ -123,12 +121,11 @@ def main():
             "loglevel", "lava-coordinator",
             "name",
             "persistent_db", "pg_lava_password",
-            "slave_keys", "slaveenv", "smtp",
+            "slaveenv", "smtp",
             "tokens", "type",
             "users",
             "version",
             "webadmin_https",
-            "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret",
             ]
         for keyword in master:
             if not keyword in keywords_master:
@@ -283,21 +280,6 @@ def main():
                 )
             )
         fsettings.close()
-        master_use_zmq_auth = False
-        if "zmq_auth" in worker:
-            master_use_zmq_auth = worker["zmq_auth"]
-        if master_use_zmq_auth:
-            if "zmq_auth_key" in worker:
-                shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/%s.key" % (workerdir, name))
-                shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/%s.key_secret" % (workerdir, name))
-            else:
-                zmq_auth_genlist.write("%s/%s\n" % (host, name))
-                need_zmq_auth_gen = True
-            if "slave_keys" in worker:
-                src_files = os.listdir(worker["slave_keys"])
-                for file_name in src_files:
-                    full_file_name = os.path.join(worker["slave_keys"], file_name)
-                    shutil.copy(full_file_name, "%s/zmq_auth/" % workerdir)
         if "users" in worker:
             for user in worker["users"]:
                 keywords_users = [ "name", "staff", "superuser", "password", "token", "email", "groups" ]
@@ -413,8 +395,6 @@ def main():
             "tags",
             "use_docker", "use_nfs", "use_nbd", "use_overlay_server", "use_tftp", "use_tap",
             "version",
-            "zmq_auth_key", "zmq_auth_key_secret",
-            "zmq_auth_master_key",
         ]
         for keyword in slave:
             if not keyword in keywords_slaves:
@@ -504,29 +484,12 @@ def main():
             masters = {}
             if "remote_user_token" in worker:
                 remote_token = worker["remote_user_token"]
-                if "zmq_auth_key" in worker:
-                    shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/" % workerdir)
-                    shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/" % workerdir)
-                    shutil.copy(worker["zmq_auth_master_key"], "%s/zmq_auth/%s.key" % (workerdir,remote_master))
         for fm in masters:
             if fm["name"].lower() == remote_master.lower():
                 slave_master = fm
                 for fuser in fm["users"]:
                     if fuser["name"] == remote_user:
                         remote_token = fuser["token"]
-                if "zmq_auth" in fm:
-                    master_use_zmq_auth = fm["zmq_auth"]
-                if master_use_zmq_auth:
-                    if "zmq_auth_key" in fm:
-                        shutil.copy(fm["zmq_auth_key"], "%s/zmq_auth/%s.key" % (workerdir, remote_address))
-                    if "zmq_auth_key" in worker:
-                        shutil.copy(worker["zmq_auth_key"], "%s/zmq_auth/%s.key" % (workerdir, name))
-                        shutil.copy(worker["zmq_auth_key_secret"], "%s/zmq_auth/%s.key_secret" % (workerdir, name))
-                        if "zmq_auth_key" in fm:
-                            shutil.copy(worker["zmq_auth_key"], "output/%s/%s/zmq_auth/%s.key" % (fm["host"], fm["name"], name))
-                    else:
-                        zmq_auth_genlist.write("%s/%s %s/%s\n" % (host, name, fm["host"], fm["name"]))
-                        need_zmq_auth_gen = True
         if remote_token == "BAD":
             print("Cannot find %s on %s" % (remote_user, remote_master))
             sys.exit(1)
@@ -849,11 +812,6 @@ def main():
         dockcomp["services"][slave_name]["ports"].append("%s-%s:%s-%s" % (ser2net_port_start, ser2net_port_max, ser2net_port_start, ser2net_port_max))
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
-
-    zmq_auth_genlist.close()
-    if need_zmq_auth_gen:
-        print("Gen ZMQ auth files")
-        subprocess.check_call(["./zmqauth/zmq_auth_fill.sh"], stdin=None)
 
 if len(sys.argv) > 1:
     if sys.argv[1] == '-h' or sys.argv[1] == '--help':

@@ -27,8 +27,6 @@ RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*pat
 COPY device-types-patch/ /root/device-types-patch/
 RUN sh root/device-types-patch/patch-device-type.sh
 
-COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
-
 COPY lava_http_fqdn /root/
 
 COPY env/ /etc/lava-server/dispatcher.d/
