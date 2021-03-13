@@ -65,33 +65,13 @@ Copy standalone-slave.yaml.example to standalone-slave.yaml
 * A remote username (remote_user)
 * A remote token for this username (remote_user_token)
 * The FQDN for connecting to the master (remote_master)
-* ZMQ public key for LAVA master (if encryption is required, see below)
 
 In our standalone-slave.yaml it will be:
 ```
     remote_master: lava.example.com
     remote_user: lab-extern
     remote_user_token: lab-extern-randomtoken
-    zmq_auth_master_key: master-public.key
 ```
-
-## Optional ZMQ keys
-If the master is using ZMQ encryption you need to:
-### Generate ZMQ keys
-Generate thoses keys via:
-```
-zmqauth/zmq_auth_gen/create_certificate.py --directory . nameofyourslave
-```
-This will produce two files:
-* A public key ending with ".key" (set it as zmq_auth_key)
-* A private key ending with ".key_secret (set it as zmq_auth_key_secret)
-
-### slave public key
-Give the slave public key to the master's admin
-
-### master public key
-Get the master public key from the master's admin and set it as "zmq_auth_master_key" in master node.
-Note: you dont need master private key (or need to touch a fake one).
 
 # Generate files
 As lavadocker run:

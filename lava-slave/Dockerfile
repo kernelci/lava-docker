@@ -1,4 +1,4 @@
-FROM lavasoftware/lava-dispatcher:2021.01
+FROM lavasoftware/lava-dispatcher:2021.03
 
 RUN apt-get update
 
@@ -37,7 +37,7 @@ COPY scripts/setup.sh .
 
 RUN apt-get -y install patch
 COPY lava-patch/ /root/lava-patch
-RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do patch -p1 < $patch || exit $?;done
+RUN cd /usr/lib/python3/dist-packages && for patch in $(ls /root/lava-patch/*patch) ; do echo "APPLY $patch"; patch -p1 < $patch || exit $?;done
 
 RUN mkdir /etc/lava-coordinator/
 COPY lava-coordinator/* /etc/lava-coordinator/
@@ -54,8 +54,6 @@ COPY entrypoint.d/* /root/entrypoint.d/
 RUN chmod +x /root/entrypoint.d/*
 
 RUN if [ -x /usr/local/bin/extra_actions ] ; then /usr/local/bin/extra_actions ; fi
-
-COPY zmq_auth/ /etc/lava-dispatcher/certificates.d/
 
 EXPOSE 69/udp 80
 

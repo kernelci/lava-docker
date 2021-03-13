@@ -2,9 +2,6 @@ slaves:
   - name: lab-extern-1
     host: externpc
     dispatcher_ip: 192.168.66.1
-    zmq_auth_key: lab-extern-1.key
-    zmq_auth_key_secret: lab-extern-1.key_secret
-    zmq_auth_master_key: master-public.key
     remote_master: lava.example.com
     remote_user: lab-extern
     remote_user_token: lab-extern-randomtoken
