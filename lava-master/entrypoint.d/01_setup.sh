@@ -266,6 +266,12 @@ do
 	done
 done
 
+if [ ! -z "$GUNICORN_WORKERS" ];then
+	echo "DEBUG: set gunicorn workers to $GUNICORN_WORKERS"
+	grep -ri workers /etc
+	sed -i "s,.*WORKERS=.*,WORKERS=$GUNICORN_WORKERS," /etc/lava-server/lava-server-gunicorn || exit $?
+fi
+
 echo "DEBUG: fix owning rights on /etc/lava-server/dispatcher-config"
 chown -Rc lavaserver:lavaserver /etc/lava-server/dispatcher-config
 exit 0
