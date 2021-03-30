@@ -30,6 +30,7 @@ COPY grub.cfg /root/
 COPY default/* /etc/default/
 
 COPY phyhostname /root/
+COPY setupenv /root/
 COPY scripts/setup.sh .
 
 COPY lava-patch/ /root/lava-patch
