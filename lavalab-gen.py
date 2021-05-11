@@ -392,7 +392,7 @@ def main():
                 fenv.close()
         if "loglevel" in worker:
             for component in worker["loglevel"]:
-                if component != "lava-master" and component != "lava-logs" and component != 'lava-server-gunicorn':
+                if component != "lava-master" and component != "lava-logs" and component != 'lava-server-gunicorn' and component != "lava-scheduler":
                     print("ERROR: invalid loglevel component %s" % component)
                     sys.exit(1)
                 loglevel = worker["loglevel"][component]
