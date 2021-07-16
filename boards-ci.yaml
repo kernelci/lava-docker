@@ -1,0 +1,25 @@
+---
+masters:
+  - name: masterci1
+    host: local
+    users:
+      - name: admin
+        token: tokenforci
+        password: passwordforci
+        superuser: true
+        staff: true
+    tokens:
+      - username: admin
+        token: dfjdfkfkdjfkdsjfslforci
+        description: no description
+slaves:
+  - name: lab-ci-0
+    host: local
+    remote_master: masterci1
+    remote_user: admin
+    use_overlay_server: false
+    use_tftp: false
+
+boards:
+  - name: qemu-01
+    type: qemu
