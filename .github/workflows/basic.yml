@@ -1,0 +1,29 @@
+---
+name: basic
+on:  # yamllint disable-line rule:truthy
+  push:
+  pull_request:
+
+jobs:
+  check-lava-lab-gen:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: install lavacli
+        run: sudo apt-get -y install lavacli
+      - run: ./lavalab-gen.py boards-ci.yaml
+      - run: cat output/local/docker-compose.yml
+      - name: Verify DNS query in docker
+        run: sh .github/docker-resolv.sh
+      - name: Build lava-docker
+        run: cd output/local && docker-compose build
+  check-formats:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: install yamllint
+        run: sudo apt-get -y install yamllint
+      - name: verify yaml files
+        run: find -iname '*.yaml' | xargs yamllint
+      - name: verify yml files
+        run: find -iname '*.yml' | xargs yamllint
