@@ -17,7 +17,7 @@ This enables the setup of a LAVA lab with minimal knowledge of the
 underlying LAVA configuration steps necessary.
 
 ## Prerequisites
-lava-docker has currently been tested primarily on Debian stable (stretch).
+lava-docker has currently been tested primarily on Debian stable (buster).
 The following packages are necessary on the host machine:
 * docker
 * docker-compose
