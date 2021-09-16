@@ -512,7 +512,8 @@ def main():
                 volume_name = cvolume.split(':')[0]
                 if "volumes" not in dockcomp:
                     dockcomp["volumes"] = {}
-                dockcomp["volumes"][volume_name] = {}
+                if cvolume[0] != '/':
+                    dockcomp["volumes"][volume_name] = {}
         if not "remote_proto" in worker:
             remote_proto = "http"
         else:
