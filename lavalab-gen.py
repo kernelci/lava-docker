@@ -474,7 +474,9 @@ def main():
             remote_rpc_port = worker["remote_rpc_port"]
         dockcomp["services"][worker_name]["environment"]["LAVA_MASTER"] = remote_address
         if "lava_worker_token" in worker:
-            dockcomp["services"][worker_name]["environment"]["LAVA_WORKER_TOKEN"] = worker["lava_worker_token"]
+            fsetupenv = open("%s/setupenv" % workerdir, "a")
+            fsetupenv.write("LAVA_WORKER_TOKEN=%s\n" % worker["lava_worker_token"])
+            fsetupenv.close()
         remote_user = worker["remote_user"]
         # find master
         remote_token = "BAD"
@@ -517,11 +519,14 @@ def main():
             remote_proto = worker["remote_proto"]
         remote_uri = "%s://%s:%s@%s:%s/RPC2" % (remote_proto, remote_user, remote_token, remote_address, remote_rpc_port)
         remote_master_url = "%s://%s:%s" % (remote_proto, remote_address, remote_rpc_port)
-        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URI"] = remote_uri
-        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_URL"] = remote_master_url
-        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_USER"] = remote_user
-        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_BASEURI"] = "%s://%s:%s/RPC2" % (remote_proto, remote_address, remote_rpc_port)
-        dockcomp["services"][worker_name]["environment"]["LAVA_MASTER_TOKEN"] = remote_token
+
+        fsetupenv = open("%s/setupenv" % workerdir, "a")
+        fsetupenv.write("LAVA_MASTER_URI=%s\n" % remote_uri)
+        fsetupenv.write("LAVA_MASTER_URL=%s\n" % remote_master_url)
+        fsetupenv.write("LAVA_MASTER_USER=%s\n" % remote_user)
+        fsetupenv.write("LAVA_MASTER_BASEURI=%s://%s:%s/RPC2\n" % (remote_proto, remote_address, remote_rpc_port))
+        fsetupenv.write("LAVA_MASTER_TOKEN=%s\n" % remote_token)
+        fsetupenv.close()
 
         if "lava-coordinator" in worker and worker["lava-coordinator"]:
             fcoordinator = open("%s/lava-coordinator/lava-coordinator.cnf" % workerdir, 'w')

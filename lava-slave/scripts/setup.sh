@@ -5,6 +5,8 @@ if [ ! -e "/root/devices/$(hostname)" ];then
 	exit 0
 fi
 
+. /root/setupenv
+
 if [ -z "$LAVA_MASTER_URI" ];then
 	echo "ERROR: Missing LAVA_MASTER_URI"
 	exit 11
