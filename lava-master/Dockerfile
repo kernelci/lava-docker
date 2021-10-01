@@ -1,6 +1,6 @@
 FROM lavasoftware/lava-server:2021.03
 
-RUN apt-get update && apt-get -y install sudo lava-coordinator git
+RUN apt-get update && apt-get -y install sudo git
 
 COPY backup /root/backup/
 
