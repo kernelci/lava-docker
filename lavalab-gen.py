@@ -44,6 +44,8 @@ template_device_ser2net = string.Template("""
 {% set connection_command = 'telnet 127.0.0.1 ${port}' %}
 """)
 
+ser2net_dict = {}
+
 template_settings_conf = string.Template("""
 {
     "DEBUG": false,
@@ -723,11 +725,22 @@ def main():
                     fp = open("%s/ser2net.conf" % workerdir, "a")
                     fp.write("DEFAULT:max-connections:10\n")
                     fp.close()
+                    fp = open("%s/ser2net.yaml" % workerdir, "a")
+                    fp.write("%YAML 1.1\n---\n")
+                    fp.close()
                 ser2net_line = "%d:telnet:600:/dev/%s:%d 8DATABITS NONE 1STOPBIT" % (ser2net_ports[worker_name], board_name, baud)
                 if "ser2net_options" in uart:
                     for ser2net_option in uart["ser2net_options"]:
                         ser2net_line += " %s" % ser2net_option
                 device_line += template_device_ser2net.substitute(port=ser2net_ports[worker_name])
+                # YAML version
+                fp = open("%s/ser2net.yaml" % workerdir, "a")
+                fp.write("connection: &con%d\n" % ser2net_ports[worker_name])
+                fp.write("  accepter: tcp,%d\n" % ser2net_ports[worker_name])
+                fp.write("  enable: on\n")
+                fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
+
+
                 ser2net_ports[worker_name] += 1
                 fp = open("%s/ser2net.conf" % workerdir, "a")
                 fp.write(ser2net_line + " banner\n")

@@ -20,6 +20,7 @@ RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,X
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,'
 
 COPY ser2net.conf /etc
+COPY ser2net.yaml /etc
 
 # PXE stuff
 RUN if [ $(uname -m) != amd64 ]; then dpkg --add-architecture amd64 && apt-get update; fi
