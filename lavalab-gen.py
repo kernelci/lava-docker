@@ -127,7 +127,7 @@ def main():
             "tokens", "type",
             "users",
             "version",
-            "webadmin_https",
+            "webadmin_https", "webinterface_port",
             ]
         for keyword in master:
             if not keyword in keywords_master:
@@ -141,13 +141,17 @@ def main():
         workerdir = "output/%s/%s" % (host, name)
         os.mkdir("output/%s" % host)
         shutil.copy("deploy.sh", "output/%s/" % host)
+        if not "webinterface_port" in master:
+            webinterface_port = "10080"
+        else:
+            webinterface_port = master["webinterface_port"]
         dockcomp = {}
         dockcomp["version"] = "2.0"
         dockcomp["services"] = {}
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         dockcomp["services"][name] = {}
         dockcomp["services"][name]["hostname"] = name
-        dockcomp["services"][name]["ports"] = [ "10080:80", "5555:5555", "5556:5556", "5500:5500" ]
+        dockcomp["services"][name]["ports"] = [ str(webinterface_port) + ":80", "5555:5555", "5556:5556", "5500:5500" ]
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name

@@ -53,6 +53,8 @@ You will see it in the "All Jobs" list: http://localhost:10080/scheduler/alljobs
 
 * For more details, see https://validation.linaro.org/static/docs/v2/first-job.html
 
+* Note that the port used above can change depending on the setting of webinterface_port in boards.yaml
+
 ### Adding your first board:
 #### device-type
 To add a board you need to find its device-type, standard naming is to use the same as the official kernel DT name.
@@ -163,7 +165,7 @@ You need to have a PDU for powering your DUT.
 Managing PDUs is done via pdu_generic
 
 ### Network ports
-The following ports are used by lava-docker and are proxyfied on the host:
+By default, the following ports are used by lava-docker and are proxyfied on the host:
 - 69/UDP	proxyfied to the slave for TFTP
 - 80		proxyfied to the slave for TODO (transfer overlay)
 - 5500		proxyfied to the slave for Notification
@@ -217,6 +219,7 @@ masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
     webadmin_https:	Does the LAVA webadmin is accessed via https
+    webinterface_port: Port number to use for the LAVA web interface (defaut to "10080")
     lava-coordinator:		Does the master should ran a lava-coordinator and export its port
     persistent_db: True/False	(default False) Is the postgres DB is persistent over reboot
     pg_lava_password:		The Postgres lavaserver password to set
