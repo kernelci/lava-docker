@@ -513,4 +513,4 @@ You have to add a DNS server on both slave with an healthcheck entry.
 
 ## Bugs, Contact
 The prefered way to submit bugs are via the github issue tracker
-You can also contact us on #lava-docker on the freenode IRC network
+You can also contact us on #lava-docker on the Libera.chat IRC network
