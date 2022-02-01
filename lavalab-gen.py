@@ -736,7 +736,7 @@ def main():
                 # YAML version
                 fp = open("%s/ser2net.yaml" % workerdir, "a")
                 fp.write("connection: &con%d\n" % ser2net_ports[worker_name])
-                fp.write("  accepter: tcp,%d\n" % ser2net_ports[worker_name])
+                fp.write("  accepter: telnet(rfc2217),tcp,%d\n" % ser2net_ports[worker_name])
                 fp.write("  enable: on\n")
                 fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
 
