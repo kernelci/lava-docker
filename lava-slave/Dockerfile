@@ -23,9 +23,9 @@ COPY ser2net.conf /etc
 COPY ser2net.yaml /etc
 
 # PXE stuff
-RUN if [ $(uname -m) != amd64 ]; then dpkg --add-architecture amd64 && apt-get update; fi
+RUN if [ $(uname -m) != amd64 -a $(uname -m) != x86_64 ]; then dpkg --add-architecture amd64 && apt-get update; fi
 RUN apt-get -y install grub-efi-amd64-bin:amd64
-RUN if [ $(uname -m) != amd64 ]; then dpkg --remove architecture amd64 && apt-get update; fi
+RUN if [ $(uname -m) != amd64 -a $(uname -m) != x86_64 ]; then dpkg --remove architecture amd64 && apt-get update; fi
 COPY grub.cfg /root/
 
 COPY default/* /etc/default/
