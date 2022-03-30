@@ -573,8 +573,8 @@ def main():
             dockcomp["services"]["healthcheck"]["ports"] = ["8080:8080"]
             dockcomp["services"]["healthcheck"]["build"] = {}
             dockcomp["services"]["healthcheck"]["build"]["context"] = "healthcheck"
-            if "build_args" in master:
-                dockcomp["services"]["healthcheck"]["build"]["args"] = master['build_args']
+            if remote_master in worker and "build_args" in worker[remote_master]:
+                dockcomp["services"]["healthcheck"]["build"]["args"] = worker[remote_master]['build_args']
             shutil.copytree("healthcheck", "output/%s/healthcheck" % host)
         if "extra_actions" in worker:
             fp = open("%s/scripts/extra_actions" % workerdir, "w")
