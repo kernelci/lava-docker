@@ -745,7 +745,8 @@ def main():
                 fp.write("  accepter: telnet(rfc2217),tcp,%d\n" % ser2net_ports[worker_name])
                 fp.write("  enable: on\n")
                 fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
-
+                fp.write("  options: on\n")
+                fp.write("    max-connections: 10\n")
 
                 ser2net_ports[worker_name] += 1
                 fp = open("%s/ser2net.conf" % workerdir, "a")
