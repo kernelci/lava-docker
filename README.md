@@ -337,6 +337,7 @@ boards:
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
       use_conmux:	True/False (Use conmux-console instead of ser2net)
       use_ser2net: 	True/False (Deprecated, ser2net is the default uart handler)
+      ser2net_keepopen:	True/False (optional) Use the recent ser2net keepopen
       ser2net_options:	(optional) A list of ser2net options to add
         - option1
         - option2

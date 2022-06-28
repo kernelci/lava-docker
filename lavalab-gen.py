@@ -710,10 +710,13 @@ def main():
                 dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (board_name, board_name))
             use_conmux = False
             use_ser2net = False
+            set2net_keepopen = False
             if "use_conmux" in uart:
                 use_conmux = uart["use_conmux"]
             if "use_ser2net" in uart:
                 use_ser2net = uart["use_ser2net"]
+            if "set2net_keepopen" in uart:
+                set2net_keepopen = uart["set2net_keepopen"]
             if (use_conmux and use_ser2net):
                 print("ERROR: Only one uart handler must be configured")
                 sys.exit(1)
@@ -744,7 +747,10 @@ def main():
                 fp.write("connection: &con%d\n" % ser2net_ports[worker_name])
                 fp.write("  accepter: telnet(rfc2217),tcp,%d\n" % ser2net_ports[worker_name])
                 fp.write("  enable: on\n")
-                fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
+                if set2net_keepopen:
+                    fp.write("  connector: keepopen(retry-time=2000,discard-badwrites),serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
+                else:
+                    fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
                 fp.write("  options: on\n")
                 fp.write("    max-connections: 10\n")
 
