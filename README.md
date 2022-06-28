@@ -334,6 +334,7 @@ boards:
       idvendor: The VID of the UART (Formated as 0xXXXX)
       idproduct: the PID of the UART (Formated as 0xXXXX)
       serial: The serial number in case of FTDI uart
+      baud:		(optional) Change the baud rate of the this uart (default is 115200)
       devpath: the UDEV devpath to this uart for UART without serial number
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
       use_conmux:	True/False (Use conmux-console instead of ser2net)
