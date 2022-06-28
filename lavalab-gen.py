@@ -751,7 +751,7 @@ def main():
                     fp.write("  connector: keepopen(retry-time=2000,discard-badwrites),serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
                 else:
                     fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
-                fp.write("  options: on\n")
+                fp.write("  options:\n")
                 fp.write("    max-connections: 10\n")
 
                 ser2net_ports[worker_name] += 1
