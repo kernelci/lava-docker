@@ -152,8 +152,6 @@ The host IP on this LAN must be set as dispatcher_ip in boards.yaml.<br/>
 Since most DUTs are booted using TFTP, they need DHCP for gaining network connectivity.<br/>
 So, on the LAN shared with DUTs, a running DHCPD is necessary. (See DHCPD below)<br/>
 
-![lava-docker diagram](doc/lava-docker.png)
-
 ## Multi-host architectures
 Lava-docker support multi-host architecture, Master and slaves could be on different host.
 
