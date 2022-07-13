@@ -223,6 +223,7 @@ masters:
     pg_lava_password:		The Postgres lavaserver password to set
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     healthcheck_url:		Hack healthchecks hosting URL. See hosting healthchecks below
+    healthcheck_repo:		Hack healthchecks git repository URL. See hosting healthchecks below
     build_args:
       - line1			A list of line to set docker build-time variables
       - line2
@@ -513,6 +514,13 @@ Example:
 One master and slave on DC A, and one slave on DC B.
 Both slave need to have healthcheck_host to true and master will have healthcheck_url set to http://healthcheck:8080
 You have to add a DNS server on both slave with an healthcheck entry.
+
+For mirroring the healthcheck repository and keeping it local
+
+- Mirror https://github.com/kernelci/lava-healthchecks-binary to your repository of choice
+- Add your local boards healthchecks binary
+- Set the repository to your new repository using healthcheck_repo on the master
+- Rebuild healthchecks docker container
 
 ## Bugs, Contact
 The prefered way to submit bugs are via the github issue tracker
