@@ -119,7 +119,7 @@ def main():
             "allowed_hosts",
             "build_args",
             "groups",
-            "healthcheck_url", "host", "http_fqdn",
+            "healthcheck_url","healthcheck_repo", "host", "http_fqdn",
             "loglevel", "lava-coordinator",
             "name",
             "persistent_db", "pg_lava_password",
@@ -558,6 +558,13 @@ def main():
             if "build_args" in master:
                 dockcomp["services"]["healthcheck"]["build"]["args"] = master['build_args']
             shutil.copytree("healthcheck", "output/%s/healthcheck" % host)
+        if "healthcheck_repo" in master:
+            healthcheckdir = "output/%s/healthcheck" % (host)
+            dockerfile = open("%s/Dockerfile" % healthcheckdir, "r+")
+            dockerfilec = re.sub('(RUN git clone ).*', '\g<1>%s lava-healthchecks-binary' % master["healthcheck_repo"], dockerfile.read())
+            dockerfile.seek(0)
+            dockerfile.write(dockerfilec)
+            dockerfile.close()
         if "extra_actions" in worker:
             fp = open("%s/scripts/extra_actions" % workerdir, "w")
             for eaction in worker["extra_actions"]:
