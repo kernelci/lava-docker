@@ -216,6 +216,7 @@ This file describe how the DUTs are connected and powered.
 masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
+    version: "202x.xx"	LAVA version for master
     webadmin_https:	Does the LAVA webadmin is accessed via https
     webinterface_port: Port number to use for the LAVA web interface (defaut to "10080")
     lava-coordinator:		Does the master should ran a lava-coordinator and export its port
@@ -266,6 +267,7 @@ masters:
 slaves:
   - name: lab-slave-XX		The name of the slave (where XX is a number)
     host: name			name of the host running lava-slave-XX (default to "local")
+    version: "202x.xx"		LAVA version for worker
     dispatcher_ip: 		the IP where the slave could be contacted. In lava-docker it is the host IP since docker proxify TFTP from host to the slave.
     remote_master: 		the name of the master to connect to
     remote_address: 		the FQDN or IP address of the master (if different from remote_master)
