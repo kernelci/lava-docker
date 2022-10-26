@@ -1,12 +1,13 @@
+---
 masters:
   - name: master1
     host: local
     users:
-    - name: admin
-      token: longrandomtokenadmin
-      password: admin
-      superuser: yes
-      staff: yes
+      - name: admin
+        token: longrandomtokenadmin
+        password: admin
+        superuser: true
+        staff: true
 slaves:
   - name: lab-slave-0
     host: local
@@ -18,7 +19,7 @@ boards:
   - name: qemu-02
     type: qemu
     slave: lab-slave-0
-    kvm: True
+    kvm: true
   - name: meson-gxl-s905x-libretech-cc-01
     type: meson-gxl-s905x-libretech-cc
     slave: lab-slave-0
@@ -34,8 +35,8 @@ boards:
     type: meson-gxbb-nanopi-k2
     slave: lab-slave-0
     custom_option:
-    - 'set bootloader_prompt = "nanopi-k2#"'
-    - "set interrupt_prompt = 'nanopi'"
+      - 'set bootloader_prompt = "nanopi-k2#"'
+      - "set interrupt_prompt = 'nanopi'"
     uboot_ipaddr: 192.168.66.201
     pdu_generic:
       hard_reset_command: /usr/local/bin/acme-cli -s 192.168.66.2 reset 3
