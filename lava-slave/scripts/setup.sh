@@ -148,7 +148,7 @@ do
 			if [ $? -ne 0 ]; then
 				CURR_WORKER=""
 			else
-				CURR_WORKER=$(cat /tmp/current-worker | sed '^.* ,,')
+				CURR_WORKER=$(cat /tmp/current-worker | sed 's,^.* ,,')
 			fi
 			if [ ! -z "$CURR_WORKER" -a "$CURR_WORKER" != "$worker" ];then
 				echo "ERROR: $devicename already present on another worker $CURR_WORKER"
