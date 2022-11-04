@@ -370,7 +370,7 @@ Example:
 
 Note on connection_command: connection_command is for people which want to use other custom way than ser2net to handle the console.
 
-Examples: see [boards.yaml.example](boards.yaml.example)
+Examples: see [boards.yaml.example](boards.yaml.example) or [boards.yaml.minimal](boards.yaml.minimal)
 
 ### Generate
 ```
