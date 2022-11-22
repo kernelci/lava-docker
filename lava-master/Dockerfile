@@ -1,4 +1,4 @@
-FROM lavasoftware/lava-server:2022.10
+FROM lavasoftware/lava-server:2022.11.1
 
 RUN apt-get update && apt-get -y install sudo git
 
