@@ -731,16 +731,9 @@ def main():
             if use_ser2net:
                 if not worker_name in ser2net_ports:
                     ser2net_ports[worker_name] = ser2net_port_start
-                    fp = open("%s/ser2net.conf" % workerdir, "a")
-                    fp.write("DEFAULT:max-connections:10\n")
-                    fp.close()
                     fp = open("%s/ser2net.yaml" % workerdir, "a")
                     fp.write("%YAML 1.1\n---\n")
                     fp.close()
-                ser2net_line = "%d:telnet:600:/dev/%s:%d 8DATABITS NONE 1STOPBIT" % (ser2net_ports[worker_name], board_name, baud)
-                if "ser2net_options" in uart:
-                    for ser2net_option in uart["ser2net_options"]:
-                        ser2net_line += " %s" % ser2net_option
                 device_line += template_device_ser2net.substitute(port=ser2net_ports[worker_name])
                 # YAML version
                 fp = open("%s/ser2net.yaml" % workerdir, "a")
@@ -748,15 +741,17 @@ def main():
                 fp.write("  accepter: telnet(rfc2217),tcp,%d\n" % ser2net_ports[worker_name])
                 fp.write("  enable: on\n")
                 if set2net_keepopen:
-                    fp.write("  connector: keepopen(retry-time=2000,discard-badwrites),serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
+                    ser2net_yaml_line= "  connector: keepopen(retry-time=2000,discard-badwrites),serialdev,/dev/%s,%dn81,local" % (board_name, baud)
                 else:
-                    fp.write("  connector: serialdev,/dev/%s,%dn81,local\n" % (board_name, baud))
+                    ser2net_yaml_line = "  connector: serialdev,/dev/%s,%dn81,local" % (board_name, baud)
+                if "ser2net_options" in uart:
+                    for ser2net_yaml_option in uart["ser2net_options"]:
+                        ser2net_yaml_line += ",%s" % ser2net_yaml_option
+                ser2net_yaml_line += "\n"
+                fp.write(ser2net_yaml_line)
                 fp.write("  options:\n")
                 fp.write("    max-connections: 10\n")
-
                 ser2net_ports[worker_name] += 1
-                fp = open("%s/ser2net.conf" % workerdir, "a")
-                fp.write(ser2net_line + " banner\n")
                 fp.close()
         if "connection_command" in board:
             connection_command = board["connection_command"]

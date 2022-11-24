@@ -19,7 +19,6 @@ COPY conmux/ /etc/conmux/
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,'
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,'
 
-COPY ser2net.conf /etc
 COPY ser2net.yaml /etc
 
 # PXE stuff
