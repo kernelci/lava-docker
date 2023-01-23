@@ -683,6 +683,10 @@ def main():
         if devicetype == "qemu" and not use_kvm:
             device_line += "{% set no_kvm = True %}\n"
         if "uart" in board:
+            keywords_uart = [ "baud", "devpath", "idproduct", "idvendor", "interfacenum", "serial", "use_ser2net", "worker" ]
+            for keyword in board["uart"]:
+                if not keyword in keywords_uart:
+                    print("WARNING: unknown keyword %s" % keyword)
             uart = board["uart"]
             baud = board["uart"].get("baud", baud_default)
             idvendor = board["uart"]["idvendor"]
