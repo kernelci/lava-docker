@@ -344,6 +344,7 @@ boards:
       devpath: the UDEV devpath to this uart for UART without serial number
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
       use_ser2net: 	True/False (Deprecated, ser2net is the default uart handler)
+      worker:          (optional) an host/IP where ser2net is running
       ser2net_keepopen:	True/False (optional) Use the recent ser2net keepopen
       ser2net_options:	(optional) A list of ser2net options to add
         - option1
