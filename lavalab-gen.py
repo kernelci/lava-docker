@@ -602,7 +602,8 @@ def main():
         if use_nbd:
             dockcomp["services"][name]["ports"].append("61950-62000:61950-62000")
             fp = open("%s/scripts/extra_actions" % workerdir, "a")
-            fp.write("apt-get -y install nbd-server\n")
+            # LAVA issue 585 need to remove /etc/nbd-server/config
+            fp.write("apt-get -y install nbd-server && rm -f /etc/nbd-server/config\n")
             fp.close()
             os.chmod("%s/scripts/extra_actions" % workerdir, 0o755)
         use_overlay_server = True
