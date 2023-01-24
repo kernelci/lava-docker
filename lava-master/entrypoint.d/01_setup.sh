@@ -16,6 +16,9 @@ else
 	sed -i "s,PASSWORD:.*,PASSWORD: '$(cat /root/pg_lava_password)'," /etc/lava-server/settings.d/00-database.yaml || exit $?
 fi
 
+cd /root/
+lava-server manage makemigrations || exit $?
+
 # verify that the backup was not already applied in case of persistent_db
 if [ ! -e "/var/lib/postgresql/lava-docker.backup_done" ];then
 	if [ -e /root/backup/db_lavaserver.gz ];then
