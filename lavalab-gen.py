@@ -31,7 +31,7 @@ template_device_pdu_generic = string.Template("""
 """)
 
 template_device_ser2net = string.Template("""
-{% set connection_command = 'telnet 127.0.0.1 ${port}' %}
+{% set connection_command = 'telnet ${telnet_host} ${port}' %}
 """)
 
 ser2net_dict = {}
@@ -740,16 +740,41 @@ def main():
             if not use_ser2net and not "connection_command" in board:
                 use_ser2net = True
             if use_ser2net:
-                if not worker_name in ser2net_ports:
-                    ser2net_ports[worker_name] = ser2net_port_start
-                    fp = open("%s/ser2net.yaml" % workerdir, "a")
+                if "worker" in uart:
+                    worker_ser2net = uart["worker"]
+                    telnet_host = worker_ser2net
+                else:
+                    worker_ser2net = worker_name
+                    telnet_host = "127.0.0.1"
+                ser2netdir = "output/%s/%s" % (host, worker_ser2net)
+                if not os.path.isdir(ser2netdir):
+                    os.mkdir(ser2netdir)
+                if (not "bind_dev" in slave or not slave["bind_dev"]) and worker_ser2net == worker_name:
+                    dockcomp_add_device(dockcomp, worker_name, "/dev/%s:/dev/%s" % (board_name, board_name))
+                udev_line = 'SUBSYSTEM=="tty", ATTRS{idVendor}=="%04x", ATTRS{idProduct}=="%04x",' % (idvendor, idproduct)
+                if "serial" in uart:
+                    udev_line += 'ATTRS{serial}=="%s", ' % board["uart"]["serial"]
+                if "devpath" in uart:
+                    udev_line += 'ATTRS{devpath}=="%s", ' % board["uart"]["devpath"]
+                if "interfacenum" in uart:
+                    udev_line += 'ENV{ID_USB_INTERFACE_NUM}=="%s", ' % board["uart"]["interfacenum"]
+                udev_line += 'MODE="0664", OWNER="uucp", SYMLINK+="%s"\n' % board_name
+                udevdir = "output/%s/%s/udev" % (host, worker_ser2net)
+                if not os.path.isdir(udevdir):
+                    os.mkdir(udevdir)
+                fp = open("%s/99-lavaworker-udev.rules" % udevdir, "a")
+                fp.write(udev_line)
+                fp.close()
+                if not worker_ser2net in ser2net_ports:
+                    ser2net_ports[worker_ser2net] = ser2net_port_start
+                    fp = open("%s/ser2net.yaml" % ser2netdir, "a")
                     fp.write("%YAML 1.1\n---\n")
                     fp.close()
-                device_line += template_device_ser2net.substitute(port=ser2net_ports[worker_name])
+                device_line += template_device_ser2net.substitute(port=ser2net_ports[worker_ser2net], telnet_host=telnet_host)
                 # YAML version
-                fp = open("%s/ser2net.yaml" % workerdir, "a")
-                fp.write("connection: &con%d\n" % ser2net_ports[worker_name])
-                fp.write("  accepter: telnet(rfc2217),tcp,%d\n" % ser2net_ports[worker_name])
+                fp = open("%s/ser2net.yaml" % ser2netdir, "a")
+                fp.write("connection: &con%d\n" % ser2net_ports[worker_ser2net])
+                fp.write("  accepter: telnet(rfc2217),tcp,%d\n" % ser2net_ports[worker_ser2net])
                 fp.write("  enable: on\n")
                 if ser2net_keepopen:
                     ser2net_yaml_line= "  connector: keepopen(retry-time=2000,discard-badwrites),serialdev,/dev/%s,%dn81,local" % (board_name, baud)
@@ -762,7 +787,7 @@ def main():
                 fp.write(ser2net_yaml_line)
                 fp.write("  options:\n")
                 fp.write("    max-connections: 10\n")
-                ser2net_ports[worker_name] += 1
+                ser2net_ports[worker_ser2net] += 1
                 fp.close()
         if "connection_command" in board:
             connection_command = board["connection_command"]
