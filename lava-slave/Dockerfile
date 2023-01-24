@@ -15,6 +15,9 @@ COPY scripts/ /usr/local/bin/
 RUN chmod a+x /usr/local/bin/*
 COPY conmux/ /etc/conmux/
 
+# LAVA issue 585
+RUN rm /etc/nbd-server/config
+
 # Caution to not use any port between the Linux dynamic port range: 32768-60999
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,'
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,'
