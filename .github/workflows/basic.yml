@@ -1,6 +1,6 @@
 ---
 name: basic
-on:  # yamllint disable-line rule:truthy
+on:  # yamllint disable-line rule:truthy rule:line-length
   push:
   pull_request:
 
@@ -27,3 +27,56 @@ jobs:
         run: find -iname '*.yaml' | xargs yamllint
       - name: verify yml files
         run: find -iname '*.yml' | xargs yamllint
+  check-lava-upgrade:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: install lavacli
+        run: sudo apt-get -y install lavacli
+      - run: ./lavalab-gen.py boards-ci-2022.01.yaml
+      - run: cat output/local/docker-compose.yml
+      - name: Verify DNS query in docker
+        run: sh .github/docker-resolv.sh
+      - name: Build lava-docker
+        run: cd output/local && docker-compose build
+      - name: Launch lava-docker
+        run: cd output/local && docker-compose up -d
+      - name: Wait for LAVA to be started
+        run: sh .github/workflows/wait-for-docker.sh
+      - name: Wait for first job to be completed
+        # yamllint disable-line rule:line-length
+        run: lavacli --uri http://admin:tokenforci@127.0.0.1:10080/RPC2 jobs wait 1
+
+      - name: Run backup
+        run: ./backup.sh
+      - name: stop docker
+        run: cd output/local && docker-compose down
+
+      - name: Clean old install
+        run: rm -r output
+      - name: Copy backup
+        run: cp -v backup-latest/* lava-master/backup/
+      - name: Run lavalab-gen
+        run: ./lavalab-gen.py boards-ci-2023.01.yaml
+      - name: Build lava-docker
+        run: cd output/local && docker-compose build
+      - name: Launch lava-docker
+        run: cd output/local && docker-compose up -d
+      - name: Wait for LAVA to be started
+        run: sh .github/workflows/wait-for-docker.sh
+      - name: Wait for first job to be completed
+        # yamllint disable-line rule:line-length
+        run: lavacli --uri http://admin:tokenforci@127.0.0.1:10080/RPC2 jobs wait 2
+      - name: Verify we still have logs
+        # yamllint disable-line rule:line-length
+        run: lavacli --uri http://admin:tokenforci@127.0.0.1:10080/RPC2 jobs logs 1
+      - name: Verify we still have logs really
+        # yamllint disable-line rule:line-length
+        run: lavacli --uri http://admin:tokenforci@127.0.0.1:10080/RPC2 jobs logs 1 > log1 && [[ -s log1 ]] || exit 1
+      - name: stop docker
+        run: cd output/local && docker-compose down
+
+      - name: restart lava-docker
+        run: cd output/local && docker-compose up -d
+      - name: Wait for LAVA to be started
+        run: sh .github/workflows/wait-for-docker.sh
