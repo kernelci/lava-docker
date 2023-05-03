@@ -1,4 +1,4 @@
-FROM bitnami/minideb:stretch
+FROM bitnami/minideb:bullseye
 
 RUN apt-get update && apt-get -y install git
 RUN git clone https://github.com/BayLibre/lava-healthchecks-binary.git
