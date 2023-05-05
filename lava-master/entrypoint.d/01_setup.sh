@@ -35,13 +35,16 @@ if [ ! -e "/var/lib/postgresql/lava-docker.backup_done" ];then
 	        # allow using different folder for tar operations (/tmp by default)
 		TMPDIR=${TMPDIR:-/tmp}
 
+		echo "DEBUG: restoring jobs output"
 		tar xzf /root/backup/joboutput.tar.gz || exit $?
+		mv /root/var/lib/lava-server/default/media/job-output/* cd /var/lib/lava-server/default/media/job-output/
 		chown -R lavaserver:lavaserver /var/lib/lava-server/default/media/job-output/
 		touch /var/lib/postgresql/lava-docker.backup_done
 	fi
 	if [ -e /root/backup/devices.tar.gz ];then
 		echo "INFO: Restoring devices files"
 		tar xzf /root/backup/devices.tar.gz
+		mv /root/etc/lava-server/dispatcher-config/devices/* /etc/lava-server/dispatcher-config/devices/
 		chown -R lavaserver:lavaserver /etc/lava-server/dispatcher-config/devices
 	fi
 else
