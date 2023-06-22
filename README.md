@@ -264,6 +264,10 @@ masters:
         env:
 	- line1			A list of line to set as environment
 	- line2
+    event_notifications:
+      event_notification_topic:   A string which event receivers can use for filtering (default is set to the name of the master)
+      event_notification_port:    Port to use for event notifications (default to "5500")
+      event_notification_enabled: Set to true to enable event notifications (default to "false")
 slaves:
   - name: lab-slave-XX		The name of the slave (where XX is a number)
     host: name			name of the host running lava-slave-XX (default to "local")

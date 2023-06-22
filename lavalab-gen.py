@@ -71,7 +71,12 @@ template_settings_conf = string.Template("""
     "EMAIL_PORT": $email_port,
     "EMAIL_USE_TLS": $email_use_tls,
     "EMAIL_USE_SSL": $email_use_ssl,
-    "EMAIL_BACKEND": "$email_backend"
+    "EMAIL_BACKEND": "$email_backend",
+    "EVENT_TOPIC": "$event_notification_topic",
+    "INTERNAL_EVENT_SOCKET": "ipc:///tmp/lava.events",
+    "EVENT_SOCKET": "tcp://*:$event_notification_port",
+    "EVENT_NOTIFICATION": $event_notification_enabled,
+    "EVENT_ADDITIONAL_SOCKETS": []
 }
 """)
 
@@ -118,6 +123,7 @@ def main():
         keywords_master = [
             "allowed_hosts",
             "build_args",
+            "event_notifications",
             "groups",
             "healthcheck_url", "host", "http_fqdn",
             "loglevel", "lava-coordinator",
@@ -268,6 +274,24 @@ def main():
                         email_use_ssl = 'false'
             if "email_backend" in worker["smtp"]:
                 email_backend = worker["smtp"]["email_backend"]
+        # Event notifications
+        event_notification_topic=name
+        event_notification_port='5500'
+        event_notification_enabled='false'
+        if "event_notifications" in worker:
+            if "event_notification_topic" in worker["event_notifications"]:
+                event_notification_topic = worker["event_notifications"]["event_notification_topic"]
+            if "event_notification_port" in worker["event_notifications"]:
+                event_notification_port = worker["event_notifications"]["event_notification_port"]
+            if "event_notification_enabled" in worker["event_notifications"]:
+                event_notification_enabled = worker["event_notifications"]["event_notification_enabled"]
+                # django does not like True or False but want true/false (no upper case)
+                if isinstance(event_notification_enabled, bool):
+                    if event_notification_enabled:
+                        event_notification_enabled = 'true'
+                    else:
+                        event_notification_enabled = 'false'
+        # Substitute variables in settings.conf
         fsettings = open("%s/settings.conf" % workerdir, 'w')
         fsettings.write(
             template_settings_conf.substitute(
@@ -282,7 +306,10 @@ def main():
                 email_use_tls = email_use_tls,
                 email_use_ssl = email_use_ssl,
                 email_backend = email_backend,
-                server_email = server_email
+                server_email = server_email,
+                event_notification_topic = event_notification_topic,
+                event_notification_port = event_notification_port,
+                event_notification_enabled = event_notification_enabled
                 )
             )
         fsettings.close()
