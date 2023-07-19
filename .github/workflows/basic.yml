@@ -80,3 +80,21 @@ jobs:
         run: cd output/local && docker-compose up -d
       - name: Wait for LAVA to be started
         run: sh .github/workflows/wait-for-docker.sh
+
+      - name: Run backup of 2023.01
+        run: ./backup.sh
+      - name: stop docker
+        run: cd output/local && docker-compose down
+
+      - name: Clean old install
+        run: rm -r output
+      - name: Copy backup
+        run: cp -v backup-latest/* lava-master/backup/
+      - name: Run lavalab-gen
+        run: ./lavalab-gen.py boards-ci-2023.06.yaml
+      - name: Build lava-docker 2023.06
+        run: cd output/local && docker-compose build
+      - name: Launch lava-docker 2023.06
+        run: cd output/local && docker-compose up -d
+      - name: Wait for LAVA 2023.06 to be started
+        run: sh .github/workflows/wait-for-docker.sh

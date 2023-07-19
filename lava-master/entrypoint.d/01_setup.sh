@@ -17,7 +17,7 @@ else
 fi
 
 cd /root/
-lava-server manage makemigrations || exit $?
+#lava-server manage makemigrations || exit $?
 
 # verify that the backup was not already applied in case of persistent_db
 if [ ! -e "/var/lib/postgresql/lava-docker.backup_done" ];then
@@ -28,7 +28,7 @@ if [ ! -e "/var/lib/postgresql/lava-docker.backup_done" ];then
 	if [ -e /root/backup/db_lavaserver ];then
 		echo "Restore database from backup"
 		sudo -u postgres psql < /root/backup/db_lavaserver || exit $?
-		yes yes | lava-server manage migrate || exit $?
+		#yes yes | lava-server manage migrate || exit $?
 		echo "Restore jobs output from backup"
 		rm -r /var/lib/lava-server/default/media/job-output/*
 
@@ -51,8 +51,58 @@ else
 	echo "DEBUG: backup already applied"
 fi
 
-lava-server manage makemigrations
-yes yes | lava-server manage migrate || exit $?
+# check current LAVA version
+# not very good way, but no real choice
+echo "DEBUG: check LAVA version from DB"
+su - postgres -c 'psql --tuples-only lavaserver -c "SELECT DISTINCT version from lava_scheduler_app_worker" | sort -V' > /tmp/workerversions
+sed -i 's,^[[:space:]]*,,' /tmp/workerversions
+echo "======"
+cat /tmp/workerversions
+echo "======"
+
+echo "DEBUG: check LAVA version from file"
+cat /usr/lib/python3/dist-packages/lava_common/VERSION
+# hack
+grep -q '2023.01' /usr/lib/python3/dist-packages/lava_common/VERSION
+if [ $? -eq 0 ];then
+	echo "DEBUG: 2023.01 need to do an old migration"
+	lava-server manage makemigrations
+	yes yes | lava-server manage migrate || exit $?
+fi
+# if we came from 2023.01 to 2023.05, we need to handle the migration bug
+grep -q '2023.0[1-5]' /tmp/workerversions
+if [ $? -eq 0 ];then
+	grep -q 2023.06 /usr/lib/python3/dist-packages/lava_common/VERSION
+	if [ $? -eq 0 ];then
+		echo "============================="
+		echo "DEBUG: handle DB migration BUG"
+		sudo -u postgres psql lavaserver -c "SELECT * from django_migrations where app = 'lava_scheduler_app';"
+		echo "============================="
+		sudo -u postgres psql lavaserver -c "SELECT * from django_migrations where app = 'lava_results_app';"
+		echo "============================="
+		lava-server manage migrate --fake lava_results_app 0019_update_query_contenttype || exit $?
+		echo "============================="
+		lava-server manage migrate --fake lava_scheduler_app 0057_dt_permissions_worker_master_version || exit $?
+		echo "============================="
+		lava-server manage migrate lava_results_app 0018_drop_buglink || exit $?
+		echo "============================="
+		lava-server manage migrate lava_scheduler_app 0056_testjob_queue_timeout || exit $?
+		echo "============================="
+		sudo -u postgres psql lavaserver -c "SELECT * from django_migrations where app = 'lava_scheduler_app';"
+		echo "============================="
+		sudo -u postgres psql lavaserver -c "SELECT * from django_migrations where app = 'lava_results_app';"
+		echo "============================="
+	else
+		echo "DEBUG: no spetial handling for DB"
+	fi
+else
+	echo "DEBUG: no spetial handling for DB"
+fi
+
+echo "DEBUG: call postinst for managing migrations"
+/usr/share/lava-server/postinst.py || exit $?
+#lava-server manage makemigrations
+#yes yes | lava-server manage migrate || exit $?
 
 # default site is set as example.com
 if [ -e /root/lava_http_fqdn ];then

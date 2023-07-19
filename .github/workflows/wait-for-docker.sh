@@ -22,7 +22,17 @@ do
 			fi
 		fi
 	fi
-	docker-compose logs --tail=50
+	docker-compose logs --tail=60
+	docker ps > /tmp/alldocker
+	grep -q master /tmp/alldocker
+	if [ $? -ne 0 ];then
+		echo "=========================================="
+		echo "=========================================="
+		echo "=========================================="
+		echo "ERROR: master died"
+		docker-compose logs
+		exit 1
+	fi
 	sleep 10
 	TIMEOUT=$((TIMEOUT+10))
 done
