@@ -341,7 +341,6 @@ boards:
       baud:		(optional) Change the baud rate of the this uart (default is 115200)
       devpath: the UDEV devpath to this uart for UART without serial number
       interfacenum:	(optional) The interfacenumber of the serial. (Used with two serial in one device)
-      use_conmux:	True/False (Use conmux-console instead of ser2net)
       use_ser2net: 	True/False (Deprecated, ser2net is the default uart handler)
       ser2net_keepopen:	True/False (optional) Use the recent ser2net keepopen
       ser2net_options:	(optional) A list of ser2net options to add
@@ -385,7 +384,6 @@ this script will generate all necessary files in the following locations:
 ```
 output/host/lava-master/tokens/			This is where the callback tokens will be generated
 output/host/lava-master/users/			This is where the users will be generated
-output/host/lab-slave-XX/conmux/		All files needed by conmux
 output/host/lab-slave-XX/devices/		All LAVA devices files
 output/host/udev/99-lavaworker-udev.rules 	udev rules for host
 output/host/docker-compose.yml			Generated from docker-compose.template

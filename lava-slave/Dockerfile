@@ -2,10 +2,9 @@ FROM lavasoftware/lava-dispatcher:2023.01
 
 RUN apt-get update
 
-# cu conmux is for console via conmux
 # telnet is for using ser2net
 # git is necessary for checkout tests
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cu conmux telnet git ser2net patch lavacli
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install telnet git ser2net patch lavacli
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
@@ -13,7 +12,6 @@ COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
 COPY scripts/ /usr/local/bin/
 RUN chmod a+x /usr/local/bin/*
-COPY conmux/ /etc/conmux/
 
 # Caution to not use any port between the Linux dynamic port range: 32768-60999
 RUN find /usr/lib/python3/dist-packages/ -iname constants.py | xargs sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,'
