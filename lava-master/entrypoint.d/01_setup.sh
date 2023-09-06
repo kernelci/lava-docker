@@ -28,7 +28,7 @@ if [ ! -e "/var/lib/postgresql/lava-docker.backup_done" ];then
 	if [ -e /root/backup/db_lavaserver ];then
 		echo "Restore database from backup"
 		sudo -u postgres psql < /root/backup/db_lavaserver || exit $?
-		yes yes | lava-server manage migrate || exit $?
+		yes yes | lava-server manage migrate
 		echo "Restore jobs output from backup"
 		rm -r /var/lib/lava-server/default/media/job-output/*
 
@@ -52,7 +52,7 @@ else
 fi
 
 lava-server manage makemigrations
-yes yes | lava-server manage migrate || exit $?
+yes yes | lava-server manage migrate
 
 # default site is set as example.com
 if [ -e /root/lava_http_fqdn ];then
