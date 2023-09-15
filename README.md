@@ -220,7 +220,9 @@ masters:
     webadmin_https:	Does the LAVA webadmin is accessed via https
     webinterface_port: Port number to use for the LAVA web interface (default to "10080")
     lava-coordinator:		Does the master should ran a lava-coordinator and export its port
-    persistent_db: true/false	(default false) Is the postgresql DB is persistent over reboot
+    persistent_db: true/false	(default false) Is the postgresql DB is persistent over reboot.
+                                WARNING: this is working accross the same LAVA version, this do not work when there is a postgresql major update
+                                This is not recommanded
     pg_lava_password:		The postgresql LAVA server password to set
     http_fqdn:			The FQDN used to access the LAVA web interface. This is necessary if you use https otherwise you will issue CSRF errors.
     healthcheck_url:		Hack healthchecks hosting URL. See hosting healthchecks below
