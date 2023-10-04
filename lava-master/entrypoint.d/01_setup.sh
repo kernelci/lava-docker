@@ -222,6 +222,12 @@ if [ -e /root/lava-callback-tokens ];then
 	done
 fi
 
+lava-server manage device-types --no-color list > /tmp/device-types.list
+if [ $? -ne 0 ];then
+	echo "ERROR: fail to get device-types"
+	exit 1
+fi
+
 # This directory is used for storing device-types already added
 mkdir -p /root/.lavadocker/
 if [ -e /root/device-types ];then
@@ -234,7 +240,7 @@ if [ -e /root/device-types ];then
 		cp $i /etc/lava-server/dispatcher-config/device-types/
 		chown lavaserver:lavaserver /etc/lava-server/dispatcher-config/device-types/$(basename $i)
 		devicetype=$(basename $i |sed 's,.jinja2,,')
-		lava-server manage device-types list | grep -q "[[:space:]]$devicetype[[:space:]]"
+		grep -q "[[:space:]]$devicetype[[:space:]]" /tmp/device-types.list
 		if [ $? -eq 0 ];then
 			echo "Skip already known $devicetype"
 		else
