@@ -147,7 +147,7 @@ def main():
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         dockcomp["services"][name] = {}
         dockcomp["services"][name]["hostname"] = name
-        dockcomp["services"][name]["ports"] = [ str(webinterface_port) + ":80", "5555:5555", "5556:5556", "5500:5500" ]
+        dockcomp["services"][name]["ports"] = [ str(webinterface_port) + ":80"]
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
