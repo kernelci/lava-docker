@@ -72,7 +72,7 @@ fi
 # if we came from 2023.01 to 2023.05, we need to handle the migration bug
 grep -q '2023.0[1-5]' /tmp/workerversions
 if [ $? -eq 0 ];then
-	grep -q 2023.06 /usr/lib/python3/dist-packages/lava_common/VERSION
+	grep -qE '2023.0[68]|2023.10' /usr/lib/python3/dist-packages/lava_common/VERSION
 	if [ $? -eq 0 ];then
 		echo "============================="
 		echo "DEBUG: handle DB migration BUG"
