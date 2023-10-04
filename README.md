@@ -217,8 +217,9 @@ masters:
  - name:  lava-master	name of the master
     host: name		name of the host running lava-master (default to "local")
     version: "202x.xx"	LAVA version for master
-    webadmin_https:	Does the LAVA webadmin is accessed via https
-    webinterface_port: Port number to use for the LAVA web interface (default to "10080")
+    webadmin_https:	    Does the LAVA webadmin is accessed via https
+    listen_address:     Address where webinterface_port will listen (default to 0.0.0.0)
+    webinterface_port:  Port number to use for the LAVA web interface (default to "10080")
     lava-coordinator:		Does the master should ran a lava-coordinator and export its port
     persistent_db: true/false	(default false) Is the postgresql DB is persistent over reboot.
                                 WARNING: this is working accross the same LAVA version, this do not work when there is a postgresql major update
