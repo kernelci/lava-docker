@@ -116,6 +116,7 @@ def main():
             "event_notifications",
             "groups", "gunicorn_workers",
             "healthcheck_url", "host", "http_fqdn",
+            "listen_address",
             "loglevel", "lava-coordinator",
             "name",
             "persistent_db", "pg_lava_password",
@@ -141,13 +142,17 @@ def main():
             webinterface_port = "10080"
         else:
             webinterface_port = master["webinterface_port"]
+        if "listen_address" in master:
+            listen_address = master["listen_address"]
+        else:
+            listen_address = '0.0.0.0'
         dockcomp = {}
         dockcomp["version"] = "2.0"
         dockcomp["services"] = {}
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         dockcomp["services"][name] = {}
         dockcomp["services"][name]["hostname"] = name
-        dockcomp["services"][name]["ports"] = [ str(webinterface_port) + ":80"]
+        dockcomp["services"][name]["ports"] = [ listen_address + ":" + str(webinterface_port) + ":80"]
         dockcomp["services"][name]["volumes"] = [ "/boot:/boot", "/lib/modules:/lib/modules" ]
         dockcomp["services"][name]["build"] = {}
         dockcomp["services"][name]["build"]["context"] = name
