@@ -563,7 +563,9 @@ def main():
             fcoordinator.write(template_lava_coordinator_conf.substitute(masterurl=remote_address))
             fcoordinator.close()
         if "dispatcher_ip" in worker:
-            dockcomp["services"][worker_name]["environment"]["LAVA_DISPATCHER_IP"] = worker["dispatcher_ip"]
+            fconfig = open("%s/worker-config" % workerdir, 'a')
+            fconfig.write("dispatcher_ip: %s" % worker["dispatcher_ip"])
+            fconfig.close()
         if "expose_ports" in worker:
             for eports in worker["expose_ports"]:
                 dockcomp["services"][name]["ports"].append("%s" % eports)
