@@ -420,7 +420,7 @@ def main():
             "custom_volumes",
             "devices", "dispatcher_ip", "default_slave",
             "extra_actions", "export_ser2net", "expose_ser2net", "expose_ports", "env",
-            "host", "host_healthcheck",
+            "host", "host_healthcheck", "http_url_format_string",
             "loglevel", "lava-coordinator", "lava_worker_token",
             "name",
             "remote_user", "remote_master", "remote_address", "remote_rpc_port", "remote_proto", "remote_user_token",
@@ -563,7 +563,9 @@ def main():
             fcoordinator.write(template_lava_coordinator_conf.substitute(masterurl=remote_address))
             fcoordinator.close()
         if "dispatcher_ip" in worker:
-            dockcomp["services"][worker_name]["environment"]["LAVA_DISPATCHER_IP"] = worker["dispatcher_ip"]
+            fconfig = open("%s/worker-config" % workerdir, 'a')
+            fconfig.write("dispatcher_ip: %s\n" % worker["dispatcher_ip"])
+            fconfig.close()
         if "expose_ports" in worker:
             for eports in worker["expose_ports"]:
                 dockcomp["services"][name]["ports"].append("%s" % eports)
@@ -581,6 +583,10 @@ def main():
             if remote_master in worker and "build_args" in worker[remote_master]:
                 dockcomp["services"]["healthcheck"]["build"]["args"] = worker[remote_master]['build_args']
             shutil.copytree("healthcheck", "output/%s/healthcheck" % host)
+        if "http_url_format_string" in worker:
+            fconfig = open("%s/worker-config" % workerdir, 'a')
+            fconfig.write("http_url_format_string: \"%s\"\n" % worker["http_url_format_string"])
+            fconfig.close()
         if "extra_actions" in worker:
             fp = open("%s/scripts/extra_actions" % workerdir, "w")
             for eaction in worker["extra_actions"]:
