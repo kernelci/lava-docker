@@ -106,9 +106,9 @@ do
 	else
 		echo "DEBUG: Worker does not need a TOKEN"
 	fi
-	if [ ! -z "$LAVA_DISPATCHER_IP" ];then
-		echo "Add dispatcher_ip $LAVA_DISPATCHER_IP to $worker"
-		/usr/local/bin/setdispatcherip.py $LAVA_MASTER_URI $worker $LAVA_DISPATCHER_IP || exit $?
+	if [ -s "/root/worker-config" ];then
+		echo "Applying LAVA worker configuration to $worker"
+		lavacli $LAVACLIOPTS workers config set $worker /root/worker-config || exit $?
 	fi
 	for device in $(ls /root/devices/$worker/)
 	do

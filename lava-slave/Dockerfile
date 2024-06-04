@@ -10,6 +10,8 @@ COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 
+COPY worker-config /root/worker-config
+
 COPY scripts/ /usr/local/bin/
 RUN chmod a+x /usr/local/bin/*
 

@@ -479,7 +479,9 @@ There are two way to add custom devices types.
 	If you are modifying an already present (upstream) device-type, it is the best way.
 
 ## How to made LAVA slave use a proxy ?
-Add env to a slave like:
+
+For a standard HTTP/HTTPS proxy add env to a slave like:
+
 slave:
   env:
   - "http_proxy: http://dns:port"
@@ -489,6 +491,11 @@ Or on master via
       env:
        - "http_proxy: http://squid_IP_address:3128"
        - "https_proxy: http://squid_IP_address:3128"
+
+Or alternatively for a URL format string style proxy such as KissCache:
+
+slave:
+  http_url_format_string: http://kisscache_host:port
 
 
 ## How to use a board which uses PXE ?
