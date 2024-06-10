@@ -147,7 +147,7 @@ def main():
         else:
             listen_address = '0.0.0.0'
         dockcomp = {}
-        dockcomp["version"] = "2.0"
+        dockcomp["version"] = "2.4"
         dockcomp["services"] = {}
         dockcomposeymlpath = "output/%s/docker-compose.yml" % host
         dockcomp["services"][name] = {}
